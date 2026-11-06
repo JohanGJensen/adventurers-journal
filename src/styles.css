@@ -433,3 +433,13 @@ select, .row-form input, .notes-page input, .notes-page textarea, .notes-page se
 a.btn { text-decoration: none; display: inline-block; }
 label.btn { display: inline-block; }
 .sheet-nav { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 12px; font-size: .9rem; }
+
+/* History log */
+.log-filters { margin-bottom: 16px; }
+.log-day { margin-bottom: 12px; }
+.log-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.log-item { display: grid; grid-template-columns: 3.5rem 1.5rem 1fr; gap: 8px; padding: 4px 0; border-bottom: 1px solid var(--line); align-items: baseline; }
+.log-item:last-child { border-bottom: 0; }
+.log-item time { color: var(--muted); font-variant-numeric: tabular-nums; font-size: .85rem; }
+.log-damage span:last-child { color: var(--cap); }
+.log-heal span:last-child { color: var(--moss); }

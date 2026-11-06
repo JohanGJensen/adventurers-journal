@@ -31,7 +31,7 @@ export function App({ character }: { character: CharacterDto }) {
   }, [c.name]);
 
   return (
-    <DiceProvider>
+    <DiceProvider characterId={character.id}>
       {!(play.ready && inventory.ready) ? <div className="loading">Loading {c.name}…</div> : (
       <main className="sheet">
         <nav className="sheet-nav">

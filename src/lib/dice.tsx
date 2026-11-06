@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useState, type ReactNode } from 'react';
+import { api } from './client';
 
 export type RollMode = 'normal' | 'advantage' | 'disadvantage';
 
@@ -49,6 +50,13 @@ export function makeRoll(label: string, sides: number, count = 1, modifier = 0, 
   };
 }
 
+/** "Perception: 17 (1d20 + 3, advantage: 14, 9)" */
+export function rollSummary(r: Roll): string {
+  const mode = r.mode === 'normal' ? '' : `, ${r.mode}`;
+  const crit = r.natural === 20 ? ' — natural 20' : r.natural === 1 ? ' — natural 1' : '';
+  return `${r.label}: ${r.total} (${r.expr}${mode}: ${r.dice.join(', ')})${crit}`;
+}
+
 export const modeFromEvent = (e: { shiftKey: boolean; altKey: boolean }): RollMode =>
   e.shiftKey ? 'advantage' : e.altKey ? 'disadvantage' : 'normal';
 
@@ -75,7 +83,8 @@ function readCinematic(): boolean {
 
 const DiceContext = createContext<DiceApi | null>(null);
 
-export function DiceProvider({ children }: { children: ReactNode }) {
+/** `characterId` (when set) gets every roll written to its history log. */
+export function DiceProvider({ children, characterId }: { children: ReactNode; characterId?: number }) {
   const [log, setLog] = useState<Roll[]>([]);
   const [active, setActive] = useState<Roll | null>(null);
   const [cinematic, setCinematicState] = useState(readCinematic);
@@ -86,9 +95,13 @@ export function DiceProvider({ children }: { children: ReactNode }) {
       const r = makeRoll(label, sides, count, modifier, mode);
       setLog((l) => [r, ...l].slice(0, 20));
       if (cinematic) setActive(r);
+      if (characterId !== undefined) {
+        const { id: _, ...data } = r;
+        void api('POST', `/characters/${characterId}/events`, { type: 'roll', summary: rollSummary(r), data });
+      }
       return r;
     },
-    [cinematic],
+    [cinematic, characterId],
   );
   const clear = useCallback(() => setLog([]), []);
   const dismiss = useCallback(() => setActive(null), []);

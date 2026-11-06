@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { App } from './App';
 import { CharacterList } from './components/CharacterList';
+import { HistoryLog } from './components/HistoryLog';
 import { ConnectionBanner } from './components/ConnectionBanner';
 import { ImportConflictDialog } from './components/ImportConflictDialog';
 import { Toasts } from './components/Toast';
@@ -47,6 +48,8 @@ function Routes() {
       return <CharacterList />;
     case 'sheet':
       return <CharacterPage id={route.id} />;
+    case 'log':
+      return <HistoryLog key={route.id} characterId={route.id} />;
     default:
       return (
         <Centered>
