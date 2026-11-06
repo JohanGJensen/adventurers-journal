@@ -58,3 +58,30 @@ export function asItemPatch(v: unknown): ItemPatch {
 
 export const optId = (v: unknown): string | undefined =>
   v === undefined ? undefined : typeof v === 'string' && /^[\w-]{1,64}$/.test(v) ? v : bad('invalid id');
+
+const SPELL_SOURCES = ['Class', 'Magic Initiate', 'Gnome', 'Other'];
+
+export function asExtras(v: unknown): import('../src/shared/types').CharacterExtras {
+  if (v === undefined) return {};
+  if (!isObj(v)) return bad('extras must be an object');
+  const out: import('../src/shared/types').CharacterExtras = {};
+  if (v.portrait !== undefined) out.portrait = typeof v.portrait === 'string' ? v.portrait : bad('portrait must be a string');
+  if (v.bonusCantrips !== undefined) out.bonusCantrips = isInt(v.bonusCantrips) ? v.bonusCantrips : bad('bonusCantrips must be an integer');
+  const spellList = (x: unknown, name: string, withSource: boolean) => {
+    if (!Array.isArray(x)) return bad(`${name} must be an array`);
+    return x.map((s) => {
+      if (!isObj(s) || typeof s.name !== 'string' || !isInt(s.level) || (s.level as number) > 9) bad(`${name}: each entry needs name and level 0–9`);
+      const o = s as Obj;
+      if (withSource && !SPELL_SOURCES.includes(o.source as string)) bad(`${name}: source must be one of ${SPELL_SOURCES.join(', ')}`);
+      return withSource
+        ? { name: o.name as string, level: o.level as number, source: o.source as never, ...(typeof o.note === 'string' ? { note: o.note } : {}) }
+        : { name: o.name as string, level: o.level as number };
+    });
+  };
+  if (v.bonusSpells !== undefined) out.bonusSpells = spellList(v.bonusSpells, 'bonusSpells', true) as never;
+  if (v.extraClassSpells !== undefined) out.extraClassSpells = spellList(v.extraClassSpells, 'extraClassSpells', false);
+  return out;
+}
+
+export const optCampaignId = (v: unknown): number | null | undefined =>
+  v === undefined ? undefined : v === null ? null : isInt(v, 1) ? v : bad('campaignId must be a positive integer or null');

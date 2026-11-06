@@ -18,7 +18,9 @@ export function SavesAndSkills({ c }: { c: Character }) {
           </li>
         ))}
       </ul>
-      <p className="hint">Gnome Cunning: advantage on INT, WIS and CHA saves against magic.</p>
+      {c.features.some((f) => f.name === 'Gnome Cunning') && (
+        <p className="hint">Gnome Cunning: advantage on INT, WIS and CHA saves against magic.</p>
+      )}
 
       <h2>Skills</h2>
       <ul className="rows">

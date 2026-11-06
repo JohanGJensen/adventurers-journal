@@ -1,7 +1,6 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { buildCharacter } from './lib/character';
-import { downloadLocalExport } from './lib/localExport';
-import { toast } from './lib/toast';
+import { linkTo } from './lib/router';
 import type { CharacterDto } from './shared/types';
 import { DiceProvider } from './lib/dice';
 import { usePlayState } from './hooks/usePlayState';
@@ -27,11 +26,19 @@ export function App({ character }: { character: CharacterDto }) {
   const close = useCallback(() => setSelection(null), []);
   const closeBrowser = useCallback(() => setBrowserOpen(false), []);
   const openSpell = useCallback((name: string) => setSelection({ kind: 'spells', name }), []);
+  useEffect(() => {
+    document.title = `${c.name} · D&D Tool`;
+  }, [c.name]);
 
   return (
     <DiceProvider>
       {!(play.ready && inventory.ready) ? <div className="loading">Loading {c.name}…</div> : (
       <main className="sheet">
+        <nav className="sheet-nav">
+          <a {...linkTo('/')}>← All characters</a>
+          <a {...linkTo(`/c/${character.id}/log`)}>History</a>
+          <a {...linkTo(`/notes?character=${character.id}`)}>Notes</a>
+        </nav>
         <Header c={c} />
         <div className="grid">
           <div className="col">
@@ -53,12 +60,7 @@ export function App({ character }: { character: CharacterDto }) {
             </button>
           </div>
         </div>
-        <footer>Spell &amp; item data: <a href="https://www.dnd5eapi.co" target="_blank" rel="noreferrer">dnd5eapi.co</a> (SRD 5.2 / 5.1, CC-BY-4.0)
-          {' · '}
-          <button className="linkish" onClick={() => downloadLocalExport() || toast('No local browser data to download')}>
-            Download local data
-          </button>
-        </footer>
+        <footer>Spell &amp; item data: <a href="https://www.dnd5eapi.co" target="_blank" rel="noreferrer">dnd5eapi.co</a> (SRD 5.2 / 5.1, CC-BY-4.0)</footer>
       </main>
       )}
       <SpellBrowser c={c} play={play} open={browserOpen} onClose={closeBrowser} onOpenSpell={openSpell} covered={!!selection} />

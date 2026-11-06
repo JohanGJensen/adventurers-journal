@@ -1,39 +1,78 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { App } from './App';
+import { CharacterList } from './components/CharacterList';
 import { ConnectionBanner } from './components/ConnectionBanner';
 import { ImportConflictDialog } from './components/ImportConflictDialog';
 import { Toasts } from './components/Toast';
 import { autoImport } from './lib/autoImport';
 import { api } from './lib/client';
+import { linkTo, useRoute } from './lib/router';
 import { toast } from './lib/toast';
 import type { CharacterDto, CharacterSummary, LocalExport } from './shared/types';
 
-type Load =
+type Boot =
   | { state: 'loading' }
   | { state: 'error'; message: string }
   | { state: 'conflict'; characterId: number; payload: LocalExport }
-  | { state: 'ready'; character: CharacterDto };
+  | { state: 'ready' };
+
+const Centered = ({ children }: { children: ReactNode }) => <div className="loading">{children}</div>;
+
+/** Loads one character, then renders the sheet. */
+function CharacterPage({ id }: { id: number }) {
+  const [c, setC] = useState<CharacterDto | null | { error: string }>(null);
+  useEffect(() => {
+    let live = true;
+    setC(null);
+    api<CharacterDto>('GET', `/characters/${id}`).then((r) => live && setC(r.data ?? { error: r.error }));
+    return () => {
+      live = false;
+    };
+  }, [id]);
+  if (!c) return <Centered>Loading…</Centered>;
+  if ('error' in c)
+    return (
+      <Centered>
+        <p>{c.error}</p>
+        <a {...linkTo('/')}>All characters</a>
+      </Centered>
+    );
+  return <App key={c.id} character={c} />;
+}
+
+function Routes() {
+  const route = useRoute();
+  switch (route.name) {
+    case 'list':
+      return <CharacterList />;
+    case 'sheet':
+      return <CharacterPage id={route.id} />;
+    default:
+      return (
+        <Centered>
+          <p>Page not found.</p>
+          <a {...linkTo('/')}>All characters</a>
+        </Centered>
+      );
+  }
+}
 
 export function Root() {
-  const [load, setLoad] = useState<Load>({ state: 'loading' });
+  const [boot, setBoot] = useState<Boot>({ state: 'loading' });
   const [attempt, setAttempt] = useState(0);
 
+  // Before any page reads play state, move old localStorage saves to the server (once).
   useEffect(() => {
     let live = true;
     (async () => {
       const list = await api<CharacterSummary[]>('GET', '/characters');
       if (!live) return;
-      if (!list.data) return setLoad({ state: 'error', message: list.error });
-      // Old localStorage saves go to the server before anything reads play state.
+      if (!list.data) return setBoot({ state: 'error', message: list.error });
       const imp = await autoImport(list.data);
       if (!live) return;
-      if (imp.status === 'conflict') return setLoad({ state: 'conflict', characterId: imp.characterId, payload: imp.payload });
+      if (imp.status === 'conflict') return setBoot({ state: 'conflict', characterId: imp.characterId, payload: imp.payload });
       if (imp.status === 'error') toast(`Could not import local data: ${imp.message}`, 'error');
-      const pick = list.data.find((x) => x.seedKey === 'faelan') ?? list.data[0];
-      if (!pick) return setLoad({ state: 'error', message: 'No characters in the database' });
-      const one = await api<CharacterDto>('GET', `/characters/${pick.id}`);
-      if (!live) return;
-      setLoad(one.data ? { state: 'ready', character: one.data } : { state: 'error', message: one.error });
+      setBoot({ state: 'ready' });
     })();
     return () => {
       live = false;
@@ -45,17 +84,17 @@ export function Root() {
   return (
     <>
       <ConnectionBanner />
-      {load.state === 'ready' ? (
-        <App character={load.character} />
-      ) : load.state === 'conflict' ? (
-        <ImportConflictDialog characterId={load.characterId} payload={load.payload} onDone={retry} />
-      ) : load.state === 'loading' ? (
-        <div className="loading">Loading…</div>
+      {boot.state === 'ready' ? (
+        <Routes />
+      ) : boot.state === 'conflict' ? (
+        <ImportConflictDialog characterId={boot.characterId} payload={boot.payload} onDone={retry} />
+      ) : boot.state === 'loading' ? (
+        <Centered>Loading…</Centered>
       ) : (
-        <div className="loading">
-          <p>Could not load characters: {load.message}</p>
+        <Centered>
+          <p>Could not reach the server: {boot.message}</p>
           <button className="btn" onClick={retry}>Retry</button>
-        </div>
+        </Centered>
       )}
       <Toasts />
     </>
