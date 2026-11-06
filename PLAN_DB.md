@@ -237,3 +237,13 @@ Each phase ships on its own with the app working throughout. Phases 1–4 replac
 ## Open points (decide during implementation)
 - Whether `events` should be pruned or archived after N entries. Not needed at single-user scale.
 - Whether to store derived `Character` stats server-side for queries across characters. Not needed until something wants to query them.
+
+## Implementation notes (where the code differs from the plan above)
+- `PUT /play` takes `events: EventIn[]`, not a single `event`. The 300 ms debounce can merge several actions into one save.
+- `characters` has two extra columns:
+  - `extras_json` holds per-character data the sheet export lacks: bonus spells, bonus cantrips, extra class spells, portrait. Faelan's values are `FAELAN_EXTRAS` in `src/data/supplement.ts`.
+  - `seed_key` (`'faelan'`) marks the seeded character. Browser auto-import always targets it.
+- An import counts as a conflict when the character has a `play_state` row or any logged event. Lazily seeded inventory alone does not count.
+- The server derives characters with the client's `buildCharacter` (Bun runs the TS directly). Pure state helpers live in `src/shared/` and are used by both sides.
+- Notes bodies are plain text, shown with `pre-wrap`. No markdown renderer.
+- Event history is paged with an opaque `before=<at>~<id>` cursor.
