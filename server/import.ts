@@ -1,5 +1,6 @@
 // The one localStorage import code path, used by POST /api/import/local and scripts/import-local.ts.
-import type { Database } from 'bun:sqlite';
+import { createHash } from 'node:crypto';
+import type { Db } from './sqlite';
 import { newId, normalizeInventory, normalizePlayState } from '../src/shared/state';
 import type { Inventory, LocalExport, PlayState } from '../src/shared/types';
 import { deriveCharacter } from './characters';
@@ -66,16 +67,16 @@ export function validateExport(payload: unknown): LocalExport {
 }
 
 export const payloadHash = (p: LocalExport) =>
-  new Bun.CryptoHasher('sha256').update(canonical({ playState: p.playState ?? null, inventory: p.inventory ?? null })).digest('hex');
+  createHash('sha256').update(canonical({ playState: p.playState ?? null, inventory: p.inventory ?? null })).digest('hex');
 
 /** True once the character has state a player made: saved play state or any logged event. */
-const hasUserData = (db: Database, cid: number) =>
+const hasUserData = (db: Db, cid: number) =>
   !!db.query('SELECT 1 FROM play_state WHERE character_id = ?').get(cid) ||
   !!db.query('SELECT 1 FROM events WHERE character_id = ? LIMIT 1').get(cid);
 
 class Rollback extends Error {}
 
-export function importLocalData(db: Database, raw: unknown, opts: ImportOpts): ImportResult {
+export function importLocalData(db: Db, raw: unknown, opts: ImportOpts): ImportResult {
   const payload = validateExport(raw);
   const cid = opts.characterId;
   const c = deriveCharacter(db, cid);

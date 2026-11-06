@@ -1,4 +1,4 @@
-import type { Database } from 'bun:sqlite';
+import type { Db } from './sqlite';
 import { newId, seedInventory } from '../src/shared/state';
 import { COINS, type Coins, type EventIn, type Inventory, type Item } from '../src/shared/types';
 import { deriveCharacter } from './characters';
@@ -11,15 +11,15 @@ interface ItemRow {
   equipped: number;
 }
 
-const readItems = (db: Database, cid: number): Item[] =>
+const readItems = (db: Db, cid: number): Item[] =>
   (db.query('SELECT id, name, qty, equipped FROM items WHERE character_id = ? ORDER BY sort, rowid').all(cid) as ItemRow[]).map(
     (r) => ({ id: r.id, name: r.name, qty: r.qty, equipped: !!r.equipped }),
   );
 
-export const hasInventory = (db: Database, cid: number) =>
+export const hasInventory = (db: Db, cid: number) =>
   !!db.query('SELECT 1 FROM coins WHERE character_id = ?').get(cid) || !!db.query('SELECT 1 FROM items WHERE character_id = ? LIMIT 1').get(cid);
 
-export function writeCoins(db: Database, cid: number, coins: Coins) {
+export function writeCoins(db: Db, cid: number, coins: Coins) {
   db.query(
     `INSERT INTO coins (character_id, cp, sp, ep, gp, pp) VALUES (?, ?, ?, ?, ?, ?)
      ON CONFLICT (character_id) DO UPDATE SET cp = excluded.cp, sp = excluded.sp, ep = excluded.ep, gp = excluded.gp, pp = excluded.pp`,
@@ -27,7 +27,7 @@ export function writeCoins(db: Database, cid: number, coins: Coins) {
 }
 
 /** Replaces the character's item list with `items` (in order). */
-export function writeItems(db: Database, cid: number, items: Item[]) {
+export function writeItems(db: Db, cid: number, items: Item[]) {
   const keep = new Set(items.map((x) => x.id));
   for (const { id } of db.query('SELECT id FROM items WHERE character_id = ?').all(cid) as { id: string }[])
     if (!keep.has(id)) db.query('DELETE FROM items WHERE id = ?').run(id);
@@ -40,7 +40,7 @@ export function writeItems(db: Database, cid: number, items: Item[]) {
 }
 
 /** Coins + items; seeds from the sheet the first time. */
-export function readInventory(db: Database, cid: number): Inventory {
+export function readInventory(db: Db, cid: number): Inventory {
   const coins = db.query('SELECT cp, sp, ep, gp, pp FROM coins WHERE character_id = ?').get(cid) as Coins | null;
   if (coins) return { coins, items: readItems(db, cid) };
   return db.transaction(() => {
@@ -52,7 +52,7 @@ export function readInventory(db: Database, cid: number): Inventory {
 }
 
 /** Applies a pure item-list change in a transaction and logs what changed. Returns the new inventory. */
-export function changeItems(db: Database, cid: number, fn: (items: Item[]) => Item[], describe: (before: Item[], after: Item[]) => EventIn | null): Inventory {
+export function changeItems(db: Db, cid: number, fn: (items: Item[]) => Item[], describe: (before: Item[], after: Item[]) => EventIn | null): Inventory {
   return db.transaction(() => {
     const inv = readInventory(db, cid);
     const after = fn(inv.items);
@@ -63,7 +63,7 @@ export function changeItems(db: Database, cid: number, fn: (items: Item[]) => It
   })();
 }
 
-export function resetInventory(db: Database, cid: number): Inventory {
+export function resetInventory(db: Db, cid: number): Inventory {
   return db.transaction(() => {
     const seeded = seedInventory(deriveCharacter(db, cid), newId);
     writeCoins(db, cid, seeded.coins);
