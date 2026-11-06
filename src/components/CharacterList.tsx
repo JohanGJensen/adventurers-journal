@@ -19,7 +19,7 @@ export function CharacterList() {
   }, []);
 
   useEffect(() => {
-    document.title = 'Characters · D&D Tool';
+    document.title = 'Characters · Adventurers Journal';
     void refresh();
   }, [refresh]);
 

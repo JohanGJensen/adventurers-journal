@@ -3,7 +3,7 @@
   "configVersion": 0,
   "workspaces": {
     "": {
-      "name": "dnd-tool",
+      "name": "adventurers-journal",
       "dependencies": {
         "react": "^19.1.0",
         "react-dom": "^19.1.0",

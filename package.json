@@ -1,5 +1,5 @@
 {
-  "name": "dnd-tool",
+  "name": "adventurers-journal",
   "private": true,
   "version": "0.1.0",
   "description": "D&D character sheet and campaign tool",
@@ -15,7 +15,8 @@
     "dist:mac": "bun scripts/dist-mac.ts",
     "desktop:smoke": "bun build scripts/node-smoke.ts --target=node --format=esm --outdir dist-electron && ELECTRON_RUN_AS_NODE=1 electron dist-electron/node-smoke.js",
     "typecheck": "tsc -p tsconfig.json && tsc -p tsconfig.server.json",
-    "test": "bun test"
+    "test": "bun test",
+    "install:linux": "bun scripts/install-linux.ts"
   },
   "devDependencies": {
     "@types/bun": "^1.4.4",
@@ -30,9 +31,9 @@
     "vite": "^6.3.5"
   },
   "build": {
-    "appId": "dev.jgl.dndtool",
-    "productName": "D&D Tool",
-    "executableName": "dnd-tool",
+    "appId": "dev.jgl.adventurersjournal",
+    "productName": "Adventurers Journal",
+    "executableName": "adventurers-journal",
     "directories": {
       "output": "release"
     },
@@ -47,21 +48,21 @@
         "rpm"
       ],
       "category": "Game",
-      "icon": "public/faelanmosswalker.png",
+      "icon": "build/icons",
       "syncDesktopName": true,
       "maintainer": "JohanGJensen"
     },
-    "artifactName": "dnd-tool-${version}.${ext}",
+    "artifactName": "adventurers-journal-${version}.${ext}",
     "mac": {
       "target": [
         "dmg"
       ],
       "category": "public.app-category.role-playing-games",
-      "icon": "public/faelanmosswalker.png"
+      "icon": "build/icon.png"
     },
     "dmg": {
-      "artifactName": "dnd-tool-${version}-${arch}.${ext}"
+      "artifactName": "adventurers-journal-${version}-${arch}.${ext}"
     }
   },
-  "desktopName": "dnd-tool.desktop"
+  "desktopName": "adventurers-journal.desktop"
 }

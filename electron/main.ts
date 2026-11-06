@@ -1,7 +1,7 @@
 // Electron main process: runs the API in-process on node:sqlite and serves the UI and /api over a
 // private app:// protocol (see protocol.ts), so no port is opened.
 import { app, BrowserWindow, session, shell } from 'electron';
-import { existsSync, mkdirSync, renameSync, rmSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, renameSync, rmSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { APP_ORIGIN, createApp } from '../server/app';
 import { openDb } from '../server/db';
@@ -12,8 +12,12 @@ import { handleProtocol, registerScheme } from './protocol';
 
 registerScheme();
 
+const NAME = 'Adventurers Journal';
+app.setName(NAME);
 // Same data dir for `bun run dev`, `bun run start` and the packaged app, whatever productName says.
-app.setPath('userData', join(app.getPath('appData'), 'dnd-tool'));
+app.setPath('userData', join(app.getPath('appData'), 'adventurers-journal'));
+/** Where the app kept its data before it was renamed from dnd-tool. */
+const LEGACY_DATA = join(app.getPath('appData'), 'dnd-tool');
 
 // app.quit() is async and would still let whenReady run (opening the DB, flashing a window).
 if (!app.requestSingleInstanceLock()) app.exit(0);
@@ -21,13 +25,13 @@ if (!app.requestSingleInstanceLock()) app.exit(0);
 /** Set by `bun run dev`: the UI comes from Vite with HMR. Ignored in packaged builds. */
 const DEV_SERVER = !app.isPackaged ? (process.env.DND_DEV_SERVER ?? null) : null;
 const DIST = join(app.getAppPath(), 'dist');
-const ICON = join(app.getAppPath(), DEV_SERVER ? 'public' : 'dist', 'faelanmosswalker.png');
+const ICON = join(app.getAppPath(), DEV_SERVER ? 'public' : 'dist', 'icon.png');
 
-/** On first launch, copy an existing DB (DND_IMPORT_FROM, or the repo's data/dnd.sqlite when unpackaged). */
-function copyExistingDb(target: string) {
-  if (existsSync(target)) return;
-  const source = process.env.DND_IMPORT_FROM ?? (app.isPackaged ? null : join(app.getAppPath(), 'data', 'dnd.sqlite'));
-  if (!source || !existsSync(source)) return;
+/** On first launch, copy an existing DB into `target` from the first of `sources` that exists. Returns that source. */
+function copyExistingDb(target: string, sources: (string | null | undefined)[]): string | null {
+  if (existsSync(target)) return null;
+  const source = sources.find((p): p is string => !!p && existsSync(p));
+  if (!source) return null;
   mkdirSync(dirname(target), { recursive: true });
   // Into a temp file first, so a failed copy never leaves a partial DB that later launches would open.
   const tmp = `${target}.importing`;
@@ -37,6 +41,7 @@ function copyExistingDb(target: string) {
     src.query('VACUUM INTO ?').run(tmp); // consistent snapshot, WAL included
     renameSync(tmp, target);
     console.log(`Copied ${source} to ${target}`);
+    return source;
   } catch (e) {
     rmSync(tmp, { force: true });
     throw e;
@@ -46,11 +51,21 @@ function copyExistingDb(target: string) {
 }
 
 function openDatabase(): Db {
-  const dbPath = process.env.DND_DB ?? join(app.getPath('userData'), 'dnd.sqlite');
-  copyExistingDb(dbPath);
+  const defaultPath = join(app.getPath('userData'), 'dnd.sqlite');
+  const dbPath = process.env.DND_DB ?? defaultPath;
+  const legacyDb = join(LEGACY_DATA, 'dnd.sqlite');
+  const copied = copyExistingDb(dbPath, [
+    process.env.DND_IMPORT_FROM,
+    dbPath === defaultPath ? legacyDb : null, // data from before the rename (the old folder is left as is)
+    app.isPackaged ? null : join(app.getAppPath(), 'data', 'dnd.sqlite'),
+  ]);
+  if (copied === legacyDb && existsSync(join(LEGACY_DATA, 'backups'))) {
+    cpSync(join(LEGACY_DATA, 'backups'), join(dirname(dbPath), 'backups'), { recursive: true, force: false });
+    console.log(`Moved data from ${LEGACY_DATA} to ${dirname(dbPath)}`);
+  }
   const db = openDb(dbPath);
   if (seedIfEmpty(db)) console.log('Seeded Faelan into a new database');
-  console.log(`dnd-tool ${DEV_SERVER ? `dev (UI from ${DEV_SERVER})` : 'desktop'} (db: ${dbPath})`);
+  console.log(`${NAME} ${DEV_SERVER ? `dev (UI from ${DEV_SERVER})` : 'desktop'} (db: ${dbPath})`);
   return db;
 }
 
@@ -62,7 +77,7 @@ function createWindow() {
   const win = new BrowserWindow({
     width: 1280,
     height: 900,
-    title: 'D&D Tool',
+    title: NAME,
     icon: ICON,
     autoHideMenuBar: true,
     show: false,
