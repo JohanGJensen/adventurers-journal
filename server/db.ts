@@ -1,31 +1,26 @@
-import { Database } from 'bun:sqlite';
-import { mkdirSync, readdirSync, readFileSync } from 'node:fs';
+import { mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
+import { MIGRATIONS } from './migrations';
+import { openSqlite, type Db } from './sqlite';
 
-const MIGRATIONS = join(import.meta.dir, 'migrations');
+export const defaultDbPath = () => process.env.DND_DB ?? join(import.meta.dirname, '..', 'data', 'dnd.sqlite');
 
-export const defaultDbPath = () => process.env.DND_DB ?? join(import.meta.dir, '..', 'data', 'dnd.sqlite');
-
-export function openDb(path = defaultDbPath()): Database {
+export function openDb(path = defaultDbPath()): Db {
   if (path !== ':memory:') mkdirSync(dirname(path), { recursive: true });
-  const db = new Database(path, { create: true, strict: true });
-  if (path !== ':memory:') db.exec('PRAGMA journal_mode=WAL;');
+  const db = openSqlite(path);
+  // WAL + synchronous=NORMAL: durable against app crashes, skips an fsync per commit (play state saves often).
+  if (path !== ':memory:') db.exec('PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL;');
   db.exec('PRAGMA foreign_keys=ON;');
   migrate(db);
   return db;
 }
 
-/** Applies migrations/NNN_*.sql above PRAGMA user_version, in order, each in its own transaction. */
-export function migrate(db: Database): number {
+/** Applies MIGRATIONS above PRAGMA user_version, in order, each in its own transaction. */
+export function migrate(db: Db): number {
   const current = (db.query('PRAGMA user_version').get() as { user_version: number }).user_version;
-  const files = readdirSync(MIGRATIONS)
-    .filter((f) => /^\d+_.*\.sql$/.test(f))
-    .sort();
   let applied = 0;
-  for (const f of files) {
-    const n = parseInt(f, 10);
+  for (const { n, sql } of MIGRATIONS) {
     if (n <= current) continue;
-    const sql = readFileSync(join(MIGRATIONS, f), 'utf8');
     db.transaction(() => {
       db.exec(sql);
       db.exec(`PRAGMA user_version = ${n}`);

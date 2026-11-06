@@ -2,25 +2,55 @@
   "name": "dnd-tool",
   "private": true,
   "version": "0.1.0",
+  "description": "D&D character sheet and campaign tool",
+  "author": "JohanGJensen",
   "type": "module",
+  "main": "dist-electron/main.js",
   "scripts": {
     "dev": "bun scripts/dev.ts",
     "start": "bun run build && NODE_ENV=production bun server/index.ts",
     "build": "tsc -p tsconfig.json && tsc -p tsconfig.server.json && vite build",
+    "build:electron": "bun build electron/main.ts --target=node --format=esm --outdir dist-electron --external electron",
+    "desktop": "bun run build && bun run build:electron && electron .",
+    "desktop:dist": "bun run build && bun run build:electron && electron-builder --linux AppImage",
+    "desktop:smoke": "bun build scripts/node-smoke.ts --target=node --format=esm --outdir dist-electron && ELECTRON_RUN_AS_NODE=1 electron dist-electron/node-smoke.js",
     "typecheck": "tsc -p tsconfig.json && tsc -p tsconfig.server.json",
     "test": "bun test",
     "preview": "vite preview"
-  },
-  "dependencies": {
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0"
   },
   "devDependencies": {
     "@types/bun": "^1.4.4",
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",
     "@vitejs/plugin-react": "^4.5.0",
+    "electron": "^45.2.3",
+    "electron-builder": "^26.18.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
     "typescript": "~5.8.3",
     "vite": "^6.3.5"
-  }
+  },
+  "build": {
+    "appId": "dev.jgl.dndtool",
+    "productName": "D&D Tool",
+    "executableName": "dnd-tool",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**",
+      "dist-electron/main.js",
+      "package.json"
+    ],
+    "linux": {
+      "target": [
+        "AppImage"
+      ],
+      "category": "Game",
+      "icon": "public/faelanmosswalker.png",
+      "syncDesktopName": true
+    },
+    "artifactName": "dnd-tool-${version}.${ext}"
+  },
+  "desktopName": "dnd-tool.desktop"
 }

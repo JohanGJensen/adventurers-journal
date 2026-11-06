@@ -1,4 +1,4 @@
-import type { Database } from 'bun:sqlite';
+import type { Db } from './sqlite';
 import { buildCharacter, type Character } from '../src/lib/character';
 import type { CharacterDto, CharacterExtras, CharacterSummary } from '../src/shared/types';
 import { parseJson } from './db';
@@ -22,19 +22,19 @@ const toDto = (r: Row): CharacterDto => ({
   extras: parseJson<CharacterExtras>(r.extras_json, {}),
 });
 
-export function getCharacter(db: Database, id: number): CharacterDto {
+export function getCharacter(db: Db, id: number): CharacterDto {
   const r = db.query('SELECT * FROM characters WHERE id = ?').get(id) as Row | null;
   if (!r) throw new HttpError(404, `No character ${id}`);
   return toDto(r);
 }
 
 /** The derived sheet, for server-side defaults (fresh play state, seeded inventory). */
-export function deriveCharacter(db: Database, id: number): Character {
+export function deriveCharacter(db: Db, id: number): Character {
   const dto = getCharacter(db, id);
   return buildCharacter(dto.sheet, dto.extras);
 }
 
-export function listCharacters(db: Database): CharacterSummary[] {
+export function listCharacters(db: Db): CharacterSummary[] {
   const rows = db.query('SELECT * FROM characters ORDER BY id').all() as Row[];
   return rows.map((r) => {
     const dto = toDto(r);
@@ -51,7 +51,7 @@ export function listCharacters(db: Database): CharacterSummary[] {
 
 /** Adds a character from a sheet export. Throws 400 if buildCharacter can't derive it. */
 export function insertCharacter(
-  db: Database,
+  db: Db,
   sheet: unknown,
   opts: { campaignId?: number | null; extras?: CharacterExtras; seedKey?: string } = {},
 ): number {
@@ -74,7 +74,7 @@ export function insertCharacter(
 }
 
 /** Resolves "--character 3" or "--character Faelan". */
-export function findCharacter(db: Database, ref: string): number | null {
+export function findCharacter(db: Db, ref: string): number | null {
   if (/^\d+$/.test(ref)) {
     const r = db.query('SELECT id FROM characters WHERE id = ?').get(Number(ref)) as { id: number } | null;
     return r?.id ?? null;

@@ -1,5 +1,5 @@
 // dnd5eapi.co lookups, normalized for the UI and cached in srd_cache.
-import type { Database } from 'bun:sqlite';
+import type { Db } from './sqlite';
 import { LOCAL_DETAILS } from '../src/data/supplement';
 import type { ClassSpell, Detail, EquipmentInfo, Kind } from '../src/shared/types';
 import { parseJson } from './db';
@@ -105,10 +105,10 @@ async function fetchVersion(kind: Kind, slug: string, version: '2024' | '2014'):
   };
 }
 
-const readCache = (db: Database, kind: string, slug: string) =>
+const readCache = (db: Db, kind: string, slug: string) =>
   db.query('SELECT data_json FROM srd_cache WHERE kind = ? AND slug = ?').get(kind, slug) as { data_json: string | null } | null;
 
-const writeCache = (db: Database, kind: string, slug: string, value: unknown) =>
+const writeCache = (db: Db, kind: string, slug: string, value: unknown) =>
   db
     .query(
       `INSERT INTO srd_cache (kind, slug, data_json) VALUES (?, ?, ?)
@@ -117,7 +117,7 @@ const writeCache = (db: Database, kind: string, slug: string, value: unknown) =>
     .run(kind, slug, value == null ? null : JSON.stringify(value));
 
 /** Local fallback → DB cache → 2024 SRD → 2014 SRD. Null when nothing is known (cached as a known miss). */
-export async function getDetail(db: Database, kind: Kind, slug: string): Promise<Detail | null> {
+export async function getDetail(db: Db, kind: Kind, slug: string): Promise<Detail | null> {
   const local = LOCAL_DETAILS[slug];
   if (local) return { ...local, source: 'Local' };
   const cached = readCache(db, kind, slug);
@@ -128,7 +128,7 @@ export async function getDetail(db: Database, kind: Kind, slug: string): Promise
 }
 
 /** The class's SRD spell list (2024, falling back to 2014). */
-export async function getClassSpellList(db: Database, cls: string): Promise<ClassSpell[] | null> {
+export async function getClassSpellList(db: Db, cls: string): Promise<ClassSpell[] | null> {
   const cached = readCache(db, 'classlist', cls);
   if (cached) return parseJson<ClassSpell[] | null>(cached.data_json, null);
   let res: Response;

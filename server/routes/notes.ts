@@ -1,4 +1,4 @@
-import type { Database } from 'bun:sqlite';
+import type { Db } from '../sqlite';
 import { NOTE_KINDS, type Note, type NoteKind } from '../../src/shared/types';
 import { getCampaign } from '../campaigns';
 import { getCharacter } from '../characters';
@@ -27,7 +27,7 @@ const toNote = (r: Row): Note => ({
   updatedAt: r.updated_at,
 });
 
-function getNote(db: Database, id: number): Note {
+function getNote(db: Db, id: number): Note {
   const r = db.query('SELECT * FROM notes WHERE id = ?').get(id) as Row | null;
   if (!r) throw new HttpError(404, `No note ${id}`);
   return toNote(r);
@@ -42,7 +42,7 @@ export const ftsQuery = (q: string): string | null => {
 const asKind = (v: unknown): NoteKind => (NOTE_KINDS.includes(v as NoteKind) ? (v as NoteKind) : bad(`kind must be one of ${NOTE_KINDS.join(', ')}`));
 const asText = (v: unknown, name: string, max: number) => (typeof v === 'string' && v.length <= max ? v : bad(`${name} must be a string (max ${max})`));
 
-function checkOwners(db: Database, campaignId: number | null, characterId: number | null) {
+function checkOwners(db: Db, campaignId: number | null, characterId: number | null) {
   if (campaignId === null && characterId === null) bad('A note needs a campaignId or a characterId');
   if (campaignId) getCampaign(db, campaignId);
   if (characterId) getCharacter(db, characterId);

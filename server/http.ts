@@ -1,4 +1,4 @@
-import type { Database } from 'bun:sqlite';
+import type { Db } from './sqlite';
 
 export class HttpError extends Error {
   constructor(
@@ -21,7 +21,7 @@ export interface Ctx {
   req: Request;
   url: URL;
   params: Record<string, string>;
-  db: Database;
+  db: Db;
 }
 
 export type Handler = (ctx: Ctx) => Response | Promise<Response>;
@@ -50,7 +50,7 @@ function compile([method, pattern, handler]: Route): Compiled {
 
 export function createRouter(routes: Route[]) {
   const compiled = routes.map(compile);
-  return async (req: Request, db: Database): Promise<Response | null> => {
+  return async (req: Request, db: Db): Promise<Response | null> => {
     const url = new URL(req.url);
     let pathMatched = false;
     for (const r of compiled) {

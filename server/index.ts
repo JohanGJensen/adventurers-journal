@@ -6,7 +6,7 @@ import { seedIfEmpty } from './seed';
 
 const prod = process.env.NODE_ENV === 'production';
 const port = Number(process.env.PORT ?? (prod ? 3000 : 3001));
-const DIST = join(import.meta.dir, '..', 'dist');
+const DIST = join(import.meta.dirname, '..', 'dist');
 
 const db = openDb();
 if (seedIfEmpty(db)) console.log('Seeded Faelan into a new database');
