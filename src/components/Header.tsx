@@ -3,7 +3,13 @@ import type { Character } from '../lib/character';
 export function Header({ c }: { c: Character }) {
   return (
     <header className="hero">
-      <img className="portrait" src={c.portrait} alt={`Portrait of ${c.name}`} />
+      {c.portrait ? (
+        <img className="portrait" src={c.portrait} alt={`Portrait of ${c.name}`} />
+      ) : (
+        <div className="portrait portrait-initials" aria-hidden="true">
+          {c.name.split(/\s+/).map((w) => w[0]).slice(0, 2).join('')}
+        </div>
+      )}
       <div className="hero-text">
         <h1>{c.name}</h1>
         <p className="subtitle">

@@ -1,13 +1,8 @@
 // Data that lives in the Obsidian note (or in the rules) but not in the exported JSON.
 
-export type SpellSource = 'Class' | 'Magic Initiate' | 'Gnome';
+import type { CharacterExtras, SpellEntry, SpellInfo } from '../shared/types';
 
-export interface SpellEntry {
-  name: string;
-  level: number;
-  source: SpellSource;
-  note?: string;
-}
+export type { SpellEntry, SpellSource } from '../shared/types';
 
 /** Spells listed in the Obsidian note that the JSON export doesn't contain. */
 export const NOTE_SPELLS: SpellEntry[] = [
@@ -19,7 +14,7 @@ export const NOTE_SPELLS: SpellEntry[] = [
 
 export interface LocalDetail {
   name: string;
-  spell?: import('../lib/api').SpellInfo;
+  spell?: SpellInfo;
   meta: [string, string][];
   paragraphs: string[];
 }
@@ -30,6 +25,14 @@ export const BONUS_CANTRIPS = PRIMAL_ORDER === 'Magician' ? 1 : 0;
 
 /** Druid spells that aren't in the SRD class list. Add more here as needed. */
 export const EXTRA_CLASS_SPELLS: { name: string; level: number }[] = [{ name: 'Gust', level: 0 }];
+
+/** Faelan's extras, stored with the seeded character in the database. */
+export const FAELAN_EXTRAS: CharacterExtras = {
+  portrait: '/faelanmosswalker.png',
+  bonusSpells: NOTE_SPELLS,
+  bonusCantrips: BONUS_CANTRIPS,
+  extraClassSpells: EXTRA_CLASS_SPELLS,
+};
 
 /** Fallback text for things the SRD API doesn't have. Paraphrased summaries, not book text. */
 export const LOCAL_DETAILS: Record<string, LocalDetail> = {

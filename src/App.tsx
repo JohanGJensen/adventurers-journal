@@ -1,4 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
+import raw from './data/faelan.json';
+import { FAELAN_EXTRAS } from './data/supplement';
 import { buildCharacter } from './lib/character';
 import { DiceProvider } from './lib/dice';
 import { usePlayState } from './hooks/usePlayState';
@@ -16,7 +18,7 @@ import { DiceStage } from './components/DiceStage';
 import { SpellBrowser } from './components/SpellBrowser';
 
 export function App() {
-  const c = useMemo(() => buildCharacter(), []);
+  const c = useMemo(() => buildCharacter(raw, FAELAN_EXTRAS), []);
   const play = usePlayState(c);
   const inventory = useInventory(c);
   const [selection, setSelection] = useState<Selection | null>(null);
