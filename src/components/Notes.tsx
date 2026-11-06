@@ -33,7 +33,7 @@ export function Notes({ query }: { query: URLSearchParams }) {
   const saved = useRef<Draft | null>(null);
 
   useEffect(() => {
-    document.title = 'Notes · D&D Tool';
+    document.title = 'Notes · Adventurers Journal';
     api<Campaign[]>('GET', '/campaigns').then((r) => r.data && setCampaigns(r.data));
     api<CharacterSummary[]>('GET', '/characters').then((r) => r.data && setChars(r.data));
   }, []);

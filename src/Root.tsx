@@ -3,19 +3,14 @@ import { App } from './App';
 import { CharacterList } from './components/CharacterList';
 import { HistoryLog } from './components/HistoryLog';
 import { Notes } from './components/Notes';
-import { ConnectionBanner } from './components/ConnectionBanner';
-import { ImportConflictDialog } from './components/ImportConflictDialog';
 import { Toasts } from './components/Toast';
-import { autoImport } from './lib/autoImport';
 import { api } from './lib/client';
 import { linkTo, useRoute } from './lib/router';
-import { toast } from './lib/toast';
-import type { CharacterDto, CharacterSummary, LocalExport } from './shared/types';
+import type { CharacterDto, CharacterSummary } from './shared/types';
 
 type Boot =
   | { state: 'loading' }
   | { state: 'error'; message: string }
-  | { state: 'conflict'; characterId: number; payload: LocalExport }
   | { state: 'ready' };
 
 const Centered = ({ children }: { children: ReactNode }) => <div className="loading">{children}</div>;
@@ -67,19 +62,13 @@ export function Root() {
   const [boot, setBoot] = useState<Boot>({ state: 'loading' });
   const [attempt, setAttempt] = useState(0);
 
-  // Before any page reads play state, move old localStorage saves to the server (once).
+  // Checks the API answers before rendering pages.
   useEffect(() => {
     let live = true;
-    (async () => {
-      const list = await api<CharacterSummary[]>('GET', '/characters');
+    api<CharacterSummary[]>('GET', '/characters').then((list) => {
       if (!live) return;
-      if (!list.data) return setBoot({ state: 'error', message: list.error });
-      const imp = await autoImport(list.data);
-      if (!live) return;
-      if (imp.status === 'conflict') return setBoot({ state: 'conflict', characterId: imp.characterId, payload: imp.payload });
-      if (imp.status === 'error') toast(`Could not import local data: ${imp.message}`, 'error');
-      setBoot({ state: 'ready' });
-    })();
+      setBoot(list.data ? { state: 'ready' } : { state: 'error', message: list.error });
+    });
     return () => {
       live = false;
     };
@@ -89,16 +78,13 @@ export function Root() {
 
   return (
     <>
-      <ConnectionBanner />
       {boot.state === 'ready' ? (
         <Routes />
-      ) : boot.state === 'conflict' ? (
-        <ImportConflictDialog characterId={boot.characterId} payload={boot.payload} onDone={retry} />
       ) : boot.state === 'loading' ? (
         <Centered>Loading…</Centered>
       ) : (
         <Centered>
-          <p>Could not reach the server: {boot.message}</p>
+          <p>Could not load data: {boot.message}</p>
           <button className="btn" onClick={retry}>Retry</button>
         </Centered>
       )}

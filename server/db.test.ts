@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { createApp } from './app';
+import { APP_ORIGIN, createApp } from './app';
 import { migrate, openDb } from './db';
 import { seedIfEmpty } from './seed';
 
@@ -38,5 +38,14 @@ describe('db', () => {
     const res = await createApp(openDb(':memory:')).fetch(new Request('http://x/api/nope'));
     expect(res.status).toBe(404);
     expect(await res.json()).toEqual({ error: 'Not found' });
+  });
+
+  test('only requests from the app origin (or with none) are allowed', async () => {
+    const app = createApp(openDb(':memory:'));
+    const req = (origin?: string) => new Request(`${APP_ORIGIN}/api/characters`, { headers: origin ? { origin } : {} });
+    expect((await app.fetch(req())).status).toBe(200);
+    expect((await app.fetch(req(APP_ORIGIN))).status).toBe(200);
+    expect((await app.fetch(req('http://localhost:5173'))).status).toBe(403);
+    expect((await app.fetch(req('null'))).status).toBe(403);
   });
 });

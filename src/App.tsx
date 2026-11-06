@@ -27,7 +27,7 @@ export function App({ character }: { character: CharacterDto }) {
   const closeBrowser = useCallback(() => setBrowserOpen(false), []);
   const openSpell = useCallback((name: string) => setSelection({ kind: 'spells', name }), []);
   useEffect(() => {
-    document.title = `${c.name} · D&D Tool`;
+    document.title = `${c.name} · Adventurers Journal`;
   }, [c.name]);
 
   return (

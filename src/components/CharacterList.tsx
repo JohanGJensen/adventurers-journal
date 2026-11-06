@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
 import { api } from '../lib/client';
-import { downloadLocalExport } from '../lib/localExport';
 import { linkTo, navigate } from '../lib/router';
 import { toast } from '../lib/toast';
 import type { Campaign, CharacterDto, CharacterSummary } from '../shared/types';
@@ -20,7 +19,7 @@ export function CharacterList() {
   }, []);
 
   useEffect(() => {
-    document.title = 'Characters · D&D Tool';
+    document.title = 'Characters · Adventurers Journal';
     void refresh();
   }, [refresh]);
 
@@ -144,17 +143,6 @@ export function CharacterList() {
             <input value={newCampaign} onChange={(e) => setNewCampaign(e.target.value)} placeholder="New campaign name" aria-label="New campaign name" />
             <button className="btn" disabled={!newCampaign.trim()}>Add</button>
           </form>
-        </section>
-
-        <section className="card">
-          <h2>Settings</h2>
-          <p className="hint">
-            Data saved in this browser before the server existed. The file is the input for{' '}
-            <code>bun scripts/import-local.ts</code>.
-          </p>
-          <button className="btn ghost" onClick={() => downloadLocalExport() || toast('No local browser data to download')}>
-            Download local data
-          </button>
         </section>
       </div>
     </main>

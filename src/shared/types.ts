@@ -144,13 +144,3 @@ export interface Note {
   createdAt: string;
   updatedAt: string;
 }
-
-export interface LocalExport {
-  format: 'dnd-tool/local-export';
-  version: 1;
-  exportedAt: string;
-  playState?: Partial<PlayState>;
-  inventory?: Partial<Inventory>;
-}
-
-export const LOCAL_KEYS = { play: 'faelan-play-state', inventory: 'faelan-inventory' } as const;
