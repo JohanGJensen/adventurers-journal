@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { Character } from '../lib/character';
 import type { PlayApi } from '../hooks/usePlayState';
-import { EXTRA_CLASS_SPELLS, NOTE_SPELLS } from '../data/supplement';
 import { fetchClassSpellList, slugify, type ClassSpell } from '../lib/api';
 import { useSpellInfo } from '../hooks/useSpellInfo';
 import { unlockLevel } from '../lib/rules';
@@ -40,13 +39,13 @@ export function SpellBrowser({
     if (!open) return;
     let live = true;
     setStatus({ state: 'loading' });
-    fetchClassSpellList('druid')
+    fetchClassSpellList(c.classKey)
       .then((list) => live && setStatus({ state: 'done', list }))
       .catch((e: Error) => live && setStatus({ state: 'error', message: e.message }));
     return () => {
       live = false;
     };
-  }, [open, attempt]);
+  }, [open, attempt, c.classKey]);
 
   useEffect(() => {
     if (!open || covered) return;
@@ -55,21 +54,21 @@ export function SpellBrowser({
     return () => window.removeEventListener('keydown', onKey);
   }, [open, covered, onClose]);
 
-  const always = useMemo(() => new Map(NOTE_SPELLS.map((s) => [s.name.toLowerCase(), s.source])), []);
+  const always = useMemo(() => new Map(c.bonusSpells.map((s) => [s.name.toLowerCase(), s.source])), [c.bonusSpells]);
 
   const all = useMemo(() => {
     if (status.state !== 'done') return [];
     const list = [...status.list];
-    for (const x of EXTRA_CLASS_SPELLS) {
+    for (const x of c.extraClassSpells) {
       if (!list.some((s) => s.name.toLowerCase() === x.name.toLowerCase())) list.push({ index: slugify(x.name), ...x });
     }
     // Always-known spells from other sources (e.g. Minor Illusion) appear too, so the overview is complete.
-    for (const s of NOTE_SPELLS) {
+    for (const s of c.bonusSpells) {
       if (!list.some((x) => x.name.toLowerCase() === s.name.toLowerCase()))
         list.push({ index: slugify(s.name), name: s.name, level: s.level });
     }
     return list.sort((a, b) => a.level - b.level || a.name.localeCompare(b.name));
-  }, [status]);
+  }, [status, c.bonusSpells, c.extraClassSpells]);
 
   // Load details for the levels in view so school/concentration/ritual filters work.
   const inView = all.filter((s) => level === 'all' || s.level === level);

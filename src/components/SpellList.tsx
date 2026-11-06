@@ -22,8 +22,9 @@ export function SpellList({
 }) {
   const { roll } = useDice();
   const { state } = play;
-  const spells = knownSpells(c, state, (n) => cachedSpellLevel('druid', n));
-  const info = useSpellInfo(spells.map((s) => s.name));
+  // Names don't depend on levels, so load details first and take levels from them.
+  const info = useSpellInfo(knownSpells(c, state).map((s) => s.name));
+  const spells = knownSpells(c, state, (n) => info.get(n)?.level ?? cachedSpellLevel(c.classKey, n));
   const isConc = (name: string) => info.get(name)?.concentration ?? CONCENTRATION_FALLBACK.has(name);
 
   const cantrips = spells.filter((s) => s.level === 0);
@@ -31,10 +32,10 @@ export function SpellList({
 
   const cast = (s: SpellEntry, useMagicInitiate = false) => {
     if (s.level > 0) {
-      if (useMagicInitiate) play.update(() => ({ goodberryUsed: true }));
+      if (useMagicInitiate) play.update(() => ({ goodberryUsed: true }), { type: 'slot', summary: `Cast ${s.name} without a slot (Magic Initiate)` });
       else play.useSlot(s.level);
     }
-    if (isConc(s.name)) play.update(() => ({ concentration: s.name }));
+    if (isConc(s.name)) play.update(() => ({ concentration: s.name }), { type: 'spells', summary: `Concentrating on ${s.name}` });
   };
 
   const slotsLeft = (lvl: number) => (c.slots[lvl - 1] ?? 0) - (state.slotsUsed[lvl - 1] ?? 0);

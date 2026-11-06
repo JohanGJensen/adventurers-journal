@@ -18,7 +18,7 @@ export function CombatStats({ c, play, inventory }: { c: Character; play: PlayAp
     if (hitDiceLeft <= 0) return;
     const r = roll('Hit die (short rest)', c.rules.hitDie, 1, c.mods.CON);
     play.heal(Math.max(0, r.total));
-    play.update((s) => ({ hitDiceUsed: s.hitDiceUsed + 1 }));
+    play.update((s) => ({ hitDiceUsed: s.hitDiceUsed + 1 }), { type: 'rest', summary: `Spent a hit die (rolled ${r.total})` });
   };
 
   return (
@@ -51,8 +51,8 @@ export function CombatStats({ c, play, inventory }: { c: Character; play: PlayAp
       {state.hp === 0 && (
         <div className="death">
           <span>Death saves</span>
-          <Track label="✓" count={state.deathSaves.success} onSet={(v) => play.update((s) => ({ deathSaves: { ...s.deathSaves, success: v } }))} />
-          <Track label="✗" count={state.deathSaves.fail} onSet={(v) => play.update((s) => ({ deathSaves: { ...s.deathSaves, fail: v } }))} />
+          <Track label="✓" count={state.deathSaves.success} onSet={(v) => play.update((s) => ({ deathSaves: { ...s.deathSaves, success: v } }), (_, b) => ({ type: 'condition', summary: `Death saves: ${b.deathSaves.success} ✓ / ${b.deathSaves.fail} ✗` }))} />
+          <Track label="✗" count={state.deathSaves.fail} onSet={(v) => play.update((s) => ({ deathSaves: { ...s.deathSaves, fail: v } }), (_, b) => ({ type: 'condition', summary: `Death saves: ${b.deathSaves.success} ✓ / ${b.deathSaves.fail} ✗` }))} />
           <button className="btn ghost" onClick={() => roll('Death save', 20)}>Roll</button>
         </div>
       )}
@@ -61,7 +61,7 @@ export function CombatStats({ c, play, inventory }: { c: Character; play: PlayAp
         <div className="concentration">
           Concentrating on <strong>{state.concentration}</strong>
           <button className="btn ghost small" onClick={() => roll('Concentration (CON save)', 20, 1, c.abilities[2].save)}>CON save</button>
-          <button className="btn ghost small" onClick={() => play.update(() => ({ concentration: null }))}>End</button>
+          <button className="btn ghost small" onClick={() => play.update(() => ({ concentration: null }), { type: 'spells', summary: `Ended concentration on ${state.concentration}` })}>End</button>
         </div>
       )}
 

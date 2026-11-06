@@ -1,5 +1,5 @@
-import raw from '../data/faelan.json';
-import { BONUS_CANTRIPS, CLASS_FEATURES, NOTE_SPELLS, type Feature, type SpellEntry } from '../data/supplement';
+import { CLASS_FEATURES, type Feature } from '../data/supplement';
+import type { CharacterExtras, SpellEntry } from '../shared/types';
 import {
   ABILITIES,
   CLASSES,
@@ -34,13 +34,15 @@ export interface Skill {
 
 export interface Character {
   name: string;
-  portrait: string;
+  portrait: string | null;
   race: string;
   className: string;
   level: number;
   background: string;
   alignment: string;
   alignmentDescription: string;
+  /** lowercase class id from the sheet, e.g. "druid" */
+  classKey: string;
   rules: ClassRules;
   profBonus: number;
   abilities: AbilityScore[];
@@ -62,6 +64,10 @@ export interface Character {
   preparedCap: number;
   /** spells as exported (class picks + always-known from the note); see knownSpells for live choices */
   spells: SpellEntry[];
+  /** always-known spells from race, feats etc. (from the character's extras) */
+  bonusSpells: SpellEntry[];
+  /** class-list spells missing from the SRD list */
+  extraClassSpells: { name: string; level: number }[];
   features: Feature[];
   tools: Feature[];
   equipment: string[];
@@ -74,7 +80,11 @@ function find(choices: Choice[], type: string): Choice {
   return c;
 }
 
-export function buildCharacter(data: any = raw[0]): Character {
+/** Derives the sheet. `data` is one character export (or the `[character]` array form). */
+export function buildCharacter(data: any, extras: CharacterExtras = {}): Character {
+  if (Array.isArray(data)) data = data[0];
+  if (!data || !Array.isArray(data.userChoices)) throw new Error('Character JSON is missing "userChoices"');
+  const bonusSpells = extras.bonusSpells ?? [];
   const choices: Choice[] = data.userChoices;
   const race = find(choices, 'race');
   const cls = find(choices, 'class');
@@ -107,18 +117,19 @@ export function buildCharacter(data: any = raw[0]): Character {
     return { name, ability, proficient: !!source, source, bonus: mods[ability] + (source ? profBonus : 0) };
   });
 
-  // JSON spells are class spells; the Obsidian note adds Magic Initiate and gnome spells.
+  // JSON spells are class spells; the extras add always-known ones (feats, race).
   const spells: SpellEntry[] = [
     ...(spellChoice.cantrips as string[]).map((name) => ({ name, level: 0, source: 'Class' as const })),
     ...(spellChoice.spells as string[]).map((name) => ({ name, level: 1, source: 'Class' as const })),
   ];
-  for (const s of NOTE_SPELLS) {
+  for (const s of bonusSpells) {
     if (!spells.some((x) => x.name.toLowerCase() === s.name.toLowerCase())) spells.push(s);
   }
   spells.sort((a, b) => a.level - b.level || a.name.localeCompare(b.name));
 
+  const raceLabel = titleCase([race.subrace, race.value].filter(Boolean).join(' '));
   const features: Feature[] = [
-    ...(race.traits as { name: string; description: string }[]).map((t) => ({ ...t, source: 'Forest Gnome' })),
+    ...(race.traits as { name: string; description: string }[]).map((t) => ({ ...t, source: raceLabel })),
     ...(bg.bonuses.originFeat as { name: string; description: string }[]).map((t) => ({
       ...t,
       source: 'Guide (origin feat)',
@@ -128,9 +139,10 @@ export function buildCharacter(data: any = raw[0]): Character {
 
   return {
     name: data.characterName,
-    portrait: '/faelanmosswalker.png',
-    race: `${titleCase(race.subrace)} ${titleCase(race.value)}`,
+    portrait: extras.portrait ?? null,
+    race: raceLabel,
     className: titleCase(cls.value),
+    classKey: cls.value,
     level,
     background: titleCase(bg.value),
     alignment: align.value,
@@ -149,9 +161,11 @@ export function buildCharacter(data: any = raw[0]): Character {
     spellAttack: profBonus + mods[rules.spellAbility],
     slots: rules.slots[level] ?? [],
     maxSpellLevel: maxSpellLevel(level),
-    cantripCap: (rules.cantripsKnown[level] ?? 0) + BONUS_CANTRIPS,
+    cantripCap: (rules.cantripsKnown[level] ?? 0) + (extras.bonusCantrips ?? 0),
     preparedCap: rules.preparedCount[level] ?? 0,
     spells,
+    bonusSpells,
+    extraClassSpells: extras.extraClassSpells ?? [],
     features,
     tools: (bg.bonuses.tools as { name: string; description: string }[]).map((t) => ({ ...t, source: 'Guide' })),
     equipment: [...Object.values(equip.value.equipped ?? {}), ...equip.value.backpack] as string[],
@@ -159,7 +173,7 @@ export function buildCharacter(data: any = raw[0]): Character {
   };
 }
 
-/** Spells Faelan currently has: chosen class cantrips, prepared class spells and always-known ones. */
+/** Spells the character currently has: chosen class cantrips, prepared class spells and always-known ones. */
 export function knownSpells(
   c: Character,
   chosen: { chosenCantrips: string[]; prepared: string[] },
@@ -171,7 +185,7 @@ export function knownSpells(
     ...chosen.chosenCantrips.map((name) => ({ name, level: 0, source: 'Class' as const })),
     ...chosen.prepared.map((name) => ({ name, level: lvl(name, 1), source: 'Class' as const })),
   ];
-  for (const s of NOTE_SPELLS) {
+  for (const s of c.bonusSpells) {
     if (!out.some((x) => x.name.toLowerCase() === s.name.toLowerCase())) out.push(s);
   }
   return out.sort((a, b) => a.level - b.level || a.name.localeCompare(b.name));
