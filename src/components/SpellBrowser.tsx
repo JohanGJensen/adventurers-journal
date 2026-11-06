@@ -40,13 +40,13 @@ export function SpellBrowser({
     if (!open) return;
     let live = true;
     setStatus({ state: 'loading' });
-    fetchClassSpellList('druid')
+    fetchClassSpellList(c.classKey)
       .then((list) => live && setStatus({ state: 'done', list }))
       .catch((e: Error) => live && setStatus({ state: 'error', message: e.message }));
     return () => {
       live = false;
     };
-  }, [open, attempt]);
+  }, [open, attempt, c.classKey]);
 
   useEffect(() => {
     if (!open || covered) return;

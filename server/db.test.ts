@@ -29,7 +29,7 @@ describe('db', () => {
     seedIfEmpty(db);
     const res = await createApp(db).fetch(new Request('http://x/api/characters'));
     expect(res.status).toBe(200);
-    const list = await res.json();
+    const list: any = await res.json();
     expect(list[0]).toMatchObject({ id: 1, name: 'Faelan Mosswalker', seedKey: 'faelan', portrait: '/faelanmosswalker.png' });
     expect(list[0].subtitle).toContain('Druid');
   });
