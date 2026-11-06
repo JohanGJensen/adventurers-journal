@@ -1,24 +1,8 @@
-// Typed fetch wrapper for the local API, plus an "is the server reachable" store.
+// Typed fetch wrapper for the in-process API (served by Electron's app:// protocol).
 
 export type Result<T> = { data: T; error?: undefined; status: number } | { data?: undefined; error: string; status: number; body?: any };
 
-let online = true;
-const listeners = new Set<() => void>();
-const setOnline = (v: boolean) => {
-  if (v === online) return;
-  online = v;
-  listeners.forEach((l) => l());
-};
-
-export const connection = {
-  subscribe(l: () => void) {
-    listeners.add(l);
-    return () => listeners.delete(l);
-  },
-  getSnapshot: () => online,
-};
-
-/** status 0 = network error (server not running). Never throws. */
+/** status 0 = the request itself failed. Never throws. */
 export async function api<T>(method: string, path: string, body?: unknown, init?: RequestInit): Promise<Result<T>> {
   let res: Response;
   try {
@@ -29,15 +13,8 @@ export async function api<T>(method: string, path: string, body?: unknown, init?
       ...init,
     });
   } catch (e) {
-    setOnline(false);
     return { error: e instanceof Error ? e.message : 'Network error', status: 0 };
   }
-  // Vite's proxy answers 502/504 when the API process is down.
-  if ((res.status === 502 || res.status === 504) && !res.headers.get('content-type')?.includes('json')) {
-    setOnline(false);
-    return { error: 'Server not running', status: 0 };
-  }
-  setOnline(true);
   let parsed: any = null;
   try {
     parsed = await res.json();
@@ -48,5 +25,3 @@ export async function api<T>(method: string, path: string, body?: unknown, init?
   return { data: parsed as T, status: res.status };
 }
 
-/** Checks reachability now (used by the banner's retry). */
-export const ping = () => api('GET', '/characters');

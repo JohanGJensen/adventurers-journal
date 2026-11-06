@@ -1,29 +1,26 @@
 import type { Db } from './sqlite';
-import { rejectReason } from './guard';
 import { createRouter, HttpError, json, type Route } from './http';
 import { campaignRoutes } from './routes/campaigns';
 import { characterRoutes } from './routes/characters';
 import { eventRoutes } from './routes/events';
-import { importRoutes } from './routes/import';
 import { inventoryRoutes } from './routes/inventory';
 import { noteRoutes } from './routes/notes';
 import { playRoutes } from './routes/play';
 import { srdRoutes } from './routes/srd';
 
+/** The origin the UI is served from (Electron's private app:// protocol). */
+export const APP_ORIGIN = 'app://dnd';
+
 /**
- * By default requests must pass the loopback Host/Origin check. `origin` replaces it for transports that
- * aren't network-reachable (Electron's app:// protocol): only requests with no Origin or exactly that one pass.
+ * The API, as a fetch handler. It is only reachable through Electron's app:// protocol (no port is opened),
+ * so the one check is that a request comes from the app's own page: no Origin, or exactly APP_ORIGIN.
  */
-export function createApp(db: Db, extra: Route[] = [], { origin }: { origin?: string } = {}) {
-  const route = createRouter([...characterRoutes, ...campaignRoutes, ...playRoutes, ...inventoryRoutes, ...srdRoutes, ...importRoutes, ...eventRoutes, ...noteRoutes, ...extra]);
-  const check = origin === undefined ? rejectReason : (req: Request) => {
-    const o = req.headers.get('origin');
-    return o === null || o === origin ? null : 'Origin not allowed';
-  };
+export function createApp(db: Db, extra: Route[] = []) {
+  const route = createRouter([...characterRoutes, ...campaignRoutes, ...playRoutes, ...inventoryRoutes, ...srdRoutes, ...eventRoutes, ...noteRoutes, ...extra]);
   return {
     async fetch(req: Request): Promise<Response> {
-      const refused = check(req);
-      if (refused) return json({ error: refused }, 403);
+      const origin = req.headers.get('origin');
+      if (origin !== null && origin !== APP_ORIGIN) return json({ error: 'Origin not allowed' }, 403);
       try {
         return (await route(req, db)) ?? json({ error: 'Not found' }, 404);
       } catch (e) {

@@ -1,11 +1,10 @@
 import { mkdirSync } from 'node:fs';
-import { dirname, join } from 'node:path';
+import { dirname } from 'node:path';
 import { MIGRATIONS } from './migrations';
 import { openSqlite, type Db } from './sqlite';
 
-export const defaultDbPath = () => process.env.DND_DB ?? join(import.meta.dirname, '..', 'data', 'dnd.sqlite');
-
-export function openDb(path = defaultDbPath()): Db {
+/** Opens (creating if needed) and migrates the DB at `path`, or an in-memory one for ':memory:'. */
+export function openDb(path: string): Db {
   if (path !== ':memory:') mkdirSync(dirname(path), { recursive: true });
   const db = openSqlite(path);
   // WAL + synchronous=NORMAL: durable against app crashes, skips an fsync per commit (play state saves often).

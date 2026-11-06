@@ -1,8 +1,6 @@
-// A small SQLite interface the server is written against, with two drivers:
-// bun:sqlite when running under Bun (dev server, tests, CLI scripts) and node:sqlite
-// when running under Node (Electron's main process). Set DND_SQLITE=node to force the
-// Node driver under Bun, e.g. `DND_SQLITE=node bun test`.
-// Drivers are loaded with process.getBuiltinModule so bundles never import the other runtime's module.
+// A small SQLite interface the server is written against, implemented on node:sqlite
+// (Electron's main process; also available under Bun for `bun test`).
+// Loaded with process.getBuiltinModule so the bundle never statically imports it.
 
 export type Param = string | number | bigint | boolean | null | Uint8Array;
 
@@ -20,7 +18,6 @@ export interface Db {
   close(): void;
 }
 
-type BunSqlite = typeof import('bun:sqlite');
 type NodeSqlite = typeof import('node:sqlite');
 
 const load = <T>(id: string): T => {
@@ -30,16 +27,10 @@ const load = <T>(id: string): T => {
 };
 
 export function openSqlite(path: string, { readonly = false }: { readonly?: boolean } = {}): Db {
-  const useBun = !!process.versions.bun && process.env.DND_SQLITE !== 'node';
-  if (useBun) {
-    const { Database } = load<BunSqlite>('bun:sqlite');
-    const opts = readonly ? { readonly: true, strict: true } : { create: true, strict: true };
-    return new Database(path, opts) as unknown as Db;
-  }
   return openNode(path, readonly);
 }
 
-// node:sqlite has no booleans; bun:sqlite binds them as 1/0.
+// node:sqlite has no booleans; bind them as 1/0.
 const bind = (params: Param[]) => params.map((p) => (typeof p === 'boolean' ? (p ? 1 : 0) : p));
 
 function openNode(path: string, readOnly: boolean): Db {
