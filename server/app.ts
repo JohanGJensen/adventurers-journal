@@ -5,11 +5,12 @@ import { characterRoutes } from './routes/characters';
 import { eventRoutes } from './routes/events';
 import { importRoutes } from './routes/import';
 import { inventoryRoutes } from './routes/inventory';
+import { noteRoutes } from './routes/notes';
 import { playRoutes } from './routes/play';
 import { srdRoutes } from './routes/srd';
 
 export function createApp(db: Database, extra: Route[] = []) {
-  const route = createRouter([...characterRoutes, ...campaignRoutes, ...playRoutes, ...inventoryRoutes, ...srdRoutes, ...importRoutes, ...eventRoutes, ...extra]);
+  const route = createRouter([...characterRoutes, ...campaignRoutes, ...playRoutes, ...inventoryRoutes, ...srdRoutes, ...importRoutes, ...eventRoutes, ...noteRoutes, ...extra]);
   return {
     async fetch(req: Request): Promise<Response> {
       try {
