@@ -1,6 +1,7 @@
 import type { Db } from './sqlite';
 import { buildCharacter, type Character } from '../src/lib/character';
-import type { CharacterDto, CharacterExtras, CharacterSummary } from '../src/shared/types';
+import { homebrewId, type CharacterDto, type CharacterExtras, type CharacterSummary, type LevelChoice } from '../src/shared/types';
+import { findHomebrew } from './homebrew';
 import { parseJson } from './db';
 import { HttpError } from './http';
 
@@ -10,37 +11,51 @@ interface Row {
   name: string;
   sheet_json: string;
   extras_json: string;
+  levels_json: string;
   seed_key: string | null;
 }
 
-const toDto = (r: Row): CharacterDto => ({
-  id: r.id,
-  name: r.name,
-  campaignId: r.campaign_id,
-  seedKey: r.seed_key,
-  sheet: JSON.parse(r.sheet_json),
-  extras: parseJson<CharacterExtras>(r.extras_json, {}),
-});
+/** The homebrew subclass the levels link to (the latest subclass pick wins), at its current version. */
+export function homebrewFor(db: Db, levels: LevelChoice[]) {
+  const id = homebrewId([...levels].reverse().find((l) => l.subclass)?.subclass?.index);
+  return id === null ? null : findHomebrew(db, id);
+}
+
+const toDto = (db: Db, r: Row): CharacterDto => {
+  const levels = parseJson<LevelChoice[]>(r.levels_json, []);
+  return {
+    id: r.id,
+    name: r.name,
+    campaignId: r.campaign_id,
+    seedKey: r.seed_key,
+    sheet: JSON.parse(r.sheet_json),
+    extras: parseJson<CharacterExtras>(r.extras_json, {}),
+    levels,
+    homebrew: homebrewFor(db, levels),
+  };
+};
+
+/** Derives the sheet from a stored character. */
+export const deriveDto = (dto: CharacterDto): Character => buildCharacter(dto.sheet, dto.extras, dto.levels, dto.homebrew);
 
 export function getCharacter(db: Db, id: number): CharacterDto {
   const r = db.query('SELECT * FROM characters WHERE id = ?').get(id) as Row | null;
   if (!r) throw new HttpError(404, `No character ${id}`);
-  return toDto(r);
+  return toDto(db, r);
 }
 
 /** The derived sheet, for server-side defaults (fresh play state, seeded inventory). */
 export function deriveCharacter(db: Db, id: number): Character {
-  const dto = getCharacter(db, id);
-  return buildCharacter(dto.sheet, dto.extras);
+  return deriveDto(getCharacter(db, id));
 }
 
 export function listCharacters(db: Db): CharacterSummary[] {
   const rows = db.query('SELECT * FROM characters ORDER BY id').all() as Row[];
   return rows.map((r) => {
-    const dto = toDto(r);
+    const dto = toDto(db, r);
     let subtitle = '';
     try {
-      const c = buildCharacter(dto.sheet, dto.extras);
+      const c = deriveDto(dto);
       subtitle = `${c.race} · ${c.className} ${c.level}`;
     } catch {
       subtitle = 'Invalid sheet';

@@ -1,5 +1,7 @@
-export const ABILITIES = ['STR', 'DEX', 'CON', 'INT', 'WIS', 'CHA'] as const;
-export type Ability = (typeof ABILITIES)[number];
+import { ABILITY_KEYS, type AbilityKey } from '../shared/types';
+
+export const ABILITIES = ABILITY_KEYS;
+export type Ability = AbilityKey;
 
 export const ABILITY_NAMES: Record<Ability, string> = {
   STR: 'Strength',
@@ -41,16 +43,49 @@ export interface ClassRules {
   cantripsKnown: number[];
   /** index = character level; spells prepared */
   preparedCount: number[];
+  /** index = character level; Wild Shape uses (0 = no Wild Shape) */
+  wildShapeUses: number[];
+  /** character levels at which the subclass grants features */
+  subclassLevels: number[];
 }
+
+export const MAX_LEVEL = 20;
+
+/** Full-caster spell slots, index = character level (PHB 2024; checked by scripts/check-levels.ts). */
+const FULL_CASTER_SLOTS: number[][] = [
+  [],
+  [2],
+  [3],
+  [4, 2],
+  [4, 3],
+  [4, 3, 2],
+  [4, 3, 3],
+  [4, 3, 3, 1],
+  [4, 3, 3, 2],
+  [4, 3, 3, 3, 1],
+  [4, 3, 3, 3, 2],
+  [4, 3, 3, 3, 2, 1],
+  [4, 3, 3, 3, 2, 1],
+  [4, 3, 3, 3, 2, 1, 1],
+  [4, 3, 3, 3, 2, 1, 1],
+  [4, 3, 3, 3, 2, 1, 1, 1],
+  [4, 3, 3, 3, 2, 1, 1, 1],
+  [4, 3, 3, 3, 2, 1, 1, 1, 1],
+  [4, 3, 3, 3, 3, 1, 1, 1, 1],
+  [4, 3, 3, 3, 3, 2, 1, 1, 1],
+  [4, 3, 3, 3, 3, 2, 2, 1, 1],
+];
 
 export const CLASSES: Record<string, ClassRules> = {
   druid: {
     hitDie: 8,
     saves: ['INT', 'WIS'],
     spellAbility: 'WIS',
-    slots: [[], [2], [3], [4, 2], [4, 3], [4, 3, 2]],
+    slots: FULL_CASTER_SLOTS,
     cantripsKnown: [0, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
     preparedCount: [0, 4, 5, 6, 7, 9, 10, 11, 12, 14, 15, 16, 16, 17, 17, 18, 18, 19, 20, 21, 22],
+    subclassLevels: [3, 6, 10, 14],
+    wildShapeUses: [0, 0, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4],
   },
 };
 
@@ -58,6 +93,8 @@ export const modifier = (score: number) => Math.floor((score - 10) / 2);
 export const proficiencyBonus = (level: number) => 2 + Math.floor((level - 1) / 4);
 export const fmt = (n: number) => (n >= 0 ? `+${n}` : `−${Math.abs(n)}`);
 export const titleCase = (s: string) => s.replace(/\b\w/g, (c) => c.toUpperCase());
+/** HP gained per level with the fixed option (5 for a d8). */
+export const fixedHitDie = (hitDie: number) => hitDie / 2 + 1;
 
 /** Highest spell level a full caster can cast at a given character level. */
 export const maxSpellLevel = (charLevel: number) => Math.min(9, Math.ceil(charLevel / 2));

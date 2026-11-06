@@ -28,8 +28,10 @@ export function DetailDrawer({ selection, onClose }: { selection: Selection | nu
   return (
     <>
       <div className="scrim" onClick={onClose} />
-      <aside className="drawer" role="dialog" aria-label={selection.name}>
+      <aside className="drawer tome" role="dialog" aria-label={selection.name}>
         <button className="close" onClick={onClose} aria-label="Close">×</button>
+        {/* scrolls inside the drawer so the tome frame stays put */}
+        <div className="drawer-scroll">
         <h2>{status.state === 'done' && status.detail ? status.detail.name : selection.name}</h2>
         {status.state === 'loading' && <p className="muted">Consulting the archives…</p>}
         {status.state === 'error' && <p className="muted">Couldn’t reach the API: {status.message}</p>}
@@ -45,6 +47,7 @@ export function DetailDrawer({ selection, onClose }: { selection: Selection | nu
             {status.detail.paragraphs.map((p, i) => <p key={i}>{p}</p>)}
           </>
         )}
+        </div>
       </aside>
     </>
   );

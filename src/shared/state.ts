@@ -27,13 +27,22 @@ export const freshPlayState = (c: StateBasis): PlayState => ({
   deathSaves: { success: 0, fail: 0 },
   chosenCantrips: c.spells.filter((x) => x.source === 'Class' && x.level === 0).map((x) => x.name),
   prepared: c.spells.filter((x) => x.source === 'Class' && x.level > 0).map((x) => x.name),
+  wildShapeUsed: 0,
+  variant: null,
+  resourcesUsed: {},
 });
 
-/** Fills in fields older saves lack. */
-export const normalizePlayState = (c: StateBasis, partial?: Partial<PlayState> | null): PlayState => ({
-  ...freshPlayState(c),
-  ...(partial && typeof partial === 'object' ? partial : {}),
-});
+/** Sizes `slotsUsed` to the current slot table (it changes when the level does), clamping each entry. */
+export const fitSlots = (used: number[], slots: number[]) => slots.map((max, i) => Math.min(max, used[i] ?? 0));
+
+/** Fills in fields older saves lack and fits level-dependent fields to the current level. */
+export function normalizePlayState(c: StateBasis, partial?: Partial<PlayState> | null): PlayState {
+  const p = (partial && typeof partial === 'object' ? partial : {}) as Partial<PlayState> & { landType?: string | null };
+  const { landType, ...rest } = p;
+  const s: PlayState = { ...freshPlayState(c), ...rest };
+  if (s.variant == null && typeof landType === 'string') s.variant = landType; // saves from before variants
+  return { ...s, slotsUsed: fitSlots(s.slotsUsed, c.slots) };
+}
 
 export const seedInventory = (c: StateBasis, newId: () => string): Inventory => ({
   coins: { cp: 0, sp: 0, ep: 0, gp: c.gold, pp: 0 },

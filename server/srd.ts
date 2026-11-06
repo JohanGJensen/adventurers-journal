@@ -1,7 +1,7 @@
 // dnd5eapi.co lookups, normalized for the UI and cached in srd_cache.
 import type { Db } from './sqlite';
 import { LOCAL_DETAILS } from '../src/data/supplement';
-import type { ClassSpell, Detail, EquipmentInfo, Kind } from '../src/shared/types';
+import type { ClassSpell, Detail, EquipmentInfo, Kind, LevelUpInfo, Pick } from '../src/shared/types';
 import { parseJson } from './db';
 
 const BASE = 'https://www.dnd5eapi.co/api';
@@ -127,24 +127,119 @@ export async function getDetail(db: Db, kind: Kind, slug: string): Promise<Detai
   return result;
 }
 
-/** The class's SRD spell list (2024, falling back to 2014). */
-export async function getClassSpellList(db: Db, cls: string): Promise<ClassSpell[] | null> {
-  const cached = readCache(db, 'classlist', cls);
-  if (cached) return parseJson<ClassSpell[] | null>(cached.data_json, null);
+/**
+ * GET `${BASE}${path}`, mapped and cached in srd_cache under (kind, slug). A 404 is cached as a known miss (null).
+ * Cached entries are served without the network, so anything fetched once works offline.
+ */
+async function cachedFetch<T>(db: Db, kind: string, slug: string, path: string, map: (d: any) => T): Promise<T | null> {
+  const cached = readCache(db, kind, slug);
+  if (cached) return parseJson<T | null>(cached.data_json, null);
   let res: Response;
   try {
-    res = await fetch(`${BASE}/2024/classes/${cls}/spells`);
-    if (res.status === 404) res = await fetch(`${BASE}/2014/classes/${cls}/spells`);
+    res = await fetch(`${BASE}${path}`);
   } catch (e) {
     throw new UpstreamError(`dnd5eapi.co unreachable: ${e instanceof Error ? e.message : e}`);
   }
   if (res.status === 404) {
-    writeCache(db, 'classlist', cls, null);
+    writeCache(db, kind, slug, null);
     return null;
   }
   if (!res.ok) throw new UpstreamError(`dnd5eapi.co returned ${res.status}`);
-  const data: any = await res.json();
-  const list: ClassSpell[] = (data.results ?? []).map((r: any) => ({ index: r.index, name: r.name, level: r.level }));
+  const value = map(await res.json());
+  writeCache(db, kind, slug, value);
+  return value;
+}
+
+/** The class's SRD spell list (2024, falling back to 2014). */
+export async function getClassSpellList(db: Db, cls: string): Promise<ClassSpell[] | null> {
+  const toSpells = (data: any): ClassSpell[] =>
+    (data.results ?? []).map((r: any) => ({ index: r.index, name: r.name, level: r.level }));
+  const cached = readCache(db, 'classlist', cls);
+  if (cached) return parseJson<ClassSpell[] | null>(cached.data_json, null);
+  const list =
+    (await cachedFetch(db, 'classlist-2024', cls, `/2024/classes/${cls}/spells`, toSpells)) ??
+    (await cachedFetch(db, 'classlist-2014', cls, `/2014/classes/${cls}/spells`, toSpells));
   writeCache(db, 'classlist', cls, list);
   return list;
+}
+
+type Text = { index: string; name: string; description: string };
+const text = (d: any): Text => ({
+  index: d.index,
+  name: d.name,
+  description: toList(d.description ?? d.desc).filter((p) => p.trim()).join('\n'),
+});
+
+/** Feature indices per level, from the 2024 class or subclass level table. */
+const levelTable = (db: Db, kind: 'classlevels' | 'subclasslevels', slug: string, path: string) =>
+  cachedFetch(db, kind, slug, path, (d: any[]): { level: number; features: string[] }[] =>
+    d.map((l) => ({ level: l.level, features: (l.features ?? []).map((f: any) => f.index) })),
+  );
+
+const indexList = (d: any): string[] => (d.results ?? []).map((r: any) => r.index);
+
+const features = (db: Db, indices: string[]) =>
+  Promise.all(indices.map((i) => cachedFetch(db, 'feature', i, `/2024/features/${i}`, text))).then((xs) =>
+    xs.filter((x): x is Text => !!x),
+  );
+
+const asPicks = (xs: (Text | null)[]): (Pick & { description: string })[] =>
+  xs.filter((x): x is Text => !!x).map((x) => ({ index: x.index, name: x.name, description: x.description }));
+
+type FeatRow = Text & { type: string; minLevel: number };
+
+async function feats(db: Db): Promise<FeatRow[]> {
+  const list = (await cachedFetch(db, 'srdlist', 'feats', '/2024/feats', indexList)) ?? [];
+  const rows = await Promise.all(
+    list.map((i) =>
+      cachedFetch(db, 'feat', i, `/2024/feats/${i}`, (d): FeatRow => {
+        const t = text(d);
+        const pre = d.prerequisite_options?.desc;
+        return {
+          ...t,
+          description: pre ? `Prerequisite: ${pre}.\n${t.description}` : t.description,
+          type: d.type ?? '',
+          minLevel: d.prerequisites?.minimum_level ?? 0,
+        };
+      }),
+    ),
+  );
+  return rows.filter((x): x is FeatRow => !!x);
+}
+
+/**
+ * Everything the level-up wizard needs for reaching `level`: class (and subclass) features with text,
+ * and the options for whatever that level asks for. Which features ask for a choice is decided by the client
+ * (LEVEL_CHOICES); this returns subclasses / feats / boons when the level has the matching feature.
+ */
+export async function getLevelUpInfo(db: Db, cls: string, level: number, subclass?: string): Promise<LevelUpInfo | null> {
+  const table = await levelTable(db, 'classlevels', cls, `/2024/classes/${cls}/levels`);
+  if (!table) return null;
+  const indices = table.find((l) => l.level === level)?.features ?? [];
+  const label = `${cls.charAt(0).toUpperCase()}${cls.slice(1)} ${level}`;
+  const out: LevelUpInfo = { level, features: (await features(db, indices)).map((f) => ({ ...f, source: label })) };
+
+  if (subclass) {
+    const sub = await cachedFetch(db, 'subclass', subclass, `/2024/subclasses/${subclass}`, text);
+    const subTable = sub && (await levelTable(db, 'subclasslevels', subclass, `/2024/subclasses/${subclass}/levels`));
+    const subIdx = subTable?.find((l) => l.level === level)?.features ?? [];
+    out.features.push(...(await features(db, subIdx)).map((f) => ({ ...f, source: `${sub!.name} ${level}` })));
+  } else if (indices.includes(`${cls}-subclass`)) {
+    const all =
+(await cachedFetch(db, 'srdlist', 'subclasses', '/2024/subclasses', indexList)) ?? [];
+    const details = await Promise.all(
+      all.map((i) => cachedFetch(db, 'subclass', i, `/2024/subclasses/${i}`, (d) => ({ ...text(d), cls: d.class?.index as string }))),
+    );
+    out.subclasses = asPicks(details.filter((d) => d?.cls === cls));
+  }
+
+  if (indices.some((i) => i.endsWith('-ability-score-improvement'))) {
+    out.feats = (await feats(db))
+      .filter((f) => (f.type === 'general' || f.type === 'origin') && f.minLevel <= level && f.index !== 'ability-score-improvement')
+      .map(({ index, name, description }) => ({ index, name, description }));
+  }
+  if (indices.some((i) => i.endsWith('-epic-boon'))) {
+    out.boons = (await feats(db)).filter((f) => f.type === 'epic-boon').map(({ index, name, description }) => ({ index, name, description }));
+  }
+  return out;
 }

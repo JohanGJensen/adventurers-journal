@@ -1,6 +1,7 @@
 import type { Character } from '../lib/character';
+import { MAX_LEVEL } from '../lib/rules';
 
-export function Header({ c }: { c: Character }) {
+export function Header({ c, onLevelUp }: { c: Character; onLevelUp?: () => void }) {
   return (
     <header className="hero">
       {c.portrait ? (
@@ -14,6 +15,10 @@ export function Header({ c }: { c: Character }) {
         <h1>{c.name}</h1>
         <p className="subtitle">
           {c.race} · {c.className} {c.level}
+          {c.subclass && <> · {c.subclass.name}</>}
+          {onLevelUp && c.level < MAX_LEVEL && (
+            <button className="btn small level-up-btn" onClick={onLevelUp}>Level up</button>
+          )}
         </p>
         <dl className="tags">
           <div><dt>Background</dt><dd>{c.background}</dd></div>

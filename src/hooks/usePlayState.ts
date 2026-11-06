@@ -192,6 +192,7 @@ export function usePlayState(c: Character, characterId: number) {
         conditions: s.conditions.filter((x) => x !== 'Unconscious'),
         chosenCantrips: s.chosenCantrips,
         prepared: s.prepared,
+        variant: s.variant,
       }),
       (a, b) => ({ type: 'rest', summary: `Long rest (HP ${a.hp} → ${b.hp}, slots restored)` }),
     );
@@ -222,9 +223,65 @@ export function usePlayState(c: Character, characterId: number) {
   const toggleCantrip = (name: string) => toggleIn('chosenCantrips', name, c.cantripCap);
   const togglePrepared = (name: string) => toggleIn('prepared', name, c.preparedCap);
 
+  const wildShape = (delta: 1 | -1) =>
+    update(
+      (s) => ({ wildShapeUsed: Math.max(0, Math.min(c.wildShapeUses, s.wildShapeUsed + delta)) }),
+      (a, b) =>
+        a.wildShapeUsed === b.wildShapeUsed
+          ? null
+          : { type: 'rest', summary: `${delta > 0 ? 'Used' : 'Regained'} a Wild Shape use (${c.wildShapeUses - b.wildShapeUsed}/${c.wildShapeUses} left)` },
+    );
+
+  const setVariant = (variant: string) =>
+    update(
+      () => ({ variant }),
+      (a, b) => (a.variant === b.variant ? null : { type: 'rest', summary: `${c.variants?.label ?? 'Variant'}: ${b.variant}` }),
+    );
+
+  const resource = (key: string, delta: 1 | -1) => {
+    const r = c.resources.find((x) => x.key === key);
+    if (!r) return;
+    update(
+      (s) => ({ resourcesUsed: { ...s.resourcesUsed, [key]: Math.max(0, Math.min(r.max, (s.resourcesUsed[key] ?? 0) + delta)) } }),
+      (a, b) =>
+        (a.resourcesUsed[key] ?? 0) === (b.resourcesUsed[key] ?? 0)
+          ? null
+          : { type: 'rest', summary: `${delta > 0 ? 'Used' : 'Regained'} ${r.name} (${r.max - (b.resourcesUsed[key] ?? 0)}/${r.max} left)` },
+    );
+  };
+
+  /** Short rest: short-recharge resources come back, and one Wild Shape use (2024 rule). Hit dice are spent separately. */
+  const shortRest = () =>
+    update(
+      (s) => ({
+        wildShapeUsed: Math.max(0, s.wildShapeUsed - 1),
+        resourcesUsed: Object.fromEntries(
+          Object.entries(s.resourcesUsed).filter(([k]) => c.resources.find((r) => r.key === k)?.recharge !== 'short'),
+        ),
+      }),
+      { type: 'rest', summary: 'Short rest (short-rest resources restored)' },
+    );
+
+  /** Waits until every local change is saved, so a server-side change (level-up) builds on it. */
+  const settle = async () => {
+    for (let i = 0; i < 50 && (saving.current || dirty.current); i++) {
+      if (!saving.current) await flush();
+      else await new Promise((r) => setTimeout(r, 50));
+    }
+  };
+
+  /** Takes over a state the server wrote (level-up, undo). */
+  const replace = (s: PlayState, v: number) => {
+    pending.current = [];
+    dirty.current = false;
+    adopt(s, v);
+  };
+
   return {
     state, ready, update, damage, heal, setTemp, useSlot, restoreSlot, toggleCondition, longRest, reset,
-    toggleCantrip, togglePrepared,
+    toggleCantrip, togglePrepared, useWildShape: () => wildShape(1), restoreWildShape: () => wildShape(-1),
+    setVariant, useResource: (key: string) => resource(key, 1), restoreResource: (key: string) => resource(key, -1), shortRest,
+    settle, replace,
   };
 }
 

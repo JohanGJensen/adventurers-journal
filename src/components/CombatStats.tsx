@@ -9,10 +9,18 @@ export function CombatStats({ c, play, inventory }: { c: Character; play: PlayAp
   const { roll } = useDice();
   const { state } = play;
   const [amount, setAmount] = useState('');
+  const [askVariant, setAskVariant] = useState(false);
+  const wildLeft = c.wildShapeUses - state.wildShapeUsed;
+
+  const longRest = () => {
+    play.longRest();
+    if (c.variants) setAskVariant(true);
+  };
   const n = Math.max(0, parseInt(amount, 10) || 0);
   const pct = Math.round((state.hp / c.hitPoints) * 100);
   const hitDiceLeft = c.level - state.hitDiceUsed;
-  const ac = armorClassFrom(inventory.inv.items, c.mods.DEX, c.armorClass);
+  const armor = armorClassFrom(inventory.inv.items, c.mods.DEX, c.armorClass);
+  const ac = c.acBonus ? { value: armor.value + c.acBonus, source: `${armor.source} ${fmt(c.acBonus)} (${c.subclass?.name})` } : armor;
 
   const spendHitDie = () => {
     if (hitDiceLeft <= 0) return;
@@ -48,6 +56,48 @@ export function CombatStats({ c, play, inventory }: { c: Character; play: PlayAp
         </div>
       </div>
 
+      {c.wildShapeUses > 0 && (
+        <div className="slots wild-shape">
+          <span>Wild Shape <small className="muted">{wildLeft}/{c.wildShapeUses}</small></span>
+          <span className="slot-pips">
+            {Array.from({ length: c.wildShapeUses }, (_, i) => (
+              <span key={i} className={`slot ${i < wildLeft ? '' : 'used'}`} />
+            ))}
+          </span>
+          <span className="item-actions">
+            <button className="btn ghost small" disabled={wildLeft <= 0} onClick={play.useWildShape}>Use</button>
+            <button className="btn ghost small" disabled={state.wildShapeUsed <= 0} onClick={play.restoreWildShape}>Regain</button>
+          </span>
+        </div>
+      )}
+
+      {c.resources.map((r) => {
+        const left = r.max - (state.resourcesUsed[r.key] ?? 0);
+        return (
+          <div className="slots wild-shape" key={r.key}>
+            <span>
+              {r.name} <small className="muted">{left}/{r.max} · {r.recharge} rest</small>
+            </span>
+            <span className="slot-pips">
+              {Array.from({ length: r.max }, (_, i) => (
+                <span key={i} className={`slot ${i < left ? '' : 'used'}`} />
+              ))}
+            </span>
+            <span className="item-actions">
+              <button className="btn ghost small" disabled={left <= 0} onClick={() => play.useResource(r.key)}>Use</button>
+              <button className="btn ghost small" disabled={left >= r.max} onClick={() => play.restoreResource(r.key)}>Regain</button>
+            </span>
+          </div>
+        );
+      })}
+
+      {c.variants && (
+        <p className="hint">
+          {c.variants.label}: <strong>{state.variant ?? 'not chosen'}</strong>{' '}
+          <button className="btn ghost small" onClick={() => setAskVariant(true)}>Change</button>
+        </p>
+      )}
+
       {state.hp === 0 && (
         <div className="death">
           <span>Death saves</span>
@@ -75,9 +125,38 @@ export function CombatStats({ c, play, inventory }: { c: Character; play: PlayAp
       </details>
 
       <div className="rest">
-        <button className="btn ghost" disabled={hitDiceLeft <= 0 || state.hp >= c.hitPoints} onClick={spendHitDie}>Short rest: spend hit die</button>
-        <button className="btn" onClick={play.longRest}>Long rest</button>
+        <button className="btn ghost" disabled={hitDiceLeft <= 0 || state.hp >= c.hitPoints} onClick={spendHitDie}>Spend hit die</button>
+        <button className="btn ghost" onClick={play.shortRest} title="Restores short-rest resources and one Wild Shape use">Short rest</button>
+        <button className="btn" onClick={longRest}>Long rest</button>
       </div>
+
+      {askVariant && c.variants && (
+        <>
+          <div className="scrim" onClick={() => setAskVariant(false)} />
+          <div className="dialog tome" role="dialog" aria-label={`Choose ${c.variants.label}`}>
+            <h2>{c.subclass?.name}</h2>
+            <p className="muted">Choose your {c.variants.label.toLowerCase()} for today.</p>
+            <div className="chips">
+              {c.variants.options.map((o) => (
+                <button
+                  key={o.name}
+                  title={o.description || undefined}
+                  className={`chip ${state.variant === o.name ? 'sel' : ''}`}
+                  onClick={() => {
+                    play.setVariant(o.name);
+                    setAskVariant(false);
+                  }}
+                >
+                  {o.name}
+                </button>
+              ))}
+            </div>
+            <button className="btn ghost small" onClick={() => setAskVariant(false)}>
+              {state.variant ? `Keep ${state.variant}` : 'Later'}
+            </button>
+          </div>
+        </>
+      )}
     </section>
   );
 }
