@@ -401,3 +401,10 @@ body[data-stage="reveal"][data-stage-mood="fumble"] .sheet { filter: blur(3px) g
   display: grid; place-items: center; background: var(--moss-soft); color: var(--moss);
   font: 700 3rem Cinzel, Georgia, serif;
 }
+
+/* Modal */
+.modal-backdrop { position: fixed; inset: 0; z-index: 70; background: rgb(0 0 0 / 45%); display: grid; place-items: center; padding: 16px; }
+.modal { max-width: 520px; width: 100%; display: grid; gap: 12px; }
+.modal p { margin: 0; }
+.modal-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.linkish { background: none; border: 0; padding: 0; color: var(--moss); text-decoration: underline; font-size: inherit; }

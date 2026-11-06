@@ -1,5 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { buildCharacter } from './lib/character';
+import { downloadLocalExport } from './lib/localExport';
+import { toast } from './lib/toast';
 import type { CharacterDto } from './shared/types';
 import { DiceProvider } from './lib/dice';
 import { usePlayState } from './hooks/usePlayState';
@@ -51,7 +53,12 @@ export function App({ character }: { character: CharacterDto }) {
             </button>
           </div>
         </div>
-        <footer>Spell &amp; item data: <a href="https://www.dnd5eapi.co" target="_blank" rel="noreferrer">dnd5eapi.co</a> (SRD 5.2 / 5.1, CC-BY-4.0)</footer>
+        <footer>Spell &amp; item data: <a href="https://www.dnd5eapi.co" target="_blank" rel="noreferrer">dnd5eapi.co</a> (SRD 5.2 / 5.1, CC-BY-4.0)
+          {' · '}
+          <button className="linkish" onClick={() => downloadLocalExport() || toast('No local browser data to download')}>
+            Download local data
+          </button>
+        </footer>
       </main>
       )}
       <SpellBrowser c={c} play={play} open={browserOpen} onClose={closeBrowser} onOpenSpell={openSpell} covered={!!selection} />
