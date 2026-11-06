@@ -382,3 +382,22 @@ body[data-stage="reveal"][data-stage-mood="fumble"] .sheet { filter: blur(3px) g
   body[data-stage] .sheet { animation: none !important; transform: none; }
   .stage, .stage-title, .stage-rays { animation: none !important; }
 }
+
+/* Server connection + toasts */
+.conn-banner {
+  position: sticky; top: 0; z-index: 50; display: flex; gap: 12px; align-items: center; justify-content: center; flex-wrap: wrap;
+  padding: 8px 16px; background: var(--cap); color: #fff; font-weight: 500;
+}
+.conn-banner code { background: rgb(0 0 0 / 20%); padding: 1px 6px; border-radius: 4px; }
+.conn-banner .btn { background: #fff; color: var(--cap); border: 0; }
+.toasts { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 60; display: grid; gap: 8px; width: min(420px, calc(100vw - 32px)); }
+.toast {
+  text-align: left; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--line);
+  background: var(--card); box-shadow: var(--shadow);
+}
+.toast.error { border-color: var(--cap); color: var(--cap); }
+.loading { padding: 48px 16px; text-align: center; color: var(--muted); }
+.portrait-initials {
+  display: grid; place-items: center; background: var(--moss-soft); color: var(--moss);
+  font: 700 3rem Cinzel, Georgia, serif;
+}

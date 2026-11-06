@@ -1,10 +1,12 @@
 import type { Database } from 'bun:sqlite';
 import { createRouter, HttpError, json, type Route } from './http';
 import { characterRoutes } from './routes/characters';
+import { inventoryRoutes } from './routes/inventory';
+import { playRoutes } from './routes/play';
 import { srdRoutes } from './routes/srd';
 
 export function createApp(db: Database, extra: Route[] = []) {
-  const route = createRouter([...characterRoutes, ...srdRoutes, ...extra]);
+  const route = createRouter([...characterRoutes, ...playRoutes, ...inventoryRoutes, ...srdRoutes, ...extra]);
   return {
     async fetch(req: Request): Promise<Response> {
       try {

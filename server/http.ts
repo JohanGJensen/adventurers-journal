@@ -79,3 +79,14 @@ export const intParam = (v: string | null | undefined, name: string): number => 
   if (!Number.isInteger(n) || n < 1) throw new HttpError(400, `Invalid ${name}`);
   return n;
 };
+
+/** Like body(), but an empty body is `{}`. */
+export async function optionalBody(req: Request): Promise<unknown> {
+  const text = await req.text();
+  if (!text.trim()) return {};
+  try {
+    return JSON.parse(text);
+  } catch {
+    throw new HttpError(400, 'Body must be JSON');
+  }
+}

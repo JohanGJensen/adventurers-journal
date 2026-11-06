@@ -32,10 +32,10 @@ export function SpellList({
 
   const cast = (s: SpellEntry, useMagicInitiate = false) => {
     if (s.level > 0) {
-      if (useMagicInitiate) play.update(() => ({ goodberryUsed: true }));
+      if (useMagicInitiate) play.update(() => ({ goodberryUsed: true }), { type: 'slot', summary: `Cast ${s.name} without a slot (Magic Initiate)` });
       else play.useSlot(s.level);
     }
-    if (isConc(s.name)) play.update(() => ({ concentration: s.name }));
+    if (isConc(s.name)) play.update(() => ({ concentration: s.name }), { type: 'spells', summary: `Concentrating on ${s.name}` });
   };
 
   const slotsLeft = (lvl: number) => (c.slots[lvl - 1] ?? 0) - (state.slotsUsed[lvl - 1] ?? 0);
