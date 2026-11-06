@@ -11,12 +11,13 @@ const FILTERS: { label: string; types: EventType[] }[] = [
   { label: 'Rests', types: ['rest'] },
   { label: 'Conditions', types: ['condition'] },
   { label: 'Items & coins', types: ['item', 'coins'] },
+  { label: 'Levels', types: ['level'] },
   { label: 'Imports', types: ['import'] },
 ];
 
 const ICON: Record<EventType, string> = {
   roll: '🎲', damage: '💥', heal: '💚', temp_hp: '🛡', slot: '✨', spells: '📜', rest: '🌙',
-  condition: '⚠', item: '🎒', coins: '🪙', import: '⇪',
+  condition: '⚠', item: '🎒', coins: '🪙', import: '⇪', level: '⭐',
 };
 
 // SQLite datetime('now') lacks a zone; strftime(...'Z') has one. Both are UTC.

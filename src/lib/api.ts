@@ -1,6 +1,6 @@
 // SRD lookups via the local server (which caches dnd5eapi.co in SQLite). Memoized per page load.
 import { LOCAL_DETAILS } from '../data/supplement';
-import type { ClassSpell, Detail, Kind } from '../shared/types';
+import type { ClassSpell, Detail, Kind, LevelUpInfo } from '../shared/types';
 import { api } from './client';
 
 export type { ClassSpell, Detail, EquipmentInfo, Kind, SpellInfo } from '../shared/types';
@@ -47,4 +47,22 @@ export async function fetchClassSpellList(cls: string): Promise<ClassSpell[]> {
 /** Spell level from an already-fetched class list, if known. */
 export function cachedSpellLevel(cls: string, name: string): number | undefined {
   return listMemory.get(cls)?.find((s) => s.name.toLowerCase() === name.toLowerCase())?.level;
+}
+
+const levelMemory = new Map<string, Promise<LevelUpInfo>>();
+
+/** Features and choice options for reaching `level` (served from the SRD cache once fetched). */
+export function fetchLevelUpInfo(cls: string, level: number, subclass?: string): Promise<LevelUpInfo> {
+  const key = `${cls}:${level}:${subclass ?? ''}`;
+  let p = levelMemory.get(key);
+  if (!p) {
+    const q = subclass ? `?subclass=${encodeURIComponent(subclass)}` : '';
+    p = api<LevelUpInfo>('GET', `/srd/levelup/${cls}/${level}${q}`).then((r) => {
+      if (r.error !== undefined) throw new Error(r.error);
+      return r.data;
+    });
+    p.catch(() => levelMemory.delete(key));
+    levelMemory.set(key, p);
+  }
+  return p;
 }

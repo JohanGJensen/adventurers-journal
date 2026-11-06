@@ -1,5 +1,5 @@
 import { HttpError, json, type Route } from '../http';
-import { getClassSpellList, getDetail, KINDS, UpstreamError } from '../srd';
+import { getClassSpellList, getDetail, getLevelUpInfo, KINDS, UpstreamError } from '../srd';
 import type { Kind } from '../../src/shared/types';
 
 const SLUG = /^[a-z0-9-]+$/;
@@ -21,6 +21,19 @@ export const srdRoutes: Route[] = [
       if (!SLUG.test(params.cls)) throw new HttpError(400, 'Invalid class');
       const list = await upstream(() => getClassSpellList(db, params.cls));
       return list ? json(list) : json({ error: `No SRD spell list for ${params.cls}` }, 404);
+    },
+  ],
+  [
+    'GET',
+    '/api/srd/levelup/:cls/:level',
+    async ({ db, params, url }) => {
+      if (!SLUG.test(params.cls)) throw new HttpError(400, 'Invalid class');
+      const level = Number(params.level);
+      if (!Number.isInteger(level) || level < 2 || level > 20) throw new HttpError(400, 'level must be 2–20');
+      const subclass = url.searchParams.get('subclass') || undefined;
+      if (subclass && !SLUG.test(subclass)) throw new HttpError(400, 'Invalid subclass');
+      const info = await upstream(() => getLevelUpInfo(db, params.cls, level, subclass));
+      return info ? json(info) : json({ error: `No SRD level table for ${params.cls}` }, 404);
     },
   ],
   [

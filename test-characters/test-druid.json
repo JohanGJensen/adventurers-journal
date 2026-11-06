@@ -1,0 +1,132 @@
+[
+  {
+    "characterName": "Test Druid",
+    "userChoices": [
+      {
+        "type": "race",
+        "value": "gnome",
+        "subrace": "forest",
+        "traits": [
+          {
+            "name": "Gnome Cunning",
+            "description": "You have advantage on all Intelligence, Wisdom, and Charisma saving throws against magic."
+          },
+          {
+            "name": "Speak with Small Beasts",
+            "description": "You can communicate simple ideas with Small or smaller beasts."
+          },
+          {
+            "name": "Minor Illusion",
+            "description": "You know the minor illusion cantrip."
+          }
+        ]
+      },
+      {
+        "type": "class",
+        "value": "druid"
+      },
+      {
+        "type": "skills",
+        "value": [
+          "Nature",
+          "Medicine"
+        ]
+      },
+      {
+        "value": "guide",
+        "type": "background",
+        "bonuses": {
+          "abilityScores": [
+            "Dexterity",
+            "Constitution",
+            "Wisdom"
+          ],
+          "originFeat": [
+            {
+              "name": "Magic Initiate (Druid)",
+              "description": "Learn two druid cantrips and one 1st-level druid spell (cast once without a slot). Wisdom is your spellcasting ability."
+            }
+          ],
+          "skills": [
+            {
+              "name": "Stealth",
+              "description": "You move quietly through wilderness areas, avoiding detection by both prey and predators."
+            },
+            {
+              "name": "Survival",
+              "description": "Tracking, foraging, predicting weather, and navigating wilderness are second nature."
+            }
+          ],
+          "tools": [
+            {
+              "name": "Cartographer's Tools",
+              "description": "Used to create accurate maps, mark trails, and record important landmarks."
+            }
+          ]
+        }
+      },
+      {
+        "type": "attributes",
+        "value": [
+          8,
+          13,
+          14,
+          13,
+          17,
+          10
+        ],
+        "baseValues": [
+          8,
+          12,
+          14,
+          13,
+          15,
+          10
+        ],
+        "bonuses": {},
+        "level": 1,
+        "pendingLevel": 1,
+        "hpGrantedLevel": 1,
+        "hitPoints": 10,
+        "armorClass": 11,
+        "initiative": 1,
+        "speed": 30
+      },
+      {
+        "type": "alignment",
+        "value": "True Neutral",
+        "description": "You seek balance or remain unaligned, like a druid preserving nature’s equilibrium or a scholar studying all sides without bias."
+      },
+      {
+        "type": "spells",
+        "cantrips": [
+          "Resistance",
+          "Gust"
+        ],
+        "spells": [
+          "Entangle"
+        ],
+        "value": [
+          "Entangle"
+        ]
+      },
+      {
+        "value": {
+          "equipped": {},
+          "backpack": [
+            "Cartographer’s Tools",
+            "Leather Armor",
+            "Quarterstaff",
+            "Sprig of Mistletoe",
+            "Explorer's Pack",
+            "Healer's Kit"
+          ],
+          "gold": 9
+        },
+        "type": "equipment"
+      }
+    ],
+    "preparedSpells": [],
+    "timestamp": 1793994374328
+  }
+]

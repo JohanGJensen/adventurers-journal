@@ -74,6 +74,7 @@ export function CharacterList() {
         <h1>Characters</h1>
         <nav className="topnav">
           <a {...linkTo('/notes')}>Campaign notes</a>
+          <a {...linkTo('/homebrew')}>Homebrew</a>
         </nav>
       </header>
 

@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 144 144" width="144" height="144">
+  <rect x="5" y="5" width="134" height="134" fill="none" stroke="#4a2c0e" stroke-width="3.4"/>
+  <rect x="5" y="5" width="134" height="134" fill="none" stroke="#d4a43c" stroke-width="1.8"/>
+  <rect x="5.6" y="5.6" width="132.8" height="132.8" fill="none" stroke="#ffe39a" stroke-width=".5" opacity=".9"/>
+  <rect x="12" y="12" width="120" height="120" fill="none" stroke="#4a2c0e" stroke-width=".9" opacity=".75"/>
+  
+    <g>
+      <path d="M10 40 C10 22 22 10 40 10" fill="none" stroke="#4a2c0e" stroke-width="5.2" stroke-linecap="round"/>
+      <path d="M10 40 C10 22 22 10 40 10" fill="none" stroke="#d4a43c" stroke-width="3" stroke-linecap="round"/>
+      <path d="M11.5 37 C12 24 24 12 37 11.5" fill="none" stroke="#ffe39a" stroke-width=".9" stroke-linecap="round"/>
+      <path d="M40 10 c6 0 8.5 5.5 5 8 c-2.6 1.8 -5.4 -.6 -3.6 -2.8" fill="none" stroke="#4a2c0e" stroke-width="4.2" stroke-linecap="round"/>
+      <path d="M40 10 c6 0 8.5 5.5 5 8 c-2.6 1.8 -5.4 -.6 -3.6 -2.8" fill="none" stroke="#d4a43c" stroke-width="2.2" stroke-linecap="round"/>
+      <path d="M10 40 c0 6 5.5 8.5 8 5 c1.8 -2.6 -.6 -5.4 -2.8 -3.6" fill="none" stroke="#4a2c0e" stroke-width="4.2" stroke-linecap="round"/>
+      <path d="M10 40 c0 6 5.5 8.5 8 5 c1.8 -2.6 -.6 -5.4 -2.8 -3.6" fill="none" stroke="#d4a43c" stroke-width="2.2" stroke-linecap="round"/>
+      <path d="M17 31 Q19 19 31 17 Q27 27 17 31 Z" fill="#d4a43c" stroke="#4a2c0e" stroke-width="1.4" stroke-linejoin="round"/>
+      <path d="M19.5 28.5 Q22 22 28.5 19.5" fill="none" stroke="#4a2c0e" stroke-width=".8"/>
+      <path d="M6.5 6.5 L13 9 L9 13 Z" fill="#d4a43c" stroke="#4a2c0e" stroke-width="1.2" stroke-linejoin="round"/>
+      <circle cx="24" cy="24" r="2.4" fill="#8f2b1b" stroke="#4a2c0e" stroke-width="1"/>
+      <circle cx="23.3" cy="23.3" r=".7" fill="#ffb59a"/>
+    </g>
+  <g transform="translate(144 0) scale(-1 1)">
+    <g>
+      <path d="M10 40 C10 22 22 10 40 10" fill="none" stroke="#4a2c0e" stroke-width="5.2" stroke-linecap="round"/>
+      <path d="M10 40 C10 22 22 10 40 10" fill="none" stroke="#d4a43c" stroke-width="3" stroke-linecap="round"/>
+      <path d="M11.5 37 C12 24 24 12 37 11.5" fill="none" stroke="#ffe39a" stroke-width=".9" stroke-linecap="round"/>
+      <path d="M40 10 c6 0 8.5 5.5 5 8 c-2.6 1.8 -5.4 -.6 -3.6 -2.8" fill="none" stroke="#4a2c0e" stroke-width="4.2" stroke-linecap="round"/>
+      <path d="M40 10 c6 0 8.5 5.5 5 8 c-2.6 1.8 -5.4 -.6 -3.6 -2.8" fill="none" stroke="#d4a43c" stroke-width="2.2" stroke-linecap="round"/>
+      <path d="M10 40 c0 6 5.5 8.5 8 5 c1.8 -2.6 -.6 -5.4 -2.8 -3.6" fill="none" stroke="#4a2c0e" stroke-width="4.2" stroke-linecap="round"/>
+      <path d="M10 40 c0 6 5.5 8.5 8 5 c1.8 -2.6 -.6 -5.4 -2.8 -3.6" fill="none" stroke="#d4a43c" stroke-width="2.2" stroke-linecap="round"/>
+      <path d="M17 31 Q19 19 31 17 Q27 27 17 31 Z" fill="#d4a43c" stroke="#4a2c0e" stroke-width="1.4" stroke-linejoin="round"/>
+      <path d="M19.5 28.5 Q22 22 28.5 19.5" fill="none" stroke="#4a2c0e" stroke-width=".8"/>
+      <path d="M6.5 6.5 L13 9 L9 13 Z" fill="#d4a43c" stroke="#4a2c0e" stroke-width="1.2" stroke-linejoin="round"/>
+      <circle cx="24" cy="24" r="2.4" fill="#8f2b1b" stroke="#4a2c0e" stroke-width="1"/>
+      <circle cx="23.3" cy="23.3" r=".7" fill="#ffb59a"/>
+    </g></g>
+  <g transform="translate(0 144) scale(1 -1)">
+    <g>
+      <path d="M10 40 C10 22 22 10 40 10" fill="none" stroke="#4a2c0e" stroke-width="5.2" stroke-linecap="round"/>
+      <path d="M10 40 C10 22 22 10 40 10" fill="none" stroke="#d4a43c" stroke-width="3" stroke-linecap="round"/>
+      <path d="M11.5 37 C12 24 24 12 37 11.5" fill="none" stroke="#ffe39a" stroke-width=".9" stroke-linecap="round"/>
+      <path d="M40 10 c6 0 8.5 5.5 5 8 c-2.6 1.8 -5.4 -.6 -3.6 -2.8" fill="none" stroke="#4a2c0e" stroke-width="4.2" stroke-linecap="round"/>
+      <path d="M40 10 c6 0 8.5 5.5 5 8 c-2.6 1.8 -5.4 -.6 -3.6 -2.8" fill="none" stroke="#d4a43c" stroke-width="2.2" stroke-linecap="round"/>
+      <path d="M10 40 c0 6 5.5 8.5 8 5 c1.8 -2.6 -.6 -5.4 -2.8 -3.6" fill="none" stroke="#4a2c0e" stroke-width="4.2" stroke-linecap="round"/>
+      <path d="M10 40 c0 6 5.5 8.5 8 5 c1.8 -2.6 -.6 -5.4 -2.8 -3.6" fill="none" stroke="#d4a43c" stroke-width="2.2" stroke-linecap="round"/>
+      <path d="M17 31 Q19 19 31 17 Q27 27 17 31 Z" fill="#d4a43c" stroke="#4a2c0e" stroke-width="1.4" stroke-linejoin="round"/>
+      <path d="M19.5 28.5 Q22 22 28.5 19.5" fill="none" stroke="#4a2c0e" stroke-width=".8"/>
+      <path d="M6.5 6.5 L13 9 L9 13 Z" fill="#d4a43c" stroke="#4a2c0e" stroke-width="1.2" stroke-linejoin="round"/>
+      <circle cx="24" cy="24" r="2.4" fill="#8f2b1b" stroke="#4a2c0e" stroke-width="1"/>
+      <circle cx="23.3" cy="23.3" r=".7" fill="#ffb59a"/>
+    </g></g>
+  <g transform="translate(144 144) scale(-1 -1)">
+    <g>
+      <path d="M10 40 C10 22 22 10 40 10" fill="none" stroke="#4a2c0e" stroke-width="5.2" stroke-linecap="round"/>
+      <path d="M10 40 C10 22 22 10 40 10" fill="none" stroke="#d4a43c" stroke-width="3" stroke-linecap="round"/>
+      <path d="M11.5 37 C12 24 24 12 37 11.5" fill="none" stroke="#ffe39a" stroke-width=".9" stroke-linecap="round"/>
+      <path d="M40 10 c6 0 8.5 5.5 5 8 c-2.6 1.8 -5.4 -.6 -3.6 -2.8" fill="none" stroke="#4a2c0e" stroke-width="4.2" stroke-linecap="round"/>
+      <path d="M40 10 c6 0 8.5 5.5 5 8 c-2.6 1.8 -5.4 -.6 -3.6 -2.8" fill="none" stroke="#d4a43c" stroke-width="2.2" stroke-linecap="round"/>
+      <path d="M10 40 c0 6 5.5 8.5 8 5 c1.8 -2.6 -.6 -5.4 -2.8 -3.6" fill="none" stroke="#4a2c0e" stroke-width="4.2" stroke-linecap="round"/>
+      <path d="M10 40 c0 6 5.5 8.5 8 5 c1.8 -2.6 -.6 -5.4 -2.8 -3.6" fill="none" stroke="#d4a43c" stroke-width="2.2" stroke-linecap="round"/>
+      <path d="M17 31 Q19 19 31 17 Q27 27 17 31 Z" fill="#d4a43c" stroke="#4a2c0e" stroke-width="1.4" stroke-linejoin="round"/>
+      <path d="M19.5 28.5 Q22 22 28.5 19.5" fill="none" stroke="#4a2c0e" stroke-width=".8"/>
+      <path d="M6.5 6.5 L13 9 L9 13 Z" fill="#d4a43c" stroke="#4a2c0e" stroke-width="1.2" stroke-linejoin="round"/>
+      <circle cx="24" cy="24" r="2.4" fill="#8f2b1b" stroke="#4a2c0e" stroke-width="1"/>
+      <circle cx="23.3" cy="23.3" r=".7" fill="#ffb59a"/>
+    </g></g>
+</svg>

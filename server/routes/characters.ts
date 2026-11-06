@@ -33,7 +33,7 @@ export const characterRoutes: Route[] = [
       if (campaignId) getCampaign(db, campaignId);
       const extras = p.extras === undefined ? current.extras : asExtras(p.extras);
       try {
-        buildCharacter(current.sheet, extras);
+        buildCharacter(current.sheet, extras, current.levels, current.homebrew);
       } catch (e) {
         throw new HttpError(400, `Extras don't fit the sheet: ${e instanceof Error ? e.message : e}`);
       }

@@ -37,6 +37,8 @@ export type Route =
   | { name: 'sheet'; id: number }
   | { name: 'log'; id: number }
   | { name: 'notes'; query: URLSearchParams }
+  | { name: 'homebrew' }
+  | { name: 'homebrewEdit'; id: number | 'new'; query: URLSearchParams }
   | { name: 'missing' };
 
 export function parseRoute(path: string): Route {
@@ -47,6 +49,9 @@ export function parseRoute(path: string): Route {
   m = /^\/c\/(\d+)\/log\/?$/.exec(pathname);
   if (m) return { name: 'log', id: Number(m[1]) };
   if (/^\/notes\/?$/.test(pathname)) return { name: 'notes', query: new URLSearchParams(search) };
+  if (/^\/homebrew\/?$/.test(pathname)) return { name: 'homebrew' };
+  m = /^\/homebrew\/(new|\d+)\/?$/.exec(pathname);
+  if (m) return { name: 'homebrewEdit', id: m[1] === 'new' ? 'new' : Number(m[1]), query: new URLSearchParams(search) };
   return { name: 'missing' };
 }
 

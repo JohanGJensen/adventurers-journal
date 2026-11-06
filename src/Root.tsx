@@ -3,6 +3,8 @@ import { App } from './App';
 import { CharacterList } from './components/CharacterList';
 import { HistoryLog } from './components/HistoryLog';
 import { Notes } from './components/Notes';
+import { HomebrewLibrary } from './components/HomebrewLibrary';
+import { HomebrewEditor } from './components/HomebrewEditor';
 import { Toasts } from './components/Toast';
 import { api } from './lib/client';
 import { linkTo, useRoute } from './lib/router';
@@ -34,7 +36,7 @@ function CharacterPage({ id }: { id: number }) {
         <a {...linkTo('/')}>All characters</a>
       </Centered>
     );
-  return <App key={c.id} character={c} />;
+  return <App key={c.id} character={c} onCharacterChange={setC} />;
 }
 
 function Routes() {
@@ -48,6 +50,10 @@ function Routes() {
       return <HistoryLog key={route.id} characterId={route.id} />;
     case 'notes':
       return <Notes query={route.query} />;
+    case 'homebrew':
+      return <HomebrewLibrary />;
+    case 'homebrewEdit':
+      return <HomebrewEditor key={String(route.id)} id={route.id} query={route.query} />;
     default:
       return (
         <Centered>

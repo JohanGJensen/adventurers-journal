@@ -50,61 +50,42 @@ I probed the live API (2024 = SRD 5.2, 2014 = SRD 5.1).
 
 Prof bonus, slots, cantrip/prepared caps and Wild Shape uses update automatically from the level table.
 
-## 3. Design
+## 3. Design (as built)
 
-### Data model: `src/lib/progression.ts` (new)
-```ts
-interface LevelChoice {
-  level: number;               // the level reached
-  hp: { method: 'fixed' | 'roll'; die: number };  // die result (fixed = 5)
-  subclass?: { index: string; name: string; custom?: string };
-  asi?: { kind: 'scores'; plus: Partial<Record<Ability, number>> }
-     | { kind: 'feat'; index: string; name: string; custom?: string };
-  option?: { feature: string; choice: string };   // Elemental Fury etc.
-  boon?: { index: string; name: string; custom?: string };
-}
-interface Progression { version: 1; levels: LevelChoice[] }  // levels 2..N, in order
-```
-- Pure functions: `applyProgression(base, prog, table)` → derived inputs (level, scores, HP, features). No React, no storage. This is the part that moves unchanged to the desktop app.
-- `src/lib/progressionStore.ts`: `load()`/`save()`/`clear()` on localStorage key `faelan-progression`. This is the only thing to swap for SQLite later.
+The SQLite/Electron overhaul landed first, so level-ups are stored server-side. `buildCharacter` runs synchronously on the server too, which shaped these decisions:
 
-### API layer: extend `src/lib/api.ts`
-- `fetchClassLevels(cls)`, `fetchSubclasses(cls)`, `fetchSubclassLevels(index)`, `fetchFeats()`, `fetchFeature(index)`.
-- Reuse the existing cache pattern from `fetchClassSpellList` (memory map → localStorage → network, stale cache when offline), so level-up works offline after the first load.
+- **Numbers are static, text comes from the API.** `src/lib/rules.ts` holds the full 1–20 druid tables (slots, cantrips, prepared, Wild Shape uses). `bun scripts/check-levels.ts` compares them with the API. The API's 2024 `cantrips_known` has glitches at levels 7 and 16, and the PHB value is used there.
+- **Storage**: `characters.levels_json` (migration 002) holds a `LevelChoice[]` (`src/shared/types.ts`). Each record snapshots the feature text shown at lock-in, so the sheet derives offline and on the server.
+- **Derivation**: `buildCharacter(sheet, extras, levels)`. Scores = export + ASI/feat/boon bonuses (cap 20, 30 for boons). Max HP is recomputed so CON changes apply to every level. Initiative and unarmored AC follow DEX changes.
+- **API**: `GET /api/srd/levelup/:cls/:level?subclass=` collects features with text plus subclass, feat and boon options, and caches every upstream call in `srd_cache`.
+- **Lock in / undo**: `POST /api/characters/:id/levels` and `DELETE /api/characters/:id/levels/last` each run in one transaction with the play-state change (HP gain, slot padding, spell picks, land type), and log a `level` event.
+- **Choice map**: `LEVEL_CHOICES` in `src/data/supplement.ts`.
+- **UI**: `LevelUp.tsx` walks through confirm → HP → subclass/ASI/option/boon → spells (`SpellPicker`, new cantrips required) → review → lock in.
+  - The Header has the "Level up" button; "Undo level N" sits under Features.
+  - Combat shows a Wild Shape tracker.
+  - Circle of the Land asks for the land type at level-up and after each long rest.
+- Reset play state leaves level-ups alone.
+- **HP step**: the average can be toggled on and off. A roll happens once and is kept, so you can switch between the two but never re-roll.
 
-### Choice map: extend `src/data/supplement.ts`
-`LEVEL_CHOICES: Record<featureIndex, ChoiceKind>`, e.g. `druid-subclass → 'subclass'`, `druid-ability-score-improvement → 'asi'`, `druid-elemental-fury → { kind: 'option', options: ['Potent Spellcasting','Primal Strike'] }`, `druid-epic-boon → 'boon'`. Unmapped features are info-only.
+## 4. Homebrew subclasses (as built)
 
-### Character derivation: `src/lib/character.ts` / `src/lib/rules.ts`
-- `buildCharacter(data, progression, levelTable)`:
-  - level = 1 + `progression.levels.length`
-  - ability scores = export + ASI bonuses (cap 20)
-  - max HP = export HP + Σ(die + CON mod) per level. This is recomputed so a CON increase applies retroactively, which matches the 5e rule.
-  - prof bonus, slots, `cantripCap` (+ Magician bonus), `preparedCap` from the API level table. Fall back to the current `CLASSES` tables when it's not loaded.
-  - features += class/subclass features up to level (with API text), chosen feat/option/boon, custom entries.
-- Remove the hand-typed `slots` / `cantripsKnown` / `preparedCount` from `rules.ts` once the API table is the source. Keep them as an offline fallback only if the cache is cold.
-- `App.tsx`: `useMemo(() => buildCharacter(...), [progression, table])` instead of `[]`.
+The free-text custom subclass in the wizard was replaced by a homebrew library at `/homebrew`, linked from the main menu.
+- **Class-tied library**: the `homebrew_subclasses` table (migration 003). Routes are `GET/POST /api/homebrew/subclasses?class=` and `GET/PUT/DELETE /api/homebrew/subclasses/:id`. Export and import use JSON.
+- **Contents**: flavor text, and per class subclass level (druid 3/6/10/14):
+  - features;
+  - always-prepared spells;
+  - buffs: AC, speed, initiative, HP per level, ability scores, extra cantrips, skill/save/other proficiencies;
+  - limited-use resources: a fixed number, the proficiency bonus or an ability modifier, recharging on a short or long rest.
 
-### Play state interplay: `src/hooks/usePlayState.ts`
-- On level-up: add the HP gain to current HP, extend `slotsUsed` to the new slot count, and keep chosen spells. Wild Shape uses get a new tracker field.
-- `load()` already merges over `fresh(c)`. Make sure arrays sized by level (`slotsUsed`) get padded when the level changes.
+  Optional **variants** (e.g. "Season": Spring/Autumn) come with their own spells. They are picked at level-up and can be changed after each long rest.
+- **Live link**: a level record stores `subclass.index = homebrew-<id>`. The server attaches the current subclass as `CharacterDto.homebrew`, and `buildCharacter(..., homebrew)` applies it, so edits reach every character straight away. Deleting a subclass is blocked while it's in use.
+- **Wizard**: SRD and homebrew subclasses are listed together, plus "Create a homebrew subclass…". That link saves the wizard draft (including a rolled HP) to sessionStorage, opens the editor, then returns with the new subclass selected.
+- **Play state**: `landType` is generalised to `variant` (old saves are migrated on read), and there's a new `resourcesUsed`. The sheet gets resource trackers and a Short rest button.
+- **Tome styling** (`.tome` in `styles.css`): applied to the wizard, spell browser, detail drawer, homebrew editor and the variant dialog, with a candlelit version in dark mode.
+  - **Textures**: `bun run textures` (`scripts/gen-textures.ts`) generates crisp, tileable, cel-shaded parchment and leather PNGs (light and dark), plus SVG ornaments: the gilt frame, the torn page edge and the ruled divider. They go in `public/textures/`.
+  - **Layers**: leather binding (border box, stitched outline) → parchment page (padding box) → torn edge (`::before`) → gilt frame (`::after`).
 
-### UI: `src/components/LevelUp.tsx` (new)
-1. **Trigger**: a "Level up" button in `Header.tsx` next to "Druid N" (hidden at 20).
-2. **Confirm**: "Advance Faelan to level N+1?" with a preview of automatic changes (prof bonus, slots, caps, new features).
-3. **Steps** (only those the level needs): HP → Subclass/ASI/Option/Boon → Spells (reuse the `SpellBrowser` picking logic with the new caps).
-4. **Review**: a summary of every change, with "Lock in" disabled until each required choice is made.
-5. **Lock in**: append the `LevelChoice`, save, and the sheet re-derives.
-- **Undo last level**: pop the last `LevelChoice`, with confirmation. Same pattern as the existing "Reset play state" button.
-- Drawer/modal styling follows `DetailDrawer` / `SpellBrowser`. HP roll uses `DiceProvider` / `DiceStage`.
-
-## 4. Implementation order
-1. API fetchers + cache (`api.ts`), with a quick console check against druid levels 1–20.
-2. `progression.ts` pure functions + store. Wire `buildCharacter` to the API table (still level 1, so there's no visible change: a regression check).
-3. Level-up modal: confirm → HP → review → lock in (levels 2 and 5 work end to end).
-4. Choice steps: subclass (3), ASI/feat (4…), option (7), boon (19), custom entries.
-5. Spell step + play-state padding (slots, Wild Shape).
-6. Undo last level.
+Follow-ups: feat mechanics beyond ability bonuses, Circle of the Land always-prepared spells by land type, classes other than druid, homebrew feats.
 
 ## 5. Verification
 - `npm run build` (tsc) passes.
@@ -117,7 +98,3 @@ interface Progression { version: 1; levels: LevelChoice[] }  // levels 2..N, in 
   - Undo last level restores the previous sheet. Reload keeps the progression.
   - Offline (DevTools) after the first load: the level-up still works from cache.
   - Custom subclass/feat shows in Features with "Custom" source.
-
-## Open questions (decide during implementation)
-- Should "Reset play state" leave the progression alone? (Proposed: yes. Progression has its own "Undo last level".)
-- Land type for Circle of the Land: prompt at level-up and again on each long rest, or a dropdown on the sheet?
