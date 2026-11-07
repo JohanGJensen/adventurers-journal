@@ -1,4 +1,4 @@
-// Runs the bundled server code on Node (Electron's own Node via `bun run desktop:smoke`), to check
+// Runs the bundled server code on Node (Electron's own Node via `bun run check`), to check
 // that what the desktop app ships works: migrations embedded as text, node:sqlite, the API, backups.
 import assert from 'node:assert/strict';
 import { mkdtempSync, rmSync } from 'node:fs';

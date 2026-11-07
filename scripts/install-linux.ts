@@ -34,7 +34,7 @@ if (process.argv.includes('--uninstall')) {
 
 const built = join(import.meta.dirname, '..', 'release', `${ID}-${pkg.version}.AppImage`);
 if (!existsSync(built)) {
-  console.error(`${built} not found; run \`bun run dist:linux\` first.`);
+  console.error(`${built} not found; run \`bun run dist\` first.`);
   process.exit(1);
 }
 
