@@ -120,6 +120,8 @@ export interface CharacterSummary {
   seedKey: string | null;
   portrait: string | null;
   subtitle: string;
+  /** lowercase class id (e.g. "druid") for theming; null if the sheet can't be derived */
+  classKey: string | null;
 }
 
 export interface CharacterDto {

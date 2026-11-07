@@ -54,13 +54,15 @@ export function listCharacters(db: Db): CharacterSummary[] {
   return rows.map((r) => {
     const dto = toDto(db, r);
     let subtitle = '';
+    let classKey: string | null = null;
     try {
       const c = deriveDto(dto);
       subtitle = `${c.race} · ${c.className} ${c.level}`;
+      classKey = c.classKey;
     } catch {
       subtitle = 'Invalid sheet';
     }
-    return { id: r.id, name: r.name, campaignId: r.campaign_id, seedKey: r.seed_key, portrait: dto.extras.portrait ?? null, subtitle };
+    return { id: r.id, name: r.name, campaignId: r.campaign_id, seedKey: r.seed_key, portrait: dto.extras.portrait ?? null, subtitle, classKey };
   });
 }
 
