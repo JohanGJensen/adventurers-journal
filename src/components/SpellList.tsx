@@ -5,6 +5,7 @@ import { useDice } from '../lib/dice';
 import { fmt } from '../lib/rules';
 import { cachedSpellLevel } from '../lib/api';
 import { useSpellInfo } from '../hooks/useSpellInfo';
+import { SchoolIcon } from './SchoolIcon';
 
 /** Used until the spell's SRD details have loaded. */
 const CONCENTRATION_FALLBACK = new Set(['Entangle', 'Guidance', 'Resistance']);
@@ -76,7 +77,7 @@ export function SpellList({
       <h3>Cantrips <small>{state.chosenCantrips.length}/{c.cantripCap} chosen</small></h3>
       <ul className="spells">
         {cantrips.map((s) => (
-          <SpellRow key={s.name} s={s} onOpen={onOpen} active={state.concentration === s.name}>
+          <SpellRow key={s.name} s={s} school={info.get(s.name)?.school} onOpen={onOpen} active={state.concentration === s.name}>
             {isConc(s.name) && <button className="btn ghost small" onClick={() => cast(s)}>Cast</button>}
           </SpellRow>
         ))}
@@ -91,7 +92,7 @@ export function SpellList({
               .map((s) => {
                 const mi = s.source === 'Magic Initiate';
                 return (
-                  <SpellRow key={s.name} s={s} onOpen={onOpen} active={state.concentration === s.name}>
+                  <SpellRow key={s.name} s={s} school={info.get(s.name)?.school} onOpen={onOpen} active={state.concentration === s.name}>
                     {mi && (
                       <button className="btn ghost small" disabled={state.goodberryUsed} onClick={() => cast(s, true)} title="Magic Initiate: once per long rest without a slot">
                         {state.goodberryUsed ? 'Free cast used' : 'Free cast'}
@@ -114,9 +115,10 @@ export function SpellList({
   );
 }
 
-function SpellRow({ s, onOpen, active, children }: { s: SpellEntry; onOpen: (n: string) => void; active: boolean; children?: React.ReactNode }) {
+function SpellRow({ s, school, onOpen, active, children }: { s: SpellEntry; school?: string; onOpen: (n: string) => void; active: boolean; children?: React.ReactNode }) {
   return (
     <li className={`spell ${active ? 'active' : ''}`}>
+      <SchoolIcon school={school} />
       <button className="link" onClick={() => onOpen(s.name)}>{s.name}</button>
       <span className={`src src-${s.source.replace(/\s/g, '').toLowerCase()}`}>{s.source}</span>
       <span className="spell-actions">{children}</span>
