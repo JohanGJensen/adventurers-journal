@@ -632,6 +632,10 @@ label.btn { display: inline-block; }
 .emblem { width: 1em; height: 1em; flex: none; }
 .inline-emblem { width: 1.1em; height: 1.1em; color: var(--accent-2); }
 
+/* Spell school glyphs */
+.school-icon { width: 18px; height: 18px; flex: none; color: var(--accent); opacity: .9; }
+.drawer-school { width: .9em; height: .9em; vertical-align: -.08em; margin-right: .3em; color: var(--class-accent, var(--rubric)); }
+
 /* ---------- Tome: parchment surfaces (wizard, spell browser, detail drawer, homebrew editor) ----------
    Textures and ornaments come from scripts/gen-textures.ts (public/textures/). Layers:
    leather binding (border box) → parchment page (padding box) → torn page edge (::before) → gilt frame (::after). */

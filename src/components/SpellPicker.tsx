@@ -3,6 +3,7 @@ import type { Character } from '../lib/character';
 import { fetchClassSpellList, slugify, type ClassSpell } from '../lib/api';
 import { useSpellInfo } from '../hooks/useSpellInfo';
 import { unlockLevel } from '../lib/rules';
+import { SchoolIcon } from './SchoolIcon';
 
 type ListStatus = { state: 'loading' } | { state: 'done'; list: ClassSpell[] } | { state: 'error'; message: string };
 
@@ -159,6 +160,7 @@ export function SpellPicker({
                     const verb = isCantrip ? 'Learn' : 'Prepare';
                     return (
                       <li key={s.index} className={`spell ${chosen || alwaysSrc ? 'mine' : ''}`}>
+                        <SchoolIcon school={i?.school} />
                         <button className="link" onClick={() => onOpenSpell(s.name)}>{s.name}</button>
                         {i?.school && <span className="school">{i.school}</span>}
                         {i?.concentration && <span className="tag" title="Concentration">C</span>}

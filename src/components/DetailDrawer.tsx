@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { lookup, type Detail, type Kind } from '../lib/api';
+import { SchoolIcon } from './SchoolIcon';
 
 export interface Selection { kind: Kind; name: string }
 
@@ -32,7 +33,10 @@ export function DetailDrawer({ selection, onClose }: { selection: Selection | nu
         <button className="close" onClick={onClose} aria-label="Close">×</button>
         {/* scrolls inside the drawer so the tome frame stays put */}
         <div className="drawer-scroll">
-        <h2>{status.state === 'done' && status.detail ? status.detail.name : selection.name}</h2>
+        <h2>
+          {status.state === 'done' && status.detail?.spell && <SchoolIcon school={status.detail.spell.school} className="school-icon drawer-school" />}
+          {status.state === 'done' && status.detail ? status.detail.name : selection.name}
+        </h2>
         {status.state === 'loading' && <p className="muted">Consulting the archives…</p>}
         {status.state === 'error' && <p className="muted">Couldn’t reach the API: {status.message}</p>}
         {status.state === 'done' && !status.detail && <p className="muted">No SRD entry for this one.</p>}
