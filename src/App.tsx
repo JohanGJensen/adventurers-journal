@@ -54,6 +54,15 @@ export function App({ character, onCharacterChange }: { character: CharacterDto;
     document.title = `${c.name} · Adventurers Journal`;
   }, [c.name]);
 
+  // Class palette (accent colours, emblem) for the whole page, including portaled dialogs.
+  useEffect(() => {
+    const root = document.documentElement;
+    root.dataset.class = c.classKey;
+    return () => {
+      delete root.dataset.class;
+    };
+  }, [c.classKey]);
+
   return (
     <DiceProvider characterId={character.id}>
       {!(play.ready && inventory.ready) ? <div className="loading">Loading {c.name}…</div> : (

@@ -1,16 +1,20 @@
 import type { Character } from '../lib/character';
 import { MAX_LEVEL } from '../lib/rules';
+import { ClassEmblem } from './ClassEmblem';
 
 export function Header({ c, onLevelUp }: { c: Character; onLevelUp?: () => void }) {
   return (
     <header className="hero">
-      {c.portrait ? (
-        <img className="portrait" src={c.portrait} alt={`Portrait of ${c.name}`} />
-      ) : (
-        <div className="portrait portrait-initials" aria-hidden="true">
-          {c.name.split(/\s+/).map((w) => w[0]).slice(0, 2).join('')}
-        </div>
-      )}
+      <div className="portrait-frame">
+        {c.portrait ? (
+          <img className="portrait" src={c.portrait} alt={`Portrait of ${c.name}`} />
+        ) : (
+          <div className="portrait portrait-initials" aria-hidden="true">
+            {c.name.split(/\s+/).map((w) => w[0]).slice(0, 2).join('')}
+          </div>
+        )}
+        <span className="emblem-badge"><ClassEmblem classKey={c.classKey} title={c.className} /></span>
+      </div>
       <div className="hero-text">
         <h1>{c.name}</h1>
         <p className="subtitle">

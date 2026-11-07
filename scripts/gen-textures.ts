@@ -254,6 +254,88 @@ function leather(seed: number, palette: string[], outline: string, highlight: st
   return cv;
 }
 
+
+interface StoneStyle {
+  blocks: string[];
+  mottle: string;
+  mortar: string;
+  bevelLight: string;
+  bevelDark: string;
+  crack: string;
+}
+
+/**
+ * Ashlar castle wall: courses of dressed blocks with offset joints, recessed mortar, a lit top/left bevel and a
+ * shaded bottom/right one, cel-shaded mottling inside each block, and the odd hairline crack.
+ * Every course's block widths sum to the tile width, so the wall tiles seamlessly.
+ */
+function stone(seed: number, s: StoneStyle) {
+  const cv = new Canvas();
+  const r = rng(seed);
+  const ROWS = 8, H = SIZE / ROWS, MORTAR = 3, BEVEL = 3;
+  // Block id map: for each pixel, which block and how far it is from that block's edges.
+  const id = new Int32Array(SIZE * SIZE);
+  const rects: { x0: number; w: number; y0: number; tone: number }[] = [];
+  for (let row = 0; row < ROWS; row++) {
+    const widths: number[] = [];
+    let left = SIZE;
+    while (left > 0) {
+      let w = Math.round(72 + r() * 80);
+      if (left - w < 60) w = left;
+      widths.push(w);
+      left -= w;
+    }
+    let x = Math.round(r() * SIZE);
+    for (const w of widths) {
+      rects.push({ x0: x, w, y0: row * H, tone: r() });
+      x += w;
+    }
+  }
+  rects.forEach((b, i) => {
+    for (let y = b.y0; y < b.y0 + H; y++) for (let dx = 0; dx < b.w; dx++) id[y * SIZE + ((b.x0 + dx) % SIZE)] = i;
+  });
+  const mortar = hex(s.mortar), hi = hex(s.bevelLight), lo = hex(s.bevelDark), mot = hex(s.mottle);
+  for (let y = 0; y < SIZE; y++)
+    for (let x = 0; x < SIZE; x++) {
+      const i = id[y * SIZE + x], b = rects[i];
+      const dx = (((x - b.x0) % SIZE) + SIZE) % SIZE, dy = y - b.y0;
+      const fromL = dx, fromR = b.w - 1 - dx, fromT = dy, fromB = H - 1 - dy;
+      // Chipped corners: wobble the mortar edge a little with noise.
+      const wob = valueNoise(x / SIZE, y / SIZE, 64, seed + i) * 1.6;
+      const edge = Math.min(fromL, fromR, fromT, fromB) - wob;
+      if (edge < MORTAR / 2) {
+        cv.set(x, y, mortar);
+        continue;
+      }
+      const base = hex(s.blocks[Math.floor(b.tone * s.blocks.length)]);
+      cv.set(x, y, base);
+      // Mottling inside the block, banded like the parchment.
+      const n = 0.6 * fbm(x / SIZE, y / SIZE, 8, 3, seed + 40) + 0.4 * fbm(x / SIZE, y / SIZE, 24, 2, seed + 70);
+      if (n > 0.6) cv.blend(x, y, mot, 0.35);
+      else if (n < 0.36) cv.blend(x, y, hi, 0.12);
+      // Bevel: light from the upper left.
+      const e = edge - MORTAR / 2;
+      if (e < BEVEL) {
+        if (Math.min(fromT, fromL) <= Math.min(fromB, fromR)) cv.blend(x, y, hi, 0.45 * (1 - e / BEVEL));
+        else cv.blend(x, y, lo, 0.55 * (1 - e / BEVEL));
+      }
+    }
+  grain(cv, seed + 3, 9);
+  // Hairline cracks and pits.
+  const ck = hex(s.crack);
+  for (let i = 0; i < 9; i++) {
+    let x = r() * SIZE, y = r() * SIZE;
+    for (let k = 0; k < 3; k++) {
+      const ang = r() * Math.PI * 2, len = 8 + r() * 16;
+      const nx = x + Math.cos(ang) * len, ny = y + Math.sin(ang) * len;
+      cv.stroke(x, y, nx, ny, (r() - 0.5) * 0.4, 1, ck, 0.55);
+      [x, y] = [nx, ny];
+    }
+  }
+  for (let i = 0; i < 120; i++) cv.disc(r() * SIZE, r() * SIZE, 0.5 + r() * 1.1, ck, 0.3 + r() * 0.3);
+  return cv;
+}
+
 /* ---------- Vector ornaments ---------- */
 
 const GOLD_DARK = '#4a2c0e';
@@ -370,6 +452,28 @@ write(
 );
 write('leather.png', png(SIZE, SIZE, leather(31, ['#6b3d22', '#5e341c', '#512b16', '#442311'], '#22110a', '#a8693e', '#2a150b').px));
 write('leather-dark.png', png(SIZE, SIZE, leather(37, ['#3e2416', '#361f12', '#2e1a0f', '#26150c'], '#0d0704', '#6e4528', '#120a05').px));
+write(
+  'stone-light.png',
+  png(SIZE, SIZE, stone(41, {
+    blocks: ['#c9c1b1', '#c2b9a7', '#bcb2a0', '#cfc7b8', '#b6ac99'],
+    mottle: '#a99e89',
+    mortar: '#8a8070',
+    bevelLight: '#ece6d8',
+    bevelDark: '#776c5b',
+    crack: '#6e6454',
+  }).px),
+);
+write(
+  'stone-dark.png',
+  png(SIZE, SIZE, stone(43, {
+    blocks: ['#34312c', '#2f2c28', '#2b2925', '#383530', '#282622'],
+    mottle: '#23211e',
+    mortar: '#151412',
+    bevelLight: '#4e4a43',
+    bevelDark: '#0e0d0c',
+    crack: '#121110',
+  }).px),
+);
 write('frame-gilt.svg', frameSvg());
 write('edge-torn.svg', tornEdgeSvg(5));
 write('rule.svg', ruleSvg('#4a2c12', '#d4a43c'));
