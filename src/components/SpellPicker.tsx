@@ -4,10 +4,16 @@ import { fetchClassSpellList, slugify, type ClassSpell } from '../lib/api';
 import { useSpellInfo } from '../hooks/useSpellInfo';
 import { unlockLevel } from '../lib/rules';
 import { SchoolIcon } from './SchoolIcon';
+import { Loader } from './Loader';
 
 type ListStatus = { state: 'loading' } | { state: 'done'; list: ClassSpell[] } | { state: 'error'; message: string };
 
 const LEVEL_LABEL = (l: number) => (l === 0 ? 'Cantrips' : `Level ${l}`);
+
+const unlockText = (c: Character, spellLevel: number) => {
+  const at = unlockLevel(c.rules, spellLevel);
+  return at === null ? `${c.className}s never get level ${spellLevel} slots` : `Unlocks at character level ${at}`;
+};
 
 /** Filter state, kept by the caller so it survives the picker closing. */
 export function useSpellFilters() {
@@ -33,6 +39,7 @@ export function SpellPicker({
   onTogglePrepared,
   onOpenSpell,
   filters,
+  hideLocked = false,
 }: {
   c: Character;
   chosenCantrips: string[];
@@ -41,6 +48,8 @@ export function SpellPicker({
   onTogglePrepared: (name: string) => void;
   onOpenSpell: (name: string) => void;
   filters: SpellFilters;
+  /** show only spell levels the character can cast now (the creation wizard) */
+  hideLocked?: boolean;
 }) {
   const [status, setStatus] = useState<ListStatus>({ state: 'loading' });
   const [attempt, setAttempt] = useState(0);
@@ -94,8 +103,9 @@ export function SpellPicker({
     if (onlyMine && !isMine(s.name)) return false;
     return true;
   });
-  const groups = [...new Set(filtered.map((s) => s.level))];
-  const levelsAvailable = [...new Set(all.map((s) => s.level))];
+  const castable = (l: number) => !hideLocked || l <= c.maxSpellLevel;
+  const groups = [...new Set(filtered.map((s) => s.level))].filter(castable);
+  const levelsAvailable = [...new Set(all.map((s) => s.level))].filter(castable);
 
   const cantripsFull = chosenCantrips.length >= c.cantripCap;
   const preparedFull = prepared.length >= c.preparedCap;
@@ -130,7 +140,7 @@ export function SpellPicker({
       </div>
 
       <div className="browser-body">
-        {status.state === 'loading' && <p className="muted">Consulting the archives…</p>}
+        {status.state === 'loading' && <Loader label="Consulting the archives" />}
         {status.state === 'error' && (
           <p className="muted">
             Couldn’t reach the archives ({status.message}).{' '}
@@ -145,7 +155,7 @@ export function SpellPicker({
             <section key={lvl} className={`spell-group ${locked ? 'locked' : ''}`}>
               <h3>
                 {LEVEL_LABEL(lvl)}
-                {locked && <span className="unlock">Unlocks at level {unlockLevel(lvl)}</span>}
+                {locked && <span className="unlock">{unlockText(c, lvl)}</span>}
               </h3>
               <ul className="spells">
                 {filtered
@@ -175,7 +185,7 @@ export function SpellPicker({
                               disabled={blocked}
                               title={
                                 locked
-                                  ? `Unlocks at character level ${unlockLevel(lvl)}`
+                                  ? unlockText(c, lvl)
                                   : blocked
                                     ? `${isCantrip ? 'Cantrip' : 'Prepared'} limit reached. Remove one first.`
                                     : undefined

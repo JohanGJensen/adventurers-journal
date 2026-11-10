@@ -92,10 +92,11 @@ export type LevelChoiceKind =
   | { kind: 'option'; options: { name: string; description: string }[] }
   | { kind: 'boon' };
 
-/** Keyed by dnd5eapi.co 2024 feature index. The API describes these choices in prose only. */
+/**
+ * Keyed by dnd5eapi.co 2024 feature index. The API describes these choices in prose only.
+ * Subclass, ASI and Epic Boon features are recognised by name in every class (see levelChoiceFor).
+ */
 export const LEVEL_CHOICES: Record<string, LevelChoiceKind> = {
-  'druid-subclass': { kind: 'subclass' },
-  'druid-ability-score-improvement': { kind: 'asi' },
   'druid-elemental-fury': {
     kind: 'option',
     options: [
@@ -107,8 +108,16 @@ export const LEVEL_CHOICES: Record<string, LevelChoiceKind> = {
       },
     ],
   },
-  'druid-epic-boon': { kind: 'boon' },
 };
+
+/** What a level-up feature asks for: an entry in LEVEL_CHOICES, or a choice every class shares, by index suffix. */
+export function levelChoiceFor(index: string): LevelChoiceKind | undefined {
+  if (LEVEL_CHOICES[index]) return LEVEL_CHOICES[index];
+  if (index.endsWith('-subclass')) return { kind: 'subclass' };
+  if (index.endsWith('-ability-score-improvement')) return { kind: 'asi' };
+  if (index.endsWith('-epic-boon')) return { kind: 'boon' };
+  return undefined;
+}
 
 /** Circle of the Land: the land types to choose from (changes on each long rest). */
 export const LAND_TYPES = ['Arid', 'Polar', 'Temperate', 'Tropical'] as const;

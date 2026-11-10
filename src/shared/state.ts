@@ -44,10 +44,16 @@ export function normalizePlayState(c: StateBasis, partial?: Partial<PlayState> |
   return { ...s, slotsUsed: fitSlots(s.slotsUsed, c.slots) };
 }
 
-export const seedInventory = (c: StateBasis, newId: () => string): Inventory => ({
-  coins: { cp: 0, sp: 0, ep: 0, gp: c.gold, pp: 0 },
-  items: c.equipment.map((name) => ({ id: newId(), name, qty: 1, equipped: false })),
-});
+/** The starting inventory: the sheet's gold, and its equipment with repeated names merged into one stack. */
+export function seedInventory(c: StateBasis, newId: () => string): Inventory {
+  const items: Item[] = [];
+  for (const name of c.equipment) {
+    const same = items.find((x) => x.name === name);
+    if (same) same.qty++;
+    else items.push({ id: newId(), name, qty: 1, equipped: false });
+  }
+  return { coins: { cp: 0, sp: 0, ep: 0, gp: c.gold, pp: 0 }, items };
+}
 
 export function normalizeInventory(c: StateBasis, partial: Partial<Inventory> | null | undefined, newId: () => string): Inventory {
   const base = seedInventory(c, newId);

@@ -5,12 +5,13 @@ import { api } from '../lib/client';
 import { useDice } from '../lib/dice';
 import { ABILITIES, ABILITY_NAMES, fixedHitDie, fmt, type Ability } from '../lib/rules';
 import { toast } from '../lib/toast';
-import { LEVEL_CHOICES, type LevelChoiceKind } from '../data/supplement';
+import { levelChoiceFor, type LevelChoiceKind } from '../data/supplement';
 import { navigate } from '../lib/router';
 import type { PlayApi } from '../hooks/usePlayState';
 import { homebrewId, homebrewIndex, type AbilityBonus, type CharacterDto, type HomebrewSubclass, type LevelChoice, type LevelUpInfo, type PlayState } from '../shared/types';
 import { SpellPicker, useSpellFilters } from './SpellPicker';
 import { SpellCounters } from './SpellBrowser';
+import { Loader } from './Loader';
 
 type Status<T> = { state: 'idle' | 'loading' } | { state: 'done'; data: T } | { state: 'error'; message: string };
 type Option = { index: string; name: string; description: string; homebrew?: boolean };
@@ -137,7 +138,7 @@ export function LevelUp({
   const choiceKinds = useMemo(() => {
     const out: { feature: string; choice: LevelChoiceKind }[] = [];
     for (const f of info?.features ?? []) {
-      const choice = LEVEL_CHOICES[f.index];
+      const choice = levelChoiceFor(f.index);
       if (!choice || (choice.kind === 'subclass' && c.subclass)) continue;
       out.push({ feature: f.name, choice });
     }
@@ -167,14 +168,14 @@ export function LevelUp({
     needs('subclass') && subclass && !subclass.custom ? (homebrew.find((h) => homebrewIndex(h.id) === subclass.option.index) ?? null) : null;
   const subInfo = useLevelInfo(c.classKey, level, pickedSub, !!pickedSub, attempt);
   const features = (pickedSub ? (subInfo.state === 'done' ? subInfo.data.features : []) : info?.features ?? [])
-    .filter((f) => !LEVEL_CHOICES[f.index])
+    .filter((f) => !levelChoiceFor(f.index))
     .map(({ name, source, description }) => ({ name, source, description }));
 
   const steps: Step[] = [
     'confirm',
     'hp',
     ...(['subclass', 'asi', 'option', 'boon'] as const).filter((k) => needs(k)),
-    'spells',
+    ...(c.spellAbility ? (['spells'] as const) : []),
     'review',
   ];
   const step = steps[Math.min(stepIdx, steps.length - 1)];
@@ -308,7 +309,7 @@ export function LevelUp({
                 <p>
                   Advance <strong>{c.name}</strong> to {c.className.toLowerCase()} level {level}?
                 </p>
-                {(base.state === 'loading' || subInfo.state === 'loading') && <p className="muted">Consulting the archives…</p>}
+                {(base.state === 'loading' || subInfo.state === 'loading') && <Loader label="Consulting the archives" />}
                 {(base.state === 'error' || subInfo.state === 'error') && (
                   <p className="muted">
                     Couldn’t load the level {level} features (

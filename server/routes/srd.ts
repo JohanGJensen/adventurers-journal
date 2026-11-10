@@ -1,5 +1,6 @@
 import { HttpError, json, type Route } from '../http';
 import { getClassSpellList, getDetail, getLevelUpInfo, KINDS, UpstreamError } from '../srd';
+import { getCreateBackground, getCreateClass, getCreateOptions, getCreateSpecies } from '../creation';
 import type { Kind } from '../../src/shared/types';
 
 const SLUG = /^[a-z0-9-]+$/;
@@ -13,7 +14,22 @@ const upstream = async <T>(fn: () => Promise<T>) => {
   }
 };
 
+/** GET /api/srd/create/<kind>/:slug for one creation lookup; 404 when the SRD doesn't have it. */
+const createRoute = (kind: string, fn: (db: Parameters<typeof getCreateClass>[0], slug: string) => Promise<unknown>): Route => [
+  'GET',
+  `/api/srd/create/${kind}/:slug`,
+  async ({ db, params }) => {
+    if (!SLUG.test(params.slug)) throw new HttpError(400, `Invalid ${kind}`);
+    const out = await upstream(() => fn(db, params.slug));
+    return out ? json(out) : json({ error: `No SRD ${kind} ${params.slug}` }, 404);
+  },
+];
+
 export const srdRoutes: Route[] = [
+  ['GET', '/api/srd/create/options', async ({ db }) => json(await upstream(() => getCreateOptions(db)))],
+  createRoute('class', getCreateClass),
+  createRoute('species', getCreateSpecies),
+  createRoute('background', getCreateBackground),
   [
     'GET',
     '/api/srd/classlist/:cls',

@@ -1,17 +1,37 @@
 import type { Character } from '../lib/character';
 import { MAX_LEVEL } from '../lib/rules';
+import type { CharacterDto } from '../shared/types';
 import { ClassEmblem } from './ClassEmblem';
+import { PortraitUpload } from './PortraitUpload';
 
-export function Header({ c, onLevelUp }: { c: Character; onLevelUp?: () => void }) {
+export function Header({
+  c,
+  onLevelUp,
+  characterId,
+  onPortraitSaved,
+}: {
+  c: Character;
+  onLevelUp?: () => void;
+  /** with onPortraitSaved: the portrait can be replaced from an image file */
+  characterId?: number;
+  onPortraitSaved?: (dto: CharacterDto) => void;
+}) {
+  const portrait = c.portrait ? (
+    <img className="portrait" src={c.portrait} alt={`Portrait of ${c.name}`} />
+  ) : (
+    <div className="portrait portrait-initials" aria-hidden="true">
+      {c.name.split(/\s+/).map((w) => w[0]).slice(0, 2).join('')}
+    </div>
+  );
   return (
     <header className="hero">
       <div className="portrait-frame">
-        {c.portrait ? (
-          <img className="portrait" src={c.portrait} alt={`Portrait of ${c.name}`} />
+        {characterId !== undefined && onPortraitSaved ? (
+          <PortraitUpload characterId={characterId} name={c.name} hasPortrait={!!c.portrait} onSaved={onPortraitSaved}>
+            {portrait}
+          </PortraitUpload>
         ) : (
-          <div className="portrait portrait-initials" aria-hidden="true">
-            {c.name.split(/\s+/).map((w) => w[0]).slice(0, 2).join('')}
-          </div>
+          portrait
         )}
         <span className="emblem-badge"><ClassEmblem classKey={c.classKey} title={c.className} /></span>
       </div>

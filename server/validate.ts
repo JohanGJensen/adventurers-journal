@@ -63,13 +63,25 @@ export function asItemPatch(v: unknown): ItemPatch {
 export const optId = (v: unknown): string | undefined =>
   v === undefined ? undefined : typeof v === 'string' && /^[\w-]{1,64}$/.test(v) ? v : bad('invalid id');
 
-const SPELL_SOURCES = ['Class', 'Magic Initiate', 'Gnome', 'Other'];
+const SPELL_SOURCES = ['Class', 'Magic Initiate', 'Gnome', 'Species', 'Subclass', 'Other'];
+
+/** Upper bound for a stored portrait (data URL length); scaled uploads are far below it. */
+const MAX_PORTRAIT_LENGTH = 1_500_000;
+
+/** A portrait is an image data URL or an app path (the seeded "/faelanmosswalker.png"); remote URLs can't load. */
+export function asPortrait(v: unknown): string {
+  if (typeof v !== 'string') return bad('portrait must be a string');
+  if (v.length > MAX_PORTRAIT_LENGTH) return bad('portrait is too large (max 1.5 MB)');
+  if (!/^data:image\/(png|jpe?g|webp|gif);base64,[A-Za-z0-9+/=]+$/.test(v) && !/^\/[\w./-]+$/.test(v))
+    return bad('portrait must be an image data URL (PNG, JPEG, WebP or GIF)');
+  return v;
+}
 
 export function asExtras(v: unknown): import('../src/shared/types').CharacterExtras {
   if (v === undefined) return {};
   if (!isObj(v)) return bad('extras must be an object');
   const out: import('../src/shared/types').CharacterExtras = {};
-  if (v.portrait !== undefined) out.portrait = typeof v.portrait === 'string' ? v.portrait : bad('portrait must be a string');
+  if (v.portrait !== undefined) out.portrait = asPortrait(v.portrait);
   if (v.bonusCantrips !== undefined) out.bonusCantrips = isInt(v.bonusCantrips) ? v.bonusCantrips : bad('bonusCantrips must be an integer');
   const spellList = (x: unknown, name: string, withSource: boolean) => {
     if (!Array.isArray(x)) return bad(`${name} must be an array`);

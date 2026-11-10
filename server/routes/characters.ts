@@ -1,7 +1,7 @@
 import { getCampaign } from '../campaigns';
 import { getCharacter, insertCharacter, listCharacters } from '../characters';
 import { body, HttpError, intParam, json, type Route } from '../http';
-import { asExtras, bad, isObj, optCampaignId } from '../validate';
+import { asExtras, asPortrait, bad, isObj, optCampaignId } from '../validate';
 import { buildCharacter } from '../../src/lib/character';
 
 export const characterRoutes: Route[] = [
@@ -31,7 +31,12 @@ export const characterRoutes: Route[] = [
       const name = p.name === undefined ? current.name : typeof p.name === 'string' && p.name.trim() ? p.name.trim() : bad('name must be a non-empty string');
       const campaignId = optCampaignId(p.campaignId);
       if (campaignId) getCampaign(db, campaignId);
-      const extras = p.extras === undefined ? current.extras : asExtras(p.extras);
+      let extras = p.extras === undefined ? current.extras : asExtras(p.extras);
+      // `portrait` changes just the portrait (null removes it), keeping the other extras.
+      if (p.portrait === null) {
+        const { portrait: _removed, ...rest } = extras;
+        extras = rest;
+      } else if (p.portrait !== undefined) extras = { ...extras, portrait: asPortrait(p.portrait) };
       try {
         buildCharacter(current.sheet, extras, current.levels, current.homebrew);
       } catch (e) {

@@ -31,31 +31,46 @@ export function SpellList({
   const cantrips = spells.filter((s) => s.level === 0);
   const levels = [...new Set(spells.filter((s) => s.level > 0).map((s) => s.level))].sort((a, b) => a - b);
 
+  const slotsLeft = (lvl: number) => (c.slots[lvl - 1] ?? 0) - (state.slotsUsed[lvl - 1] ?? 0);
+  /** The lowest slot level at or above the spell's level with a slot left (Pact Magic slots are all one level). */
+  const slotFor = (spellLevel: number) => {
+    for (let l = spellLevel; l <= c.slots.length; l++) if (slotsLeft(l) > 0) return l;
+    return null;
+  };
+
   const cast = (s: SpellEntry, useMagicInitiate = false) => {
     if (s.level > 0) {
       if (useMagicInitiate) play.update(() => ({ goodberryUsed: true }), { type: 'slot', summary: `Cast ${s.name} without a slot (Magic Initiate)` });
-      else play.useSlot(s.level);
+      else {
+        const slot = slotFor(s.level);
+        if (slot === null) return;
+        play.useSlot(slot);
+      }
     }
     if (isConc(s.name)) play.update(() => ({ concentration: s.name }), { type: 'spells', summary: `Concentrating on ${s.name}` });
   };
 
-  const slotsLeft = (lvl: number) => (c.slots[lvl - 1] ?? 0) - (state.slotsUsed[lvl - 1] ?? 0);
+  // Classes without Spellcasting only show spells from species or feats, if they have any.
+  const caster = c.spellAbility !== null;
+  if (!caster && !spells.length) return null;
 
   return (
     <section className="card">
       <div className="card-head">
-        <h2>Spellcasting</h2>
-        <button className="btn ghost small" onClick={onBrowse}>Browse spells</button>
+        <h2>{caster ? 'Spellcasting' : 'Spells'}</h2>
+        {caster && <button className="btn ghost small" onClick={onBrowse}>Browse spells</button>}
       </div>
-      <div className="stat-boxes">
-        <div className="stat"><span className="stat-label">Ability</span><span className="stat-val">{c.spellAbility}</span></div>
-        <div className="stat"><span className="stat-label">Save DC</span><span className="stat-val">{c.spellSaveDC}</span></div>
-        <button className="stat" onClick={() => roll('Spell attack', 20, 1, c.spellAttack)}>
-          <span className="stat-label">Attack</span><span className="stat-val">{fmt(c.spellAttack)}</span>
-        </button>
-      </div>
+      {caster && (
+        <div className="stat-boxes">
+          <div className="stat"><span className="stat-label">Ability</span><span className="stat-val">{c.spellAbility}</span></div>
+          <div className="stat"><span className="stat-label">Save DC</span><span className="stat-val">{c.spellSaveDC}</span></div>
+          <button className="stat" onClick={() => roll('Spell attack', 20, 1, c.spellAttack)}>
+            <span className="stat-label">Attack</span><span className="stat-val">{fmt(c.spellAttack)}</span>
+          </button>
+        </div>
+      )}
 
-      {c.slots.map((total, i) => (
+      {c.slots.map((total, i) => total > 0 && (
         <div className="slots" key={i}>
           <span>Level {i + 1} slots</span>
           <span className="slot-pips">
@@ -74,7 +89,9 @@ export function SpellList({
         </div>
       ))}
 
-      <h3>Cantrips <small>{state.chosenCantrips.length}/{c.cantripCap} chosen</small></h3>
+      {(cantrips.length > 0 || c.cantripCap > 0) && (
+        <h3>Cantrips {c.cantripCap > 0 && <small>{state.chosenCantrips.length}/{c.cantripCap} chosen</small>}</h3>
+      )}
       <ul className="spells">
         {cantrips.map((s) => (
           <SpellRow key={s.name} s={s} school={info.get(s.name)?.school} onOpen={onOpen} active={state.concentration === s.name}>
@@ -85,7 +102,7 @@ export function SpellList({
 
       {levels.map((lvl) => (
         <div key={lvl}>
-          <h3>Level {lvl} {lvl === 1 && <small>{state.prepared.length}/{c.preparedCap} prepared</small>}</h3>
+          <h3>Level {lvl} {lvl === 1 && c.preparedCap > 0 && <small>{state.prepared.length}/{c.preparedCap} prepared</small>}</h3>
           <ul className="spells">
             {spells
               .filter((s) => s.level === lvl)
@@ -98,7 +115,14 @@ export function SpellList({
                         {state.goodberryUsed ? 'Free cast used' : 'Free cast'}
                       </button>
                     )}
-                    <button className="btn small" disabled={slotsLeft(s.level) <= 0} onClick={() => cast(s)}>Cast (slot)</button>
+                    {c.slots.length > 0 && (() => {
+                      const slot = slotFor(s.level);
+                      return (
+                        <button className="btn small" disabled={slot === null} onClick={() => cast(s)}>
+                          {slot !== null && slot > s.level ? `Cast (level ${slot} slot)` : 'Cast (slot)'}
+                        </button>
+                      );
+                    })()}
                   </SpellRow>
                 );
               })}

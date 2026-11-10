@@ -224,6 +224,7 @@ a { color: var(--accent); }
 .src-class { color: var(--accent); }
 .src-magicinitiate { color: var(--heading); }
 .src-gnome { color: var(--cap); }
+.src-species { color: var(--cap); }
 
 /* Features & equipment */
 .feature { border-top: 1px solid var(--line); padding: 6px 0; }
@@ -635,9 +636,9 @@ label.btn { display: inline-block; }
 /* Rune circuit: on hover a spark of the class's glow runs round the card edge, the gilt rule
    lights up and the card lifts. The arc is ::after (::before is the .card gilt rule), masked to a 2px ring. */
 @property --rune-angle { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
-.char-card { transition: transform .25s ease, box-shadow .3s ease; }
-.char-card::before { transition: opacity .3s, border-color .3s, box-shadow .3s; }
-.char-card::after {
+.rune-card { transition: transform .25s ease, box-shadow .3s ease; }
+.rune-card::before { transition: opacity .3s, border-color .3s, box-shadow .3s; }
+.rune-card::after {
   content: ''; position: absolute; inset: -1px; top: -4px; z-index: 1; pointer-events: none;
   padding: 2px; border-radius: 4px; opacity: 0; transition: opacity .35s;
   background: conic-gradient(from var(--rune-angle),
@@ -647,18 +648,18 @@ label.btn { display: inline-block; }
   -webkit-mask-composite: xor;
   mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
 }
-.char-card .mini-portrait, .char-card .inline-emblem { transition: box-shadow .3s, filter .3s; }
-.char-card:is(:hover, :focus-within) {
+.rune-card .mini-portrait, .rune-card :is(.inline-emblem, .pick-emblem) { transition: box-shadow .3s, filter .3s; }
+.rune-card:is(:hover, :focus-within) {
   transform: translateY(-3px);
   animation: rune-breathe 2.4s ease-in-out infinite alternate;
 }
-.char-card:is(:hover, :focus-within)::before {
+.rune-card:is(:hover, :focus-within)::before {
   opacity: .9; border-color: var(--glow);
   box-shadow: 0 0 6px color-mix(in srgb, var(--glow) 60%, transparent), inset 0 0 6px color-mix(in srgb, var(--glow) 35%, transparent);
 }
-.char-card:is(:hover, :focus-within)::after { opacity: 1; animation: rune-spin 2.4s linear infinite; }
-.char-card:is(:hover, :focus-within) .mini-portrait { box-shadow: 0 0 0 1px var(--gilt), 0 0 12px 2px var(--glow); }
-.char-card:is(:hover, :focus-within) .inline-emblem {
+.rune-card:is(:hover, :focus-within)::after { opacity: 1; animation: rune-spin 2.4s linear infinite; }
+.rune-card:is(:hover, :focus-within) .mini-portrait { box-shadow: 0 0 0 1px var(--gilt), 0 0 12px 2px var(--glow); }
+.rune-card:is(:hover, :focus-within) :is(.inline-emblem, .pick-emblem) {
   filter: drop-shadow(0 0 3px var(--glow));
   animation: emblem-shimmer .9s ease-out;
 }
@@ -673,9 +674,9 @@ label.btn { display: inline-block; }
   100% { filter: drop-shadow(0 0 3px var(--glow)); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .char-card:is(:hover, :focus-within) { transform: none; animation: none; box-shadow: var(--shadow), 0 0 14px 1px color-mix(in srgb, var(--glow) 45%, transparent); }
-  .char-card:is(:hover, :focus-within)::after { animation: none; background: color-mix(in srgb, var(--glow) 70%, transparent); }
-  .char-card:is(:hover, :focus-within) .inline-emblem { animation: none; }
+  .rune-card:is(:hover, :focus-within) { transform: none; animation: none; box-shadow: var(--shadow), 0 0 14px 1px color-mix(in srgb, var(--glow) 45%, transparent); }
+  .rune-card:is(:hover, :focus-within)::after { animation: none; background: color-mix(in srgb, var(--glow) 70%, transparent); }
+  .rune-card:is(:hover, :focus-within) :is(.inline-emblem, .pick-emblem) { animation: none; }
 }
 
 /* Spell school glyphs */
@@ -882,3 +883,208 @@ label.btn { display: inline-block; }
 .hb-wide { width: 100%; padding: 5px 8px; }
 .tome-actions { display: flex; justify-content: flex-end; gap: 8px; padding-top: 22px; }
 .tome-actions .btn:disabled { opacity: .5; }
+
+/* ---------- Character creation wizard (/new) ---------- */
+.create-cta { display: grid; gap: 10px; justify-items: start; border-top: 4px solid var(--gilt); }
+.create-page .list-head { align-items: center; }
+.start-over { margin-left: auto; }
+
+/* Step trail: wax-seal numbers joined by a gilt thread. */
+.create-steps { list-style: none; margin: 0 0 18px; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.create-steps li { display: flex; align-items: center; }
+.create-steps li + li::before { content: ''; width: 14px; height: 1px; background: var(--gilt); opacity: .6; margin-right: 6px; }
+.create-steps button {
+  display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px 3px 3px; border-radius: 999px;
+  border: 1px solid var(--line); background: var(--card); color: var(--ink); font-size: .9rem;
+}
+.create-steps .step-num {
+  width: 22px; height: 22px; display: inline-grid; place-items: center; border-radius: 50%;
+  border: 1px solid var(--gilt); font-size: .78rem; font-weight: 600; color: var(--muted);
+}
+.create-steps .done .step-num { background: var(--accent-soft); color: var(--accent); border-color: var(--accent); }
+.create-steps .now button { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.create-steps .now .step-num { background: var(--accent); color: var(--card); border-color: var(--accent); }
+.create-steps button:disabled { opacity: .5; }
+
+.create-layout { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 16px; align-items: start; }
+.create-main { display: grid; gap: 16px; min-width: 0; }
+.create-summary { position: sticky; top: 16px; display: grid; gap: 12px; }
+@media (max-width: 900px) {
+  .create-layout { grid-template-columns: 1fr; }
+  .create-summary { position: static; order: -1; }
+}
+.summary-head { display: flex; gap: 12px; align-items: center; }
+.summary-head strong { display: block; font-family: 'IM Fell English SC', Cinzel, serif; font-weight: 400; font-size: 1.15rem; color: var(--heading); }
+.summary-head small { display: block; }
+.summary-head .portrait-initials .emblem { width: 28px; height: 28px; }
+.summary-scores, .review-scores { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 4px; text-align: center; }
+.summary-scores > div, .review-scores > div {
+  display: grid; padding: 4px 2px; border: 1px solid var(--line); border-radius: 3px; background: var(--bg-2);
+}
+.summary-scores strong, .review-scores strong { font-size: 1.1rem; line-height: 1.1; }
+.summary-scores span, .review-scores span { font-size: .75rem; color: var(--muted); }
+.review-score.save { border-color: var(--accent); box-shadow: inset 0 -2px 0 var(--accent); }
+.create-error { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 16px; }
+.create-error p { margin: 0; }
+
+.create-foot {
+  position: sticky; bottom: 0; z-index: 2; display: flex; justify-content: flex-end; align-items: center; gap: 8px; flex-wrap: wrap;
+  padding: 10px 14px; border: 1px solid var(--line); border-radius: 3px; background: var(--card); box-shadow: var(--shadow);
+}
+.create-foot .hint { margin: 0 auto 0 0; }
+
+/* Pick cards: classes wear their own colours (each card sets data-class). */
+.pick-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 180px), 1fr)); gap: 10px; }
+.pick-card {
+  display: grid; gap: 2px; justify-items: start; align-content: start; text-align: left; padding: 14px 14px 12px;
+  border-top: 4px solid var(--accent); color: var(--ink);
+}
+.pick-card strong { font-family: 'IM Fell English SC', Cinzel, serif; font-weight: 400; font-size: 1.15rem; color: var(--heading); }
+.pick-card[data-class] strong { color: var(--accent); }
+.pick-card small { font-size: .85rem; }
+.pick-emblem { width: 34px; height: 34px; color: var(--accent-2); margin-bottom: 4px; }
+.pick-tag { margin-top: 6px; font-size: .72rem; padding: 1px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); }
+.pick-traits { margin-top: 4px; font-size: .8rem; color: var(--muted); }
+.pick-card.sel { box-shadow: 0 0 0 2px var(--accent), var(--shadow); background: linear-gradient(var(--accent-soft), var(--accent-soft)), linear-gradient(var(--card-wash), var(--card-wash)), var(--card-tex) 0 0 / 512px 512px repeat, var(--card); }
+.pick-card.sel::before { opacity: .9; border-color: var(--glow); }
+.pick-card:not(.rune-card):hover { border-color: var(--accent-2); }
+.pick-custom { border-top-style: dashed; border-top-color: var(--gilt); }
+.pick-detail { display: grid; gap: 6px; }
+.pick-detail h2 .inline-emblem { vertical-align: -.12em; }
+
+.facts { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; }
+.facts div { display: flex; gap: 6px; align-items: baseline; padding: 3px 10px; border: 1px solid var(--line); border-radius: 999px; background: var(--bg-2); }
+.facts dt { color: var(--muted); font-size: .8rem; }
+.facts dd { margin: 0; font-weight: 600; }
+
+.create-chips { margin: 4px 0 6px; }
+.create-chips .chip.locked { border-style: dashed; }
+.create-chips .chip small { font-size: .75em; }
+.spell-chip { display: inline-flex; padding: 0; overflow: hidden; }
+.spell-chip button { border: 0; background: none; color: inherit; padding: 2px 6px 2px 10px; font-size: .85rem; }
+.spell-chip .chip-info { padding: 2px 8px 2px 4px; opacity: .7; }
+.spell-chip .chip-info:hover { opacity: 1; }
+
+.field { display: grid; gap: 4px; }
+.field > span { font-size: .85rem; color: var(--muted); }
+.field input, .field select {
+  padding: 6px 10px; border-radius: 3px; border: 1px solid var(--line); background: var(--card); color: var(--ink); font: inherit;
+}
+.field input:focus, .field select:focus { outline: 1px solid var(--gilt); border-color: var(--gilt); }
+.field.inline { grid-auto-flow: column; align-items: center; justify-content: start; }
+.custom-bg { gap: 10px; }
+.warn { color: var(--cap); }
+
+.score-table { display: grid; gap: 6px; margin: 10px 0 4px; }
+.score-row {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto 3ch 5.5rem; gap: 10px; align-items: center;
+  padding: 6px 10px; border: 1px solid var(--line); border-radius: 3px; background: var(--bg-2);
+}
+.score-name small { margin-left: 4px; }
+.score-row select { padding: 4px 8px; border-radius: 3px; border: 1px solid var(--line); background: var(--card); color: var(--ink); font: inherit; }
+.stepper { display: inline-flex; align-items: center; gap: 6px; }
+.stepper-val { min-width: 2ch; text-align: center; font-weight: 600; }
+.score-plus { color: var(--accent); font-weight: 600; text-align: right; }
+.score-final { text-align: right; font-size: 1.15rem; font-weight: 600; }
+.score-final small { font-size: .75rem; }
+.bonus-row { margin-top: 8px; }
+
+.equip-choice strong { color: var(--ink); }
+.equip-items { margin: 4px 0 0; padding-left: 18px; color: var(--muted); font-size: .88rem; }
+.spells-card .filters { margin: 0 -16px; }
+.spells-card .browser-body { overflow: visible; padding: 8px 0 0; }
+
+.details-grid { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 20px; align-items: start; }
+@media (max-width: 560px) { .details-grid { grid-template-columns: 1fr; } }
+.portrait-pick { display: grid; gap: 8px; justify-items: center; }
+.portrait-pick .portrait { width: 120px; height: 120px; }
+.portrait-pick .portrait-initials { font-size: 2.2rem; }
+.details-fields { display: grid; gap: 12px; }
+.align-grid .choice span { font-size: .8rem; }
+.review-card { display: grid; gap: 8px; }
+.review-card h3 { margin-bottom: 0; }
+.review-card p { margin: 0; }
+.create-steps .step-name { white-space: nowrap; }
+@media (max-width: 520px) {
+  .create-steps .step-name { display: none; }
+  .create-steps .now .step-name { display: inline; }
+  .create-steps button { padding-right: 3px; }
+  .create-steps .now button { padding-right: 10px; }
+  .summary-scores, .review-scores { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .score-row { grid-template-columns: minmax(0, 1fr) auto; }
+  .score-name small { display: none; }
+  .score-plus { grid-column: 1; text-align: left; }
+  .create-foot { justify-content: stretch; }
+  .create-foot .hint { flex-basis: 100%; }
+  .create-foot .btn { flex: 1; }
+}
+
+/* ---------- Arcane sigil loader ---------- */
+.loader {
+  display: grid; justify-items: center; gap: 12px; padding: 48px 16px; color: var(--gilt);
+  opacity: 0; animation: loader-in .35s ease-out .15s forwards; /* cached loads finish before it shows */
+}
+.loader-inline { display: inline-flex; align-items: center; gap: 10px; padding: 8px 0; }
+.loader-sigil { width: 120px; height: 120px; overflow: visible; }
+.loader-inline .loader-sigil { width: 36px; height: 36px; }
+.loader-label { font-style: italic; color: var(--muted); }
+.loader-page .loader-label { font-size: 1.1rem; color: var(--on-stone); text-shadow: 0 1px 0 rgb(255 255 255 / 25%), 0 0 12px var(--torch); }
+@media (prefers-color-scheme: dark) { .loader-page .loader-label { text-shadow: 0 1px 2px rgb(0 0 0 / 80%), 0 0 14px rgb(0 0 0 / 60%); } }
+.loader-label::after { content: ''; display: inline-block; width: 1.2em; text-align: left; animation: loader-dots 1.6s steps(1) infinite; }
+.loader-page .loader-sigil { filter: drop-shadow(0 0 10px color-mix(in srgb, var(--glow) 35%, transparent)); }
+
+.sigil-runes { transform-box: view-box; transform-origin: 50% 50%; animation: sigil-turn 24s linear infinite; }
+.sigil-draw { stroke-dasharray: 1; stroke-dashoffset: 1; animation: sigil-draw 3.6s ease-in-out infinite; }
+.sigil-draw.d2 { animation-delay: .25s; }
+.sigil-draw.d3 { animation-delay: .5s; }
+.sigil-draw.d4 { animation-delay: .75s; stroke: var(--glow); }
+.sigil-core {
+  fill: var(--glow); transform-box: view-box; transform-origin: 50% 50%;
+  filter: drop-shadow(0 0 3px var(--glow)); animation: sigil-pulse 1.8s ease-in-out infinite alternate;
+}
+
+@keyframes loader-in { to { opacity: 1; } }
+@keyframes sigil-turn { to { transform: rotate(360deg); } }
+@keyframes sigil-draw {
+  0% { stroke-dashoffset: 1; opacity: 1; }
+  45%, 75% { stroke-dashoffset: 0; opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
+}
+@keyframes sigil-pulse { from { transform: scale(.7); opacity: .65; } to { transform: scale(1.15); opacity: 1; } }
+@keyframes loader-dots { 0% { content: ''; } 25% { content: '.'; } 50% { content: '..'; } 75% { content: '...'; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .sigil-runes, .sigil-draw, .sigil-core, .loader-label::after { animation: none; }
+  .sigil-draw { stroke-dashoffset: 0; }
+  .loader-sigil { animation: sigil-calm 2.4s ease-in-out infinite alternate; }
+  .loader-label::after { content: '…'; }
+}
+@keyframes sigil-calm { from { opacity: .55; } to { opacity: 1; } }
+
+/* ---------- Portrait upload (sheet header, list cards) ---------- */
+.visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.portrait-upload { position: relative; flex: none; }
+.portrait-upload-label { position: relative; display: block; cursor: pointer; border-radius: 50%; }
+.portrait-upload-overlay {
+  position: absolute; inset: 0; border-radius: 50%; display: grid; place-content: center; justify-items: center; gap: 4px;
+  background: radial-gradient(circle, rgb(20 12 4 / 55%), rgb(20 12 4 / 72%)); color: #f7e6c6;
+  font: italic .95rem 'EB Garamond', serif; text-align: center; opacity: 0; transition: opacity .2s;
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--glow) 70%, transparent);
+}
+.portrait-upload-icon { width: 28px; height: 28px; filter: drop-shadow(0 0 4px var(--glow)); }
+.portrait-upload.compact .portrait-upload-icon { width: 20px; height: 20px; }
+.portrait-upload-label:hover .portrait-upload-overlay,
+.portrait-upload-label:focus-within .portrait-upload-overlay,
+.portrait-upload.busy .portrait-upload-overlay { opacity: 1; }
+.portrait-upload-label:focus-within { outline: 2px solid var(--gilt); outline-offset: 3px; }
+.portrait-upload.busy .portrait-upload-overlay { animation: sigil-calm 1s ease-in-out infinite alternate; }
+.portrait-remove {
+  position: absolute; top: 2px; right: 2px; z-index: 2; width: 24px; height: 24px; display: grid; place-items: center; padding: 0;
+  border-radius: 50%; border: 1px solid var(--gilt); background: var(--card); color: var(--ink); font-size: 1rem; line-height: 1;
+  opacity: 0; transition: opacity .2s; box-shadow: var(--shadow);
+}
+.portrait-upload.compact .portrait-remove { top: -4px; right: -4px; width: 20px; height: 20px; font-size: .85rem; }
+.portrait-upload:is(:hover, :focus-within) .portrait-remove { opacity: 1; }
+@media (hover: none) { .portrait-remove { opacity: 1; } }
+.char-head { display: flex; gap: 12px; align-items: center; }
+.char-head .char-link { flex: 1; min-width: 0; }

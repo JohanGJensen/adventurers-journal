@@ -4,6 +4,8 @@ import { linkTo, navigate } from '../lib/router';
 import { toast } from '../lib/toast';
 import type { Campaign, CharacterDto, CharacterSummary } from '../shared/types';
 import { ClassEmblem } from './ClassEmblem';
+import { PortraitUpload } from './PortraitUpload';
+import { Loader } from './Loader';
 
 const initials = (name: string) => name.split(/\s+/).map((w) => w[0]).slice(0, 2).join('');
 
@@ -80,7 +82,7 @@ export function CharacterList() {
       </header>
 
       {chars === null ? (
-        <div className="loading">Loading…</div>
+        <Loader size="page" label="Gathering the company" />
       ) : (
         groups.map((g) => (
           <section key={g.key} className="char-group">
@@ -88,14 +90,18 @@ export function CharacterList() {
             {!g.items.length && <p className="hint">No characters yet.</p>}
             <div className="char-cards">
               {g.items.map((c) => (
-                <article key={c.id} className="card char-card" data-class={c.classKey ?? undefined}>
-                  <a className="char-link" {...linkTo(`/c/${c.id}`)}>
-                    {c.portrait ? <img className="mini-portrait" src={c.portrait} alt="" /> : <span className="mini-portrait portrait-initials">{initials(c.name)}</span>}
-                    <span>
-                      <strong><ClassEmblem classKey={c.classKey} className="emblem inline-emblem" />{c.name}</strong>
-                      <small>{c.subtitle}</small>
-                    </span>
-                  </a>
+                <article key={c.id} className="card char-card rune-card" data-class={c.classKey ?? undefined}>
+                  <div className="char-head">
+                    <PortraitUpload compact characterId={c.id} name={c.name} hasPortrait={!!c.portrait} onSaved={() => void refresh()}>
+                      {c.portrait ? <img className="mini-portrait" src={c.portrait} alt="" /> : <span className="mini-portrait portrait-initials">{initials(c.name)}</span>}
+                    </PortraitUpload>
+                    <a className="char-link" {...linkTo(`/c/${c.id}`)}>
+                      <span>
+                        <strong><ClassEmblem classKey={c.classKey} className="emblem inline-emblem" />{c.name}</strong>
+                        <small>{c.subtitle}</small>
+                      </span>
+                    </a>
+                  </div>
                   <div className="char-actions">
                     <select
                       aria-label={`Campaign for ${c.name}`}
@@ -116,6 +122,12 @@ export function CharacterList() {
       )}
 
       <div className="list-tools">
+        <section className="card create-cta">
+          <h2>Create a character</h2>
+          <p className="hint">Build a level 1 hero from the 2024 rules: class, species, background, scores, skills, gear and spells.</p>
+          <a className="btn" {...linkTo('/new')}>Begin</a>
+        </section>
+
         <section className="card">
           <h2>Import a character</h2>
           <p className="hint">A character sheet export (JSON, same format as faelan.json).</p>

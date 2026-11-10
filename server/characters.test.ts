@@ -39,11 +39,11 @@ describe('characters', () => {
   test('invalid sheets are 400', async () => {
     const { call } = setup();
     expect((await call('POST', '/characters', { sheet: { userChoices: [] } })).status).toBe(400);
-    const wizard = otherSheet();
-    wizard.userChoices.find((c: any) => c.type === 'class').value = 'wizard';
-    const r = await call('POST', '/characters', { sheet: wizard });
+    const unknown = otherSheet();
+    unknown.userChoices.find((c: any) => c.type === 'class').value = 'artificer';
+    const r = await call('POST', '/characters', { sheet: unknown });
     expect(r.status).toBe(400);
-    expect(r.body.error).toContain('No rules for class "wizard"');
+    expect(r.body.error).toContain('No rules for class "artificer"');
   });
 
   test('rename, assign campaign, edit extras, delete cascades', async () => {
@@ -59,6 +59,27 @@ describe('characters', () => {
     expect((await call('DELETE', '/characters/1')).status).toBe(200);
     expect(db.query('SELECT count(*) AS n FROM events').get()).toEqual({ n: 0 });
     expect((await call('GET', '/characters/1')).status).toBe(404);
+  });
+
+  test('portrait: set, replace and remove without touching other extras; bad images are 400', async () => {
+    const { call } = setup();
+    const png = 'data:image/png;base64,iVBORw0KGgo=';
+    const webp = 'data:image/webp;base64,UklGRg==';
+    let r = await call('PATCH', '/characters/1', { portrait: png });
+    expect(r.status).toBe(200);
+    expect(r.body.extras.portrait).toBe(png);
+    expect(r.body.extras.bonusSpells.length).toBeGreaterThan(0); // Faelan's other extras are kept
+    r = await call('PATCH', '/characters/1', { portrait: webp });
+    expect(r.body.extras.portrait).toBe(webp);
+    expect((await call('GET', '/characters')).body[0].portrait).toBe(webp);
+    r = await call('PATCH', '/characters/1', { portrait: null });
+    expect(r.status).toBe(200);
+    expect(r.body.extras).not.toHaveProperty('portrait');
+    expect(r.body.extras.bonusCantrips).toBe(1);
+    for (const bad of ['https://example.com/me.png', 'data:text/html;base64,PGI+', `data:image/png;base64,${'A'.repeat(1_500_001)}`, 42]) {
+      expect((await call('PATCH', '/characters/1', { portrait: bad })).status).toBe(400);
+    }
+    expect((await call('POST', '/characters', { sheet: otherSheet(), extras: { portrait: 'javascript:alert(1)' } })).status).toBe(400);
   });
 
   test('campaign CRUD', async () => {

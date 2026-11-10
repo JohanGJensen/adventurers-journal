@@ -44,7 +44,7 @@ describe('homebrew subclasses', () => {
     expect((await call('GET', '/homebrew/subclasses?class=wizard')).body).toHaveLength(0);
     expect((await call('PUT', '/homebrew/subclasses/1', circle({ name: 'Circle of Tests' }))).body.name).toBe('Circle of Tests');
     expect((await call('POST', '/homebrew/subclasses', circle({ levels: [{ level: 4, features: [], spells: [], buffs: {}, resources: [] }] }))).status).toBe(400);
-    expect((await call('POST', '/homebrew/subclasses', circle({ classKey: 'bard' }))).status).toBe(400);
+    expect((await call('POST', '/homebrew/subclasses', circle({ classKey: 'artificer' }))).status).toBe(400);
     expect((await call('POST', '/homebrew/subclasses', circle({ name: '' }))).status).toBe(400);
   });
 

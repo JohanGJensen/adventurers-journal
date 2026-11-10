@@ -34,12 +34,12 @@ export function SpellBrowser({
   return (
     <>
       <div className="scrim browser-scrim" onClick={onClose} />
-      <div className="browser tome" role="dialog" aria-label="Druid spells">
+      <div className="browser tome" role="dialog" aria-label={`${c.className} spells`}>
         <header className="browser-head">
           <div>
-            <h2>Druid spells</h2>
+            <h2>{c.className} spells</h2>
             <p className="muted small-print">
-              Level {c.level} · spells up to level {c.maxSpellLevel} · Magician Primal Order
+              Level {c.level} · spells up to level {c.maxSpellLevel}
             </p>
           </div>
           <SpellCounters c={c} chosenCantrips={state.chosenCantrips} prepared={state.prepared} />

@@ -3,6 +3,7 @@ import { api } from '../lib/client';
 import { linkTo, navigate } from '../lib/router';
 import { toast } from '../lib/toast';
 import { NOTE_KINDS, type Campaign, type CharacterSummary, type Note, type NoteKind } from '../shared/types';
+import { Loader } from './Loader';
 
 /** "k:3" = campaign 3, "c:1" = character 1, "" = everything. */
 type Owner = string;
@@ -137,7 +138,7 @@ export function Notes({ query }: { query: URLSearchParams }) {
             <button className="btn" onClick={create}>New note</button>
           </div>
           {notes === null ? (
-            <p className="hint">Loading…</p>
+            <Loader label="Leafing through notes" />
           ) : !notes.length ? (
             <p className="hint">{q ? 'No matches.' : 'No notes yet.'}</p>
           ) : (
