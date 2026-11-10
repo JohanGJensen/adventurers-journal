@@ -632,6 +632,52 @@ label.btn { display: inline-block; }
 .emblem { width: 1em; height: 1em; flex: none; }
 .inline-emblem { width: 1.1em; height: 1.1em; color: var(--accent-2); }
 
+/* Rune circuit: on hover a spark of the class's glow runs round the card edge, the gilt rule
+   lights up and the card lifts. The arc is ::after (::before is the .card gilt rule), masked to a 2px ring. */
+@property --rune-angle { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+.char-card { transition: transform .25s ease, box-shadow .3s ease; }
+.char-card::before { transition: opacity .3s, border-color .3s, box-shadow .3s; }
+.char-card::after {
+  content: ''; position: absolute; inset: -1px; top: -4px; z-index: 1; pointer-events: none;
+  padding: 2px; border-radius: 4px; opacity: 0; transition: opacity .35s;
+  background: conic-gradient(from var(--rune-angle),
+    transparent 0 62%, color-mix(in srgb, var(--glow) 40%, transparent) 74%,
+    var(--glow) 84%, rgb(255 255 255 / 85%) 87%, var(--glow) 90%, transparent 97%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+}
+.char-card .mini-portrait, .char-card .inline-emblem { transition: box-shadow .3s, filter .3s; }
+.char-card:is(:hover, :focus-within) {
+  transform: translateY(-3px);
+  animation: rune-breathe 2.4s ease-in-out infinite alternate;
+}
+.char-card:is(:hover, :focus-within)::before {
+  opacity: .9; border-color: var(--glow);
+  box-shadow: 0 0 6px color-mix(in srgb, var(--glow) 60%, transparent), inset 0 0 6px color-mix(in srgb, var(--glow) 35%, transparent);
+}
+.char-card:is(:hover, :focus-within)::after { opacity: 1; animation: rune-spin 2.4s linear infinite; }
+.char-card:is(:hover, :focus-within) .mini-portrait { box-shadow: 0 0 0 1px var(--gilt), 0 0 12px 2px var(--glow); }
+.char-card:is(:hover, :focus-within) .inline-emblem {
+  filter: drop-shadow(0 0 3px var(--glow));
+  animation: emblem-shimmer .9s ease-out;
+}
+@keyframes rune-spin { to { --rune-angle: 360deg; } }
+@keyframes rune-breathe {
+  from { box-shadow: var(--shadow), 0 10px 22px rgb(20 12 2 / 22%), 0 0 10px 0 color-mix(in srgb, var(--glow) 35%, transparent); }
+  to   { box-shadow: var(--shadow), 0 10px 22px rgb(20 12 2 / 22%), 0 0 18px 2px color-mix(in srgb, var(--glow) 55%, transparent); }
+}
+@keyframes emblem-shimmer {
+  0%   { filter: drop-shadow(0 0 0 var(--glow)); }
+  40%  { filter: drop-shadow(0 0 6px var(--glow)) brightness(1.5); }
+  100% { filter: drop-shadow(0 0 3px var(--glow)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .char-card:is(:hover, :focus-within) { transform: none; animation: none; box-shadow: var(--shadow), 0 0 14px 1px color-mix(in srgb, var(--glow) 45%, transparent); }
+  .char-card:is(:hover, :focus-within)::after { animation: none; background: color-mix(in srgb, var(--glow) 70%, transparent); }
+  .char-card:is(:hover, :focus-within) .inline-emblem { animation: none; }
+}
+
 /* Spell school glyphs */
 .school-icon { width: 18px; height: 18px; flex: none; color: var(--accent); opacity: .9; }
 .drawer-school { width: .9em; height: .9em; vertical-align: -.08em; margin-right: .3em; color: var(--class-accent, var(--rubric)); }
