@@ -34,6 +34,7 @@ export function linkTo(to: string) {
 
 export type Route =
   | { name: 'list' }
+  | { name: 'create' }
   | { name: 'sheet'; id: number }
   | { name: 'log'; id: number }
   | { name: 'notes'; query: URLSearchParams }
@@ -44,6 +45,7 @@ export type Route =
 export function parseRoute(path: string): Route {
   const [pathname, search = ''] = path.split('?');
   if (pathname === '/' || pathname === '') return { name: 'list' };
+  if (/^\/new\/?$/.test(pathname)) return { name: 'create' };
   let m = /^\/c\/(\d+)\/?$/.exec(pathname);
   if (m) return { name: 'sheet', id: Number(m[1]) };
   m = /^\/c\/(\d+)\/log\/?$/.exec(pathname);

@@ -4,6 +4,7 @@ import { linkTo, navigate } from '../lib/router';
 import { CLASSES, titleCase } from '../lib/rules';
 import { toast } from '../lib/toast';
 import type { HomebrewSubclass } from '../shared/types';
+import { Loader } from './Loader';
 
 /** Strips server-only fields, for export and duplicate. */
 export const homebrewBody = ({ id: _id, usedBy: _u, ...rest }: HomebrewSubclass) => rest;
@@ -92,7 +93,7 @@ export function HomebrewLibrary() {
       </p>
 
       {list === null ? (
-        <p className="muted">Loading…</p>
+        <Loader label="Searching the library" />
       ) : (
         classes.map((k) => {
           const items = list.filter((h) => h.classKey === k);

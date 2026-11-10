@@ -6,6 +6,7 @@ import { ABILITIES, ABILITY_NAMES, CLASSES, SKILLS, titleCase, type Ability } fr
 import { toast } from '../lib/toast';
 import type { HomebrewBuffs, HomebrewLevel, HomebrewResource, HomebrewSpell, HomebrewSubclass, HomebrewVariant } from '../shared/types';
 import { homebrewBody } from './HomebrewLibrary';
+import { Loader } from './Loader';
 
 type Draft = Omit<HomebrewSubclass, 'id' | 'usedBy'>;
 
@@ -76,7 +77,7 @@ export function HomebrewEditor({ id, query }: { id: number | 'new'; query: URLSe
     fetchClassSpellList(classKey).then(setSpells).catch(() => setSpells([]));
   }, [classKey]);
 
-  if (!draft) return <div className="loading">Loading…</div>;
+  if (!draft) return <Loader size="page" label="Unrolling the scroll" />;
 
   const set = (patch: Partial<Draft>) => setDraft({ ...draft, ...patch });
   const setLevel = (i: number, l: HomebrewLevel) => set({ levels: replaceAt(draft.levels, i, l) });

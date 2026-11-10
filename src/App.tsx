@@ -20,6 +20,7 @@ import { LevelUp } from './components/LevelUp';
 import { api } from './lib/client';
 import { toast } from './lib/toast';
 import type { PlayState } from './shared/types';
+import { Loader } from './components/Loader';
 
 export function App({ character, onCharacterChange }: { character: CharacterDto; onCharacterChange: (c: CharacterDto) => void }) {
   const c = useMemo(() => buildCharacter(character.sheet, character.extras, character.levels, character.homebrew), [character]);
@@ -65,14 +66,14 @@ export function App({ character, onCharacterChange }: { character: CharacterDto;
 
   return (
     <DiceProvider characterId={character.id}>
-      {!(play.ready && inventory.ready) ? <div className="loading">Loading {c.name}…</div> : (
+      {!(play.ready && inventory.ready) ? <Loader size="page" label={`Opening ${c.name}’s journal`} /> : (
       <main className="sheet">
         <nav className="sheet-nav">
           <a {...linkTo('/')}>← All characters</a>
           <a {...linkTo(`/c/${character.id}/log`)}>History</a>
           <a {...linkTo(`/notes?character=${character.id}`)}>Notes</a>
         </nav>
-        <Header c={c} onLevelUp={() => setLevelUpOpen(true)} />
+        <Header c={c} onLevelUp={() => setLevelUpOpen(true)} characterId={character.id} onPortraitSaved={onCharacterChange} />
         <div className="grid">
           <div className="col">
             <AbilityScores c={c} />

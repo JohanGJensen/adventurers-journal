@@ -66,3 +66,19 @@ export function fetchLevelUpInfo(cls: string, level: number, subclass?: string):
   }
   return p;
 }
+
+const createMemory = new Map<string, Promise<unknown>>();
+
+/** A creation lookup (options, or a class / species / background), memoized; failed requests can be retried. */
+export function fetchCreate<T>(path: string): Promise<T> {
+  let p = createMemory.get(path) as Promise<T> | undefined;
+  if (!p) {
+    p = api<T>('GET', `/srd/create/${path}`).then((r) => {
+      if (r.error !== undefined) throw new Error(r.error);
+      return r.data;
+    });
+    p.catch(() => createMemory.delete(path));
+    createMemory.set(path, p);
+  }
+  return p;
+}

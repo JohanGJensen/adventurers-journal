@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { App } from './App';
 import { CharacterList } from './components/CharacterList';
+import { CreateCharacter } from './components/create/CreateCharacter';
 import { HistoryLog } from './components/HistoryLog';
 import { Notes } from './components/Notes';
 import { HomebrewLibrary } from './components/HomebrewLibrary';
@@ -9,6 +10,7 @@ import { Toasts } from './components/Toast';
 import { api } from './lib/client';
 import { linkTo, useRoute } from './lib/router';
 import type { CharacterDto, CharacterSummary } from './shared/types';
+import { Loader } from './components/Loader';
 
 type Boot =
   | { state: 'loading' }
@@ -28,7 +30,7 @@ function CharacterPage({ id }: { id: number }) {
       live = false;
     };
   }, [id]);
-  if (!c) return <Centered>Loading…</Centered>;
+  if (!c) return <Loader size="page" label="Opening the journal" />;
   if ('error' in c)
     return (
       <Centered>
@@ -44,6 +46,8 @@ function Routes() {
   switch (route.name) {
     case 'list':
       return <CharacterList />;
+    case 'create':
+      return <CreateCharacter />;
     case 'sheet':
       return <CharacterPage id={route.id} />;
     case 'log':
@@ -87,7 +91,7 @@ export function Root() {
       {boot.state === 'ready' ? (
         <Routes />
       ) : boot.state === 'loading' ? (
-        <Centered>Loading…</Centered>
+        <Loader size="page" label="Unsealing the journal" />
       ) : (
         <Centered>
           <p>Could not load data: {boot.message}</p>

@@ -131,7 +131,7 @@ export async function getDetail(db: Db, kind: Kind, slug: string): Promise<Detai
  * GET `${BASE}${path}`, mapped and cached in srd_cache under (kind, slug). A 404 is cached as a known miss (null).
  * Cached entries are served without the network, so anything fetched once works offline.
  */
-async function cachedFetch<T>(db: Db, kind: string, slug: string, path: string, map: (d: any) => T): Promise<T | null> {
+export async function cachedFetch<T>(db: Db, kind: string, slug: string, path: string, map: (d: any) => T): Promise<T | null> {
   const cached = readCache(db, kind, slug);
   if (cached) return parseJson<T | null>(cached.data_json, null);
   let res: Response;
@@ -163,22 +163,22 @@ export async function getClassSpellList(db: Db, cls: string): Promise<ClassSpell
   return list;
 }
 
-type Text = { index: string; name: string; description: string };
-const text = (d: any): Text => ({
+export type Text = { index: string; name: string; description: string };
+export const text = (d: any): Text => ({
   index: d.index,
   name: d.name,
   description: toList(d.description ?? d.desc).filter((p) => p.trim()).join('\n'),
 });
 
 /** Feature indices per level, from the 2024 class or subclass level table. */
-const levelTable = (db: Db, kind: 'classlevels' | 'subclasslevels', slug: string, path: string) =>
+export const levelTable = (db: Db, kind: 'classlevels' | 'subclasslevels', slug: string, path: string) =>
   cachedFetch(db, kind, slug, path, (d: any[]): { level: number; features: string[] }[] =>
     d.map((l) => ({ level: l.level, features: (l.features ?? []).map((f: any) => f.index) })),
   );
 
-const indexList = (d: any): string[] => (d.results ?? []).map((r: any) => r.index);
+export const indexList = (d: any): string[] => (d.results ?? []).map((r: any) => r.index);
 
-const features = (db: Db, indices: string[]) =>
+export const features = (db: Db, indices: string[]) =>
   Promise.all(indices.map((i) => cachedFetch(db, 'feature', i, `/2024/features/${i}`, text))).then((xs) =>
     xs.filter((x): x is Text => !!x),
   );
@@ -188,7 +188,7 @@ const asPicks = (xs: (Text | null)[]): (Pick & { description: string })[] =>
 
 type FeatRow = Text & { type: string; minLevel: number };
 
-async function feats(db: Db): Promise<FeatRow[]> {
+export async function feats(db: Db): Promise<FeatRow[]> {
   const list = (await cachedFetch(db, 'srdlist', 'feats', '/2024/feats', indexList)) ?? [];
   const rows = await Promise.all(
     list.map((i) =>
@@ -210,7 +210,7 @@ async function feats(db: Db): Promise<FeatRow[]> {
 /**
  * Everything the level-up wizard needs for reaching `level`: class (and subclass) features with text,
  * and the options for whatever that level asks for. Which features ask for a choice is decided by the client
- * (LEVEL_CHOICES); this returns subclasses / feats / boons when the level has the matching feature.
+ * (levelChoiceFor); this returns subclasses / feats / boons when the level has the matching feature.
  */
 export async function getLevelUpInfo(db: Db, cls: string, level: number, subclass?: string): Promise<LevelUpInfo | null> {
   const table = await levelTable(db, 'classlevels', cls, `/2024/classes/${cls}/levels`);

@@ -38,7 +38,7 @@ export interface Inventory {
   items: Item[];
 }
 
-export type SpellSource = 'Class' | 'Magic Initiate' | 'Gnome' | 'Subclass' | 'Other';
+export type SpellSource = 'Class' | 'Magic Initiate' | 'Gnome' | 'Species' | 'Subclass' | 'Other';
 
 export interface SpellEntry {
   name: string;
@@ -266,3 +266,118 @@ export const homebrewId = (index: string | undefined): number | null => {
   const m = /^homebrew-(\d+)$/.exec(index ?? '');
   return m ? Number(m[1]) : null;
 };
+
+/* Character creation (2024 SRD), normalised by server/creation.ts. */
+
+export interface CreateText {
+  index: string;
+  name: string;
+  description: string;
+}
+
+/** Pick `choose` of `from` (skill or tool names). */
+export interface NameChoice {
+  choose: number;
+  desc: string;
+  from: string[];
+}
+
+export interface EquipItem {
+  name: string;
+  qty: number;
+  /** "of your choice" items (e.g. a musical instrument): the player fills in the specifics on the sheet */
+  choice?: boolean;
+}
+
+/** One starting-equipment package, e.g. (A) gear + 15 GP or (B) 75 GP. */
+export interface EquipOption {
+  label: string;
+  items: EquipItem[];
+  gold: number;
+}
+
+export interface ClassSummary {
+  index: string;
+  name: string;
+  hitDie: number;
+  primary: string;
+  saves: AbilityKey[];
+  /** null for classes without Spellcasting */
+  spellAbility: AbilityKey | null;
+}
+
+export interface CreateClass extends ClassSummary {
+  skills: NameChoice;
+  /** tool or instrument proficiencies to pick (Bard, Monk) */
+  toolChoices: NameChoice[];
+  /** armor and weapon training */
+  proficiencies: string[];
+  equipment: EquipOption[];
+  /** level-1 class features with text */
+  features: CreateText[];
+  cantrips: number;
+  prepared: number;
+}
+
+export interface CreateSpell {
+  name: string;
+  level: number;
+}
+
+export interface CreateTrait extends CreateText {
+  /** the trait asks for skill proficiencies (Human Skillful, Elf Keen Senses) */
+  skills?: NameChoice;
+  /** spells the trait grants at level 1 */
+  spells: CreateSpell[];
+  /** replaces the species speed (Wood Elf) */
+  speed?: number;
+  /** the trait grants an origin feat of the player's choice (Human Versatile) */
+  originFeat?: boolean;
+}
+
+export interface CreateLineage {
+  index: string;
+  name: string;
+  /** short form for the species label, e.g. "Wood" for "Elven Lineage: Wood Elf" */
+  label: string;
+  /** level-1 traits */
+  traits: CreateTrait[];
+}
+
+export interface SpeciesSummary {
+  index: string;
+  name: string;
+  speed: number;
+  sizes: string[];
+  traitNames: string[];
+}
+
+export interface CreateSpecies extends SpeciesSummary {
+  traits: CreateTrait[];
+  /** e.g. "Elven Lineage"; empty when the species has no lineages */
+  lineageLabel: string;
+  lineages: CreateLineage[];
+}
+
+export interface BackgroundSummary {
+  index: string;
+  name: string;
+  abilities: AbilityKey[];
+  feat: Pick & { note?: string };
+  skills: string[];
+}
+
+export interface CreateBackground extends BackgroundSummary {
+  feat: CreateText & { note?: string };
+  tools: string[];
+  toolChoice: NameChoice | null;
+  equipment: EquipOption[];
+}
+
+export interface CreateOptions {
+  classes: ClassSummary[];
+  species: SpeciesSummary[];
+  backgrounds: BackgroundSummary[];
+  originFeats: CreateText[];
+  alignments: { name: string; description: string }[];
+}

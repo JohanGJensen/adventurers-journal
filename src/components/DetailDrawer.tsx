@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { lookup, type Detail, type Kind } from '../lib/api';
 import { SchoolIcon } from './SchoolIcon';
+import { Loader } from './Loader';
 
 export interface Selection { kind: Kind; name: string }
 
@@ -37,7 +38,7 @@ export function DetailDrawer({ selection, onClose }: { selection: Selection | nu
           {status.state === 'done' && status.detail?.spell && <SchoolIcon school={status.detail.spell.school} className="school-icon drawer-school" />}
           {status.state === 'done' && status.detail ? status.detail.name : selection.name}
         </h2>
-        {status.state === 'loading' && <p className="muted">Consulting the archives…</p>}
+        {status.state === 'loading' && <Loader label="Consulting the archives" />}
         {status.state === 'error' && <p className="muted">Couldn’t reach the API: {status.message}</p>}
         {status.state === 'done' && !status.detail && <p className="muted">No SRD entry for this one.</p>}
         {status.state === 'done' && status.detail && (

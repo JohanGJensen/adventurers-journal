@@ -60,7 +60,8 @@ export interface Character {
   armorClass: number;
   initiative: number;
   speed: number;
-  spellAbility: Ability;
+  /** null for classes without Spellcasting; save DC and attack are then 0 */
+  spellAbility: Ability | null;
   spellSaveDC: number;
   spellAttack: number;
   slots: number[];
@@ -211,8 +212,11 @@ export function buildCharacter(
   });
 
   const profSources = new Map<string, string>();
-  for (const s of find(choices, 'skills').value as string[]) profSources.set(s, 'Class');
+  const skillChoice = find(choices, 'skills');
+  for (const s of skillChoice.value as string[]) profSources.set(s, 'Class');
   for (const s of bg.bonuses.skills as { name: string }[]) profSources.set(s.name, 'Background');
+  // Skills from species traits or origin feats (sheets made by the creation wizard).
+  for (const s of (skillChoice.other ?? []) as { name: string; source: string }[]) if (!profSources.has(s.name)) profSources.set(s.name, s.source);
   for (const s of buffs.flatMap((b) => b.skills ?? [])) if (!profSources.has(s)) profSources.set(s, 'Subclass');
 
   const bonusSpells: SpellEntry[] = [...(extras.bonusSpells ?? [])];
@@ -237,13 +241,18 @@ export function buildCharacter(
   spells.sort((a, b) => a.level - b.level || a.name.localeCompare(b.name));
 
   const raceLabel = titleCase([race.subrace, race.value].filter(Boolean).join(' '));
+  const bgLabel = titleCase(bg.value);
+  // Sheets made by the creation wizard carry their level-1 class features; imported exports fall back to the supplement.
+  const classFeatures: Feature[] = Array.isArray(cls.features)
+    ? (cls.features as { name: string; description: string }[]).map((f) => ({ ...f, source: `${titleCase(cls.value)} 1` }))
+    : (CLASS_FEATURES[cls.value] ?? []);
   const features: Feature[] = [
     ...(race.traits as { name: string; description: string }[]).map((t) => ({ ...t, source: raceLabel })),
     ...(bg.bonuses.originFeat as { name: string; description: string }[]).map((t) => ({
       ...t,
-      source: 'Guide (origin feat)',
+      source: `${bgLabel} (origin feat)`,
     })),
-    ...(CLASS_FEATURES[cls.value] ?? []),
+    ...classFeatures,
     ...levelFeatures(levels, titleCase(cls.value), hb),
     ...hbLevels.flatMap((l) => l.features.map((f) => ({ ...f, source: `${hb!.name} ${l.level}` }))),
   ];
@@ -293,7 +302,7 @@ export function buildCharacter(
     className: titleCase(cls.value),
     classKey: cls.value,
     level,
-    background: titleCase(bg.value),
+    background: bgLabel,
     alignment: align.value,
     alignmentDescription: align.description,
     rules,
@@ -306,17 +315,17 @@ export function buildCharacter(
     initiative: attrs.initiative + dexDelta + sum('initiative'),
     speed: attrs.speed + sum('speed'),
     spellAbility: rules.spellAbility,
-    spellSaveDC: 8 + profBonus + mods[rules.spellAbility],
-    spellAttack: profBonus + mods[rules.spellAbility],
+    spellSaveDC: rules.spellAbility ? 8 + profBonus + mods[rules.spellAbility] : 0,
+    spellAttack: rules.spellAbility ? profBonus + mods[rules.spellAbility] : 0,
     slots: rules.slots[level] ?? [],
-    maxSpellLevel: maxSpellLevel(level),
+    maxSpellLevel: maxSpellLevel(rules, level),
     cantripCap: (rules.cantripsKnown[level] ?? 0) + (extras.bonusCantrips ?? 0) + sum('cantrips'),
     preparedCap: rules.preparedCount[level] ?? 0,
     spells,
     bonusSpells,
     extraClassSpells: extras.extraClassSpells ?? [],
     features,
-    tools: (bg.bonuses.tools as { name: string; description: string }[]).map((t) => ({ ...t, source: 'Guide' })),
+    tools: (bg.bonuses.tools as { name: string; description: string; source?: string }[]).map((t) => ({ ...t, source: t.source ?? bgLabel })),
     equipment: [...Object.values(equip.value.equipped ?? {}), ...equip.value.backpack] as string[],
     gold: equip.value.gold ?? 0,
     exportLevel,
