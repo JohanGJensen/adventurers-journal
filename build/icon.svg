@@ -1,0 +1,122 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="45%" r="70%">
+      <stop offset="0" stop-color="#3a2560"/>
+      <stop offset="0.6" stop-color="#1c1233"/>
+      <stop offset="1" stop-color="#0c0818"/>
+    </radialGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#fff6c2" stop-opacity="1"/>
+      <stop offset="0.25" stop-color="#ffd23f" stop-opacity="0.85"/>
+      <stop offset="1" stop-color="#ff9a1f" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="aura" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#ff8a3d" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#ff8a3d" stop-opacity="0"/>
+    </radialGradient>
+    <symbol id="sparkle" viewBox="-10 -10 20 20">
+      <path d="M0-10 Q1.5-1.5 10 0 Q1.5 1.5 0 10 Q-1.5 1.5 -10 0 Q-1.5-1.5 0-10Z"/>
+    </symbol>
+  </defs>
+
+  <rect width="1024" height="1024" fill="url(#bg)"/>
+  <circle cx="512" cy="500" r="430" fill="url(#aura)"/>
+
+  <!-- magic ribbons behind the book -->
+  <g fill="none" stroke-linecap="round">
+    <path d="M150 640 C 60 520, 180 380, 330 400" stroke="#1a0f2e" stroke-width="58"/>
+    <path d="M150 640 C 60 520, 180 380, 330 400" stroke="#b44dff" stroke-width="40"/>
+    <path d="M150 640 C 60 520, 180 380, 330 400" stroke="#e7a8ff" stroke-width="12" transform="translate(-6,-8)"/>
+    <path d="M880 300 C 990 420, 900 600, 720 590" stroke="#1a0f2e" stroke-width="58"/>
+    <path d="M880 300 C 990 420, 900 600, 720 590" stroke="#4d8bff" stroke-width="40"/>
+    <path d="M880 300 C 990 420, 900 600, 720 590" stroke="#b8d4ff" stroke-width="12" transform="translate(6,-8)"/>
+    <path d="M200 780 C 260 880, 420 900, 520 860" stroke="#1a0f2e" stroke-width="44"/>
+    <path d="M200 780 C 260 880, 420 900, 520 860" stroke="#ff5fa8" stroke-width="28"/>
+    <path d="M200 780 C 260 880, 420 900, 520 860" stroke="#ffc1dd" stroke-width="8" transform="translate(0,-6)"/>
+  </g>
+
+  <!-- the tome -->
+  <g transform="rotate(-10 512 512)" stroke="#2a1206" stroke-width="16" stroke-linejoin="round" stroke-linecap="round">
+    <!-- shadow -->
+    <ellipse cx="540" cy="880" rx="300" ry="44" fill="#000" opacity="0.35" stroke="none"/>
+    <!-- back cover -->
+    <rect x="290" y="200" width="500" height="660" rx="44" fill="#7a2e14"/>
+    <!-- page block -->
+    <path d="M320 190 H748 Q772 190 772 214 V812 Q772 836 748 836 H320 Z" fill="#fbe8bf"/>
+    <g stroke="#d9b77c" stroke-width="5" fill="none">
+      <path d="M760 240 V800"/><path d="M748 250 V790"/>
+      <path d="M340 822 H740"/><path d="M340 808 H730"/>
+    </g>
+    <!-- front cover -->
+    <rect x="270" y="150" width="480" height="650" rx="44" fill="#b4441f"/>
+    <!-- cel shading: lit upper-left, dark lower-right -->
+    <path d="M300 160 H700 Q730 160 736 190 Q620 210 520 300 Q400 410 300 420 Z" fill="#d2602e" stroke="none"/>
+    <path d="M740 520 V756 Q740 790 706 790 H420 Q600 740 740 520 Z" fill="#8f3216" stroke="none"/>
+    <rect x="270" y="150" width="480" height="650" rx="44" fill="none"/>
+    <!-- gilt frame -->
+    <rect x="335" y="205" width="370" height="540" rx="24" fill="none" stroke="#ffcc3d" stroke-width="10"/>
+    <!-- spine -->
+    <path d="M300 152 Q228 160 222 210 V760 Q228 808 300 800 Z" fill="#8f3216"/>
+    <path d="M286 170 Q246 178 244 214 V420" fill="none" stroke="#c75530" stroke-width="12"/>
+    <g fill="#ffcc3d">
+      <path d="M222 300 Q262 292 300 300 V336 Q262 328 222 336 Z"/>
+      <path d="M222 600 Q262 592 300 600 V636 Q262 628 222 636 Z"/>
+    </g>
+    <!-- bookmark -->
+    <path d="M560 820 V930 L585 905 L610 930 V820" fill="#d6304a"/>
+
+    <!-- gold corner caps -->
+    <g fill="#ffcc3d">
+      <path d="M660 150 H706 Q750 150 750 194 V240 Q720 200 660 150 Z"/>
+      <path d="M750 706 V756 Q750 800 706 800 H660 Q720 760 750 706 Z"/>
+      <path d="M300 150 H360 Q320 180 300 232 Z" />
+      <path d="M300 800 H360 Q320 772 300 720 Z" />
+    </g>
+    <g fill="#fff3b0" stroke="none">
+      <circle cx="722" cy="178" r="7"/>
+      <circle cx="722" cy="772" r="7"/>
+    </g>
+
+    <!-- rune circle -->
+    <circle cx="520" cy="475" r="150" fill="#9a3518" stroke="#ffcc3d" stroke-width="10"/>
+    <circle cx="520" cy="475" r="112" fill="none" stroke="#ffcc3d" stroke-width="7"/>
+    <g stroke="#ffcc3d" stroke-width="7" fill="none" stroke-linecap="round">
+      <!-- simple cartoon runes around the ring -->
+      <g id="rune1"><path d="M520 335 V355 M512 340 L528 350"/></g>
+      <use href="#rune1" transform="rotate(30 520 475)"/>
+      <g transform="rotate(60 520 475)"><path d="M512 335 L520 355 L528 335"/></g>
+      <use href="#rune1" transform="rotate(90 520 475)"/>
+      <g transform="rotate(120 520 475)"><path d="M514 337 V355 M514 337 L526 345 L514 349"/></g>
+      <g transform="rotate(150 520 475)"><path d="M512 335 L528 355 M528 335 L512 355"/></g>
+      <use href="#rune1" transform="rotate(180 520 475)"/>
+      <g transform="rotate(210 520 475)"><path d="M512 335 L520 355 L528 335"/></g>
+      <g transform="rotate(240 520 475)"><path d="M514 337 V355 M514 337 L526 345 L514 349"/></g>
+      <use href="#rune1" transform="rotate(270 520 475)"/>
+      <g transform="rotate(300 520 475)"><path d="M512 335 L528 355 M528 335 L512 355"/></g>
+      <g transform="rotate(330 520 475)"><path d="M512 335 L520 355 L528 335"/></g>
+    </g>
+  </g>
+
+  <!-- glowing compass star (upright, over the tome) -->
+  <g transform="rotate(-10 512 512)">
+    <circle cx="520" cy="475" r="200" fill="url(#glow)" opacity="0.8"/>
+    <path d="M520 290 Q550 445 705 475 Q550 505 520 660 Q490 505 335 475 Q490 445 520 290 Z"
+          fill="#ffd84a" stroke="#2a1206" stroke-width="14" stroke-linejoin="round"/>
+    
+    <path d="M520 360 Q535 460 620 475 Q535 490 520 590 Q505 490 420 475 Q505 460 520 360 Z" fill="#fff3a8"/>
+    <circle cx="520" cy="475" r="24" fill="#fffbe6" stroke="#2a1206" stroke-width="10"/>
+    <circle cx="512" cy="468" r="7" fill="#fff"/>
+  </g>
+
+  <!-- sparkles -->
+  <g fill="#fff6c2" stroke="#2a1206" stroke-width="1.2">
+    <use href="#sparkle" x="160" y="230" width="70" height="70"/>
+    <use href="#sparkle" x="800" y="140" width="56" height="56"/>
+    <use href="#sparkle" x="850" y="700" width="64" height="64"/>
+    <use href="#sparkle" x="110" y="430" width="36" height="36"/>
+    <use href="#sparkle" x="880" y="850" width="40" height="40"/>
+  </g>
+  <g fill="#ffd84a">
+    <circle cx="260" cy="170" r="8"/><circle cx="900" cy="560" r="9"/><circle cx="780" cy="880" r="7"/><circle cx="90" cy="700" r="7"/>
+  </g>
+</svg>
