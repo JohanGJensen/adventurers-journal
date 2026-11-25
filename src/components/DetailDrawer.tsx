@@ -34,22 +34,28 @@ export function DetailDrawer({ selection, onClose }: { selection: Selection | nu
         <button className="close" onClick={onClose} aria-label="Close">×</button>
         {/* scrolls inside the drawer so the tome frame stays put */}
         <div className="drawer-scroll">
+        <div className="drawer-side">
         <h2>
           {status.state === 'done' && status.detail?.spell && <SchoolIcon school={status.detail.spell.school} className="school-icon drawer-school" />}
           {status.state === 'done' && status.detail ? status.detail.name : selection.name}
         </h2>
+        </div>
         {status.state === 'loading' && <Loader label="Consulting the archives" />}
         {status.state === 'error' && <p className="muted">Couldn’t reach the API: {status.message}</p>}
         {status.state === 'done' && !status.detail && <p className="muted">No SRD entry for this one.</p>}
         {status.state === 'done' && status.detail && (
           <>
-            <span className="source-tag">{status.detail.source}</span>
-            <dl className="meta">
-              {status.detail.meta.map(([k, v]) => (
-                <div key={k}><dt>{k}</dt><dd>{v}</dd></div>
-              ))}
-            </dl>
-            {status.detail.paragraphs.map((p, i) => <p key={i}>{p}</p>)}
+            <div className="drawer-side">
+              <span className="source-tag">{status.detail.source}</span>
+              <dl className="meta">
+                {status.detail.meta.map(([k, v]) => (
+                  <div key={k}><dt>{k}</dt><dd>{v}</dd></div>
+                ))}
+              </dl>
+            </div>
+            <div className="drawer-text">
+              {status.detail.paragraphs.map((p, i) => <p key={i}>{p}</p>)}
+            </div>
           </>
         )}
         </div>

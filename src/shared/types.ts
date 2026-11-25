@@ -157,6 +157,48 @@ export interface Note {
   updatedAt: string;
 }
 
+export const TERRAINS = ['plains', 'forest', 'hills', 'mountains', 'water', 'swamp', 'desert', 'road', 'settlement', 'ruin', 'cave'] as const;
+export type Terrain = (typeof TERRAINS)[number];
+
+/** One hex on a character's journey map (axial coordinates). Sketched until charted with a Cartographer's Tools check. */
+export interface MapHex {
+  q: number;
+  r: number;
+  terrain: Terrain;
+  state: 'sketched' | 'charted';
+  label: string;
+  noteId: number | null;
+}
+
+export const PATH_KINDS = ['trail', 'road', 'river', 'border'] as const;
+export type PathKind = (typeof PATH_KINDS)[number];
+
+/** A freehand line on the map, in map units (the hex grid's pixel space at zoom 1). */
+export interface MapPath {
+  id: number;
+  kind: PathKind;
+  points: [number, number][];
+}
+
+export const MARK_KINDS = ['party', 'camp', 'battle', 'treasure', 'danger', 'quest', 'npc', 'text'] as const;
+export type MarkKind = (typeof MARK_KINDS)[number];
+
+/** A pin (or, for `text`, a free label) placed anywhere on the map. */
+export interface MapMark {
+  id: number;
+  kind: MarkKind;
+  x: number;
+  y: number;
+  label: string;
+  noteId: number | null;
+}
+
+export interface JourneyMapDto {
+  hexes: MapHex[];
+  paths: MapPath[];
+  marks: MapMark[];
+}
+
 export const ABILITY_KEYS = ['STR', 'DEX', 'CON', 'INT', 'WIS', 'CHA'] as const;
 export type AbilityKey = (typeof ABILITY_KEYS)[number];
 export type AbilityBonus = Partial<Record<AbilityKey, number>>;

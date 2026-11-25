@@ -3,6 +3,7 @@ import { App } from './App';
 import { CharacterList } from './components/CharacterList';
 import { CreateCharacter } from './components/create/CreateCharacter';
 import { HistoryLog } from './components/HistoryLog';
+import { MapPage } from './components/JourneyMap';
 import { Notes } from './components/Notes';
 import { HomebrewLibrary } from './components/HomebrewLibrary';
 import { HomebrewEditor } from './components/HomebrewEditor';
@@ -52,6 +53,8 @@ function Routes() {
       return <CharacterPage id={route.id} />;
     case 'log':
       return <HistoryLog key={route.id} characterId={route.id} />;
+    case 'map':
+      return <MapPage key={route.id} characterId={route.id} />;
     case 'notes':
       return <Notes query={route.query} />;
     case 'homebrew':

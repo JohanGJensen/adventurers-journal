@@ -4,7 +4,7 @@ export function Features({ c, variant }: { c: Character; variant?: string | null
   return (
     <section className="card">
       <h2>Features &amp; Traits</h2>
-      {[...c.features, ...c.tools].map((f) => (
+      {c.features.map((f) => (
         <details key={`${f.name}|${f.source}`} className="feature">
           <summary>
             {f.name}

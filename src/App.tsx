@@ -12,6 +12,8 @@ import { CombatStats } from './components/CombatStats';
 import { SpellList } from './components/SpellList';
 import { Features } from './components/Features';
 import { Equipment } from './components/Equipment';
+import { ToolKit } from './components/ToolKit';
+import { hasTool } from './data/tools';
 import { DetailDrawer, type Selection } from './components/DetailDrawer';
 import { DiceTray } from './components/DiceTray';
 import { DiceStage } from './components/DiceStage';
@@ -72,6 +74,7 @@ export function App({ character, onCharacterChange }: { character: CharacterDto;
           <a {...linkTo('/')}>← All characters</a>
           <a {...linkTo(`/c/${character.id}/log`)}>History</a>
           <a {...linkTo(`/notes?character=${character.id}`)}>Notes</a>
+          {hasTool(c.tools, "Cartographer's Tools") && <a {...linkTo(`/c/${character.id}/map`)}>Journey map</a>}
         </nav>
         <Header c={c} onLevelUp={() => setLevelUpOpen(true)} characterId={character.id} onPortraitSaved={onCharacterChange} />
         <div className="grid">
@@ -85,6 +88,7 @@ export function App({ character, onCharacterChange }: { character: CharacterDto;
           </div>
           <div className="col">
             <Features c={c} variant={play.state.variant} />
+            <ToolKit c={c} />
             <Equipment inventory={inventory} onOpen={(name) => setSelection({ kind: 'equipment', name })} />
             <button
               className="btn ghost reset"
