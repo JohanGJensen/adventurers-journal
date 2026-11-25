@@ -72,6 +72,7 @@ export function App({ character, onCharacterChange }: { character: CharacterDto;
       <main className="sheet">
         <nav className="sheet-nav">
           <a {...linkTo('/')}>← All characters</a>
+          <a {...linkTo(`/c/${character.id}/lore`)}>Lore</a>
           <a {...linkTo(`/c/${character.id}/log`)}>History</a>
           <a {...linkTo(`/notes?character=${character.id}`)}>Notes</a>
           {hasTool(c.tools, "Cartographer's Tools") && <a {...linkTo(`/c/${character.id}/map`)}>Journey map</a>}

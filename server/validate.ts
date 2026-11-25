@@ -1,5 +1,5 @@
 // Hand-written guards for request bodies.
-import { ABILITY_KEYS, COINS, EVENT_TYPES, type AbilityBonus, type AbilityKey, type Coins, type EventIn, type FeatureText, type HomebrewBuffs, type HomebrewLevel, type HomebrewResource, type HomebrewSubclass, type LevelChoice, type Pick, type PlayState } from '../src/shared/types';
+import { ABILITY_KEYS, COINS, EVENT_TYPES, TRAIT_KINDS, type Lore, type AbilityBonus, type AbilityKey, type Coins, type EventIn, type FeatureText, type HomebrewBuffs, type HomebrewLevel, type HomebrewResource, type HomebrewSubclass, type LevelChoice, type Pick, type PlayState } from '../src/shared/types';
 import { CLASSES, SKILLS } from '../src/lib/rules';
 import type { ItemPatch } from '../src/shared/inventory';
 import { HttpError } from './http';
@@ -97,6 +97,34 @@ export function asExtras(v: unknown): import('../src/shared/types').CharacterExt
   if (v.bonusSpells !== undefined) out.bonusSpells = spellList(v.bonusSpells, 'bonusSpells', true) as never;
   if (v.extraClassSpells !== undefined) out.extraClassSpells = spellList(v.extraClassSpells, 'extraClassSpells', false);
   return out;
+}
+
+const MAX_SECTIONS = 50;
+const MAX_TRAITS = 30;
+
+/** A Lore document from a request body (updatedAt is set by the server). */
+export function asLore(v: unknown): Omit<Lore, 'updatedAt'> {
+  if (!isObj(v)) return bad('lore must be an object');
+  if (!Array.isArray(v.sections) || v.sections.length > MAX_SECTIONS) return bad(`sections must be an array (max ${MAX_SECTIONS})`);
+  const sections = v.sections.map((s, i) => {
+    if (!isObj(s)) return bad(`sections[${i}] must be an object`);
+    return {
+      id: optId(s.id) ?? bad(`sections[${i}].id is required`),
+      title: typeof s.title === 'string' && s.title.length <= 200 ? s.title : bad(`sections[${i}].title must be a string (max 200)`),
+      body: typeof s.body === 'string' && s.body.length <= 50_000 ? s.body : bad(`sections[${i}].body must be a string (max 50000)`),
+    };
+  });
+  if (!isObj(v.traits)) return bad('traits must be an object');
+  const t = v.traits;
+  const traits = Object.fromEntries(
+    TRAIT_KINDS.map((k) => {
+      const list = t[k] ?? [];
+      if (!isStrArr(list) || list.length > MAX_TRAITS || list.some((x) => x.length > 1000))
+        bad(`traits.${k} must be an array of strings (max ${MAX_TRAITS}, 1000 chars each)`);
+      return [k, list];
+    }),
+  ) as Lore['traits'];
+  return { sections, traits };
 }
 
 export const optCampaignId = (v: unknown): number | null | undefined =>

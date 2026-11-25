@@ -610,6 +610,7 @@ function JourneyMap({ c, characterId }: { c: Character; characterId: number }) {
     <main className="sheet map-page">
       <nav className="sheet-nav">
         <a {...linkTo(`/c/${characterId}`)}>← {c.name}</a>
+        <a {...linkTo(`/c/${characterId}/lore`)}>Lore</a>
         <a {...linkTo(`/notes?character=${characterId}`)}>Notes</a>
       </nav>
       <div className="map-layout">
