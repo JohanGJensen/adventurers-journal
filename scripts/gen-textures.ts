@@ -427,14 +427,14 @@ const write = (name: string, data: Uint8Array | string) => {
 write(
   'parchment-light.png',
   png(SIZE, SIZE, parchment(11, {
-    palette: ['#f7ebce', '#f2e2bd', '#ebd6aa', '#e2c895'],
-    contour: '#c29d64',
-    speck: '#5a3d1e',
-    fibreLight: '#fff8e4',
-    fibreDark: '#9c7646',
-    fox: '#d6a96e',
-    foxRim: '#a8743e',
-    strength: 1,
+    palette: ['#f8f4e9', '#f3eee0', '#ece5d3', '#e4dbc4'],
+    contour: '#cdbf9e',
+    speck: '#76684c',
+    fibreLight: '#fdfbf4',
+    fibreDark: '#ada07f',
+    fox: '#ddd0b0',
+    foxRim: '#b9a882',
+    strength: 0.5,
   }).px),
 );
 write(
