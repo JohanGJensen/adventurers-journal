@@ -79,6 +79,7 @@ export function HistoryLog({ characterId }: { characterId: number }) {
       <nav className="sheet-nav">
         <a {...linkTo('/')}>← All characters</a>
         <a {...linkTo(`/c/${characterId}`)}>Sheet</a>
+        <a {...linkTo(`/c/${characterId}/lore`)}>Lore</a>
         <a {...linkTo(`/notes?character=${characterId}`)}>Notes</a>
       </nav>
       <header className="list-head">

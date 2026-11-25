@@ -157,6 +157,25 @@ export interface Note {
   updatedAt: string;
 }
 
+/** The trait lists on a character's Lore page. */
+export const TRAIT_KINDS = ['personality', 'ideals', 'bonds', 'flaws'] as const;
+export type TraitKind = (typeof TRAIT_KINDS)[number];
+
+export interface LoreSection {
+  id: string;
+  title: string;
+  body: string;
+}
+
+/** A character's backstory and traits; stored as one document per character. */
+export interface Lore {
+  sections: LoreSection[];
+  traits: Record<TraitKind, string[]>;
+  updatedAt: string | null;
+}
+
+export const emptyLore = (): Lore => ({ sections: [], traits: { personality: [], ideals: [], bonds: [], flaws: [] }, updatedAt: null });
+
 export const TERRAINS = ['plains', 'forest', 'hills', 'mountains', 'water', 'swamp', 'desert', 'road', 'settlement', 'ruin', 'cave'] as const;
 export type Terrain = (typeof TERRAINS)[number];
 

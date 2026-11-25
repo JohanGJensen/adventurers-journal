@@ -118,6 +118,7 @@ export function Notes({ query }: { query: URLSearchParams }) {
       <nav className="sheet-nav">
         <a {...linkTo('/')}>← All characters</a>
         {filter.startsWith('c:') && <a {...linkTo(`/c/${filter.slice(2)}`)}>Sheet</a>}
+        {filter.startsWith('c:') && <a {...linkTo(`/c/${filter.slice(2)}/lore`)}>Lore</a>}
       </nav>
       <header className="list-head">
         <h1>Notes{filter && ownerName(filter) ? ` · ${ownerName(filter)}` : ''}</h1>

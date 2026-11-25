@@ -4,6 +4,7 @@ import { campaignRoutes } from './routes/campaigns';
 import { characterRoutes } from './routes/characters';
 import { eventRoutes } from './routes/events';
 import { inventoryRoutes } from './routes/inventory';
+import { loreRoutes } from './routes/lore';
 import { noteRoutes } from './routes/notes';
 import { mapRoutes } from './routes/maps';
 import { homebrewRoutes } from './routes/homebrew';
@@ -19,7 +20,7 @@ export const APP_ORIGIN = 'app://dnd';
  * so the one check is that a request comes from the app's own page: no Origin, or exactly APP_ORIGIN.
  */
 export function createApp(db: Db, extra: Route[] = []) {
-  const route = createRouter([...characterRoutes, ...campaignRoutes, ...playRoutes, ...levelRoutes, ...homebrewRoutes, ...inventoryRoutes, ...srdRoutes, ...eventRoutes, ...noteRoutes, ...mapRoutes, ...extra]);
+  const route = createRouter([...characterRoutes, ...campaignRoutes, ...playRoutes, ...levelRoutes, ...homebrewRoutes, ...inventoryRoutes, ...srdRoutes, ...eventRoutes, ...noteRoutes, ...loreRoutes, ...mapRoutes, ...extra]);
   return {
     async fetch(req: Request): Promise<Response> {
       const origin = req.headers.get('origin');
