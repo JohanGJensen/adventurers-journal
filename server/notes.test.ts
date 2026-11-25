@@ -48,6 +48,45 @@ describe('notes', () => {
     expect(titles(await call('GET', '/notes?q=rope'))).toEqual(['Shopping']);
   });
 
+  test('aliases, tags and kind fields: validation, round-trip, search', async () => {
+    const { call } = setup();
+    expect((await call('POST', '/notes', { title: 'x', characterId: 1, kind: 'quest', fields: { status: 'lost' } })).status).toBe(400);
+    expect((await call('POST', '/notes', { title: 'x', characterId: 1, tags: 'a,b' })).status).toBe(400);
+    const city = (
+      await call('POST', '/notes', { title: 'Neverwinter', kind: 'place', characterId: 1, aliases: [' City of  Skilled Hands ', 'city of skilled hands'], tags: ['Sword Coast', 'city'], fields: { type: 'city', bogus: 'x' } })
+    ).body;
+    expect(city).toMatchObject({ aliases: ['City of Skilled Hands'], tags: ['sword coast', 'city'], fields: { type: 'city' } });
+    expect(titles(await call('GET', '/notes?q=skilled'))).toEqual(['Neverwinter']);
+    expect(titles(await call('GET', `/notes?tag=${encodeURIComponent('Sword Coast')}`))).toEqual(['Neverwinter']);
+    expect(titles(await call('GET', '/notes?tag=sword'))).toEqual([]);
+    // changing kind drops fields the new kind doesn't have, and bad pick-list values, instead of failing
+    const npc = (await call('POST', '/notes', { title: 'Gundren', kind: 'npc', characterId: 1, fields: { status: 'missing', role: 'Dwarf' } })).body;
+    expect((await call('PATCH', `/notes/${npc.id}`, { kind: 'quest' })).body.fields).toEqual({});
+    const idx = (await call('GET', '/notes/index?character=1')).body;
+    expect(idx.map((r: any) => r.title).sort()).toEqual(['Gundren', 'Neverwinter']);
+    expect(idx[0].body).toBeUndefined();
+    expect((await call('GET', `/notes/${city.id}`)).body).toMatchObject({ title: 'Neverwinter', tags: ['sword coast', 'city'] });
+    expect((await call('GET', '/notes/999')).status).toBe(404);
+  });
+
+  test('backlinks and renames', async () => {
+    const { call } = setup();
+    const city = (await call('POST', '/notes', { title: 'Neverwinter', kind: 'place', characterId: 1, aliases: ['City of Skilled Hands'] })).body;
+    const mk = async (title: string, body: string, extra = {}) => (await call('POST', '/notes', { title, body, characterId: 1, ...extra })).body;
+    const a = await mk('Explicit', 'Head to [[neverwinter|the city]].');
+    await mk('Auto', 'Back in the city of skilled hands we rested.');
+    await mk('Field', '', { kind: 'quest', fields: { location: 'Neverwinter', status: 'active' } });
+    await mk('Neverwinter Wood', '', { kind: 'place' });
+    await mk('Nope', 'Neverwinter Wood is spooky. Neverwinters.');
+    const back = async () => titles(await call('GET', `/notes/${city.id}/backlinks`)).sort();
+    expect(await back()).toEqual(['Auto', 'Explicit', 'Field']);
+    const renamed = (await call('PATCH', `/notes/${city.id}`, { title: 'Waterdeep' })).body;
+    expect(renamed.aliases).toEqual(['City of Skilled Hands', 'Neverwinter']);
+    expect((await call('GET', '/notes?q=explicit')).body[0].body).toBe('Head to [[Waterdeep|the city]].');
+    expect(await back()).toEqual(['Auto', 'Explicit', 'Field']);
+    expect((await call('GET', `/notes/${a.id}/backlinks`)).body).toEqual([]);
+  });
+
   test('ftsQuery', () => {
     expect(ftsQuery('  ')).toBeNull();
     expect(ftsQuery('wolf "pen')).toBe('"wolf"* "pen"*');

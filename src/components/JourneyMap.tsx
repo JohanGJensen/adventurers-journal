@@ -964,7 +964,7 @@ function HexEditor({
       <NoteField value={hex.noteId} notes={notes} onChange={(noteId) => onChange({ ...hex, noteId })} />
       <div className="char-actions">
         {hex.noteId ? (
-          <a className="btn ghost small" {...linkTo(`/notes?character=${characterId}`)}>Open notes</a>
+          <a className="btn ghost small" {...linkTo(`/notes?character=${characterId}&note=${hex.noteId}`)}>Open note</a>
         ) : (
           <button className="btn ghost small" onClick={onNewNote}>New place note</button>
         )}
@@ -1015,7 +1015,7 @@ function MarkEditor({
       <div className="char-actions">
         {!isText &&
           (mark.noteId ? (
-            <a className="btn ghost small" {...linkTo(`/notes?character=${characterId}`)}>Open notes</a>
+            <a className="btn ghost small" {...linkTo(`/notes?character=${characterId}&note=${mark.noteId}`)}>Open note</a>
           ) : (
             <button className="btn ghost small" onClick={onNewNote}>New note</button>
           ))}
