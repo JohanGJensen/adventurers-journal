@@ -54,7 +54,7 @@ export function CharacterList() {
   };
 
   const remove = async (c: CharacterSummary) => {
-    if (!confirm(`Delete ${c.name}? Their play state, inventory, history and notes are deleted too.`)) return;
+    if (!confirm(`Delete ${c.name}? Their play state, inventory and history are deleted too. Campaign notes stay.`)) return;
     const r = await api('DELETE', `/characters/${c.id}`);
     if (r.error !== undefined) toast(r.error, 'error');
     void refresh();
@@ -76,7 +76,6 @@ export function CharacterList() {
       <header className="list-head">
         <h1>Characters</h1>
         <nav className="topnav">
-          <a {...linkTo('/notes')}>Campaign notes</a>
           <a {...linkTo('/homebrew')}>Homebrew</a>
         </nav>
       </header>
@@ -146,12 +145,16 @@ export function CharacterList() {
         <section className="card">
           <h2>Campaigns</h2>
           <ul className="plain">
-            {campaigns.map((k) => (
+            {campaigns.map((k) => {
+              // Notes live on a character's Notes tab; any character in the campaign shows the same ones.
+              const member = chars?.find((c) => c.campaignId === k.id);
+              return (
               <li key={k.id}>
-                <a {...linkTo(`/notes?campaign=${k.id}`)}>{k.name}</a>{' '}
+                {member ? <a {...linkTo(`/c/${member.id}/notes`)} title="Campaign notes">{k.name}</a> : k.name}{' '}
                 <button className="btn ghost small" onClick={() => removeCampaign(k)} aria-label={`Delete campaign ${k.name}`}>×</button>
               </li>
-            ))}
+              );
+            })}
           </ul>
           <form className="row-form" onSubmit={(e) => { e.preventDefault(); void addCampaign(); }}>
             <input value={newCampaign} onChange={(e) => setNewCampaign(e.target.value)} placeholder="New campaign name" aria-label="New campaign name" />

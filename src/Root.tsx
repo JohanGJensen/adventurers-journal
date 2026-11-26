@@ -5,7 +5,7 @@ import { CreateCharacter } from './components/create/CreateCharacter';
 import { HistoryLog } from './components/HistoryLog';
 import { MapPage } from './components/JourneyMap';
 import { LorePage } from './components/Lore';
-import { Notes } from './components/notes/NotesPage';
+import { LegacyNotesRedirect, Notes } from './components/notes/NotesPage';
 import { HomebrewLibrary } from './components/HomebrewLibrary';
 import { HomebrewEditor } from './components/HomebrewEditor';
 import { Toasts } from './components/Toast';
@@ -59,7 +59,9 @@ function Routes() {
     case 'lore':
       return <LorePage key={route.id} characterId={route.id} />;
     case 'notes':
-      return <Notes query={route.query} />;
+      return <Notes key={route.id} characterId={route.id} query={route.query} />;
+    case 'legacyNotes':
+      return <LegacyNotesRedirect query={route.query} />;
     case 'homebrew':
       return <HomebrewLibrary />;
     case 'homebrewEdit':

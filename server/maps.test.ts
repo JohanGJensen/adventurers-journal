@@ -35,11 +35,12 @@ describe('journey map', () => {
     expect((await call('DELETE', '/characters/1/map/hexes?q=&r=3')).status).toBe(400);
   });
 
-  test("a hex links to the character's own place note, and survives the note's deletion", async () => {
-    const { call } = setup();
+  test("a hex links to a place note of the character's campaign, and survives the note's deletion", async () => {
+    const { call, db } = setup();
+    db.exec("INSERT INTO campaigns (id, name) VALUES (1, 'Mine'); UPDATE characters SET campaign_id = 1 WHERE id = 1;");
     const note = (await call('POST', '/notes', { title: 'Old Owl Well', kind: 'place', characterId: 1 })).body;
     expect((await call('PUT', '/characters/1/map/hexes', { q: 0, r: 0, terrain: 'ruin', noteId: 999 })).status).toBe(404);
-    const camp = (await call('POST', '/campaigns', { name: 'Phandelver' })).body;
+    const camp = (await call('POST', '/campaigns', { name: 'Theirs' })).body;
     const other = (await call('POST', '/notes', { title: 'Elsewhere', campaignId: camp.id })).body;
     expect((await call('PUT', '/characters/1/map/hexes', { q: 0, r: 0, terrain: 'ruin', noteId: other.id })).status).toBe(400);
 

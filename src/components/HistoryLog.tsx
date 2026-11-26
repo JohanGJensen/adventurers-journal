@@ -80,7 +80,7 @@ export function HistoryLog({ characterId }: { characterId: number }) {
         <a {...linkTo('/')}>← All characters</a>
         <a {...linkTo(`/c/${characterId}`)}>Sheet</a>
         <a {...linkTo(`/c/${characterId}/lore`)}>Lore</a>
-        <a {...linkTo(`/notes?character=${characterId}`)}>Notes</a>
+        {character?.campaignId && <a {...linkTo(`/c/${characterId}/notes`)}>Notes</a>}
       </nav>
       <header className="list-head">
         <h1>History{character ? ` · ${character.name}` : ''}</h1>

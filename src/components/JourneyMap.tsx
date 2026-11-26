@@ -189,10 +189,10 @@ export function MapPage({ characterId }: { characterId: number }) {
         <a {...linkTo('/')}>All characters</a>
       </div>
     );
-  return <JourneyMap c={c} characterId={characterId} />;
+  return <JourneyMap c={c} characterId={characterId} campaignId={dto.campaignId} />;
 }
 
-function JourneyMap({ c, characterId }: { c: Character; characterId: number }) {
+function JourneyMap({ c, characterId, campaignId }: { c: Character; characterId: number; campaignId: number | null }) {
   const [map, setMap] = useState<JourneyMapDto | null>(null);
   const [notes, setNotes] = useState<Note[]>([]);
   const [tool, setTool] = useState<Tool>('paint');
@@ -219,7 +219,8 @@ function JourneyMap({ c, characterId }: { c: Character; characterId: number }) {
   const base = `/characters/${characterId}/map`;
 
   const load = useCallback(async () => {
-    const [m, n] = await Promise.all([api<JourneyMapDto>('GET', base), api<Note[]>('GET', `/notes?character=${characterId}`)]);
+    // Notes are the campaign's; a character outside any campaign has none to link.
+    const [m, n] = await Promise.all([api<JourneyMapDto>('GET', base), campaignId ? api<Note[]>('GET', `/notes?campaign=${campaignId}`) : { data: [] as Note[] }]);
     if (m.error) toast(`Couldn't load the map: ${m.error}`, 'error');
     if (m.data) {
       // centre on what's been drawn the first time the map loads
@@ -228,7 +229,7 @@ function JourneyMap({ c, characterId }: { c: Character; characterId: number }) {
       setMap(m.data);
     }
     if (n.data) setNotes(n.data);
-  }, [base, characterId]);
+  }, [base, campaignId]);
 
   useEffect(() => {
     void load();
@@ -611,7 +612,7 @@ function JourneyMap({ c, characterId }: { c: Character; characterId: number }) {
       <nav className="sheet-nav">
         <a {...linkTo(`/c/${characterId}`)}>← {c.name}</a>
         <a {...linkTo(`/c/${characterId}/lore`)}>Lore</a>
-        <a {...linkTo(`/notes?character=${characterId}`)}>Notes</a>
+        {campaignId && <a {...linkTo(`/c/${characterId}/notes`)}>Notes</a>}
       </nav>
       <div className="map-layout">
         <div className={`map-frame tome ${cursor}`}>
@@ -964,7 +965,7 @@ function HexEditor({
       <NoteField value={hex.noteId} notes={notes} onChange={(noteId) => onChange({ ...hex, noteId })} />
       <div className="char-actions">
         {hex.noteId ? (
-          <a className="btn ghost small" {...linkTo(`/notes?character=${characterId}&note=${hex.noteId}`)}>Open note</a>
+          <a className="btn ghost small" {...linkTo(`/c/${characterId}/notes?note=${hex.noteId}`)}>Open note</a>
         ) : (
           <button className="btn ghost small" onClick={onNewNote}>New place note</button>
         )}
@@ -1015,7 +1016,7 @@ function MarkEditor({
       <div className="char-actions">
         {!isText &&
           (mark.noteId ? (
-            <a className="btn ghost small" {...linkTo(`/notes?character=${characterId}&note=${mark.noteId}`)}>Open note</a>
+            <a className="btn ghost small" {...linkTo(`/c/${characterId}/notes?note=${mark.noteId}`)}>Open note</a>
           ) : (
             <button className="btn ghost small" onClick={onNewNote}>New note</button>
           ))}

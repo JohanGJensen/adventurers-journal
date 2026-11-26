@@ -22,7 +22,7 @@ directly, using the same server code. By default it uses the app's database. `DN
 | Command | What it does |
 |---|---|
 | `list` | id, name, subtitle and `hasLore` for every character |
-| `show <id>` | The brief: race and subrace, class, subclass, level, background, alignment, abilities, skills, tools, features, spells (with source), equipment, the character's notes, and existing `lore` |
+| `show <id>` | The brief: race and subrace, class, subclass, level, background, alignment, abilities, skills, tools, features, spells (with source), equipment, their campaign's notes, and existing `lore` |
 | `write <id> <file.json> [--replace]` | Validates and saves lore after backing up the database. It refuses if the character already has lore, unless `--replace` is given |
 
 It's safe to run while the app is open. Afterwards the user only needs to reload the Lore page.
@@ -39,7 +39,7 @@ It's safe to run while the app is open. Afterwards the user only needs to reload
    - background skills and tools
    - alignment
    - signature spells and gear
-   - anything in their notes
+   - anything in their campaign's notes
 
    Then ask the user, in plain text, for **table facts the sheet can't show**: how the character looks,
    memorable moments from play, and their role in the party. Faelan's were a red hat, buffing an ally with

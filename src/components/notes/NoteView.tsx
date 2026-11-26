@@ -1,10 +1,12 @@
 import { Fragment, type ReactNode } from 'react';
 import { parseBlocks, parseInline, type Inline } from '../../lib/markdown';
 import { resolveName, segmentText, type LinkIndex } from '../../shared/noteLinks';
-import { NOTE_FIELDS, NOTE_KIND_LABELS, type Note, type NoteKind } from '../../shared/types';
-import { parseAt } from './common';
+import { NOTE_FIELDS, type Note, type NoteKind } from '../../shared/types';
+import { kindName, parseAt } from './common';
 
 export interface LinkHandlers {
+  /** The page URL of note `id`, for new-tab opens. */
+  href: (id: number) => string;
   /** Open note `id`. */
   onLink: (id: number) => void;
   /** Create a note for a [[target]] that doesn't exist yet. */
@@ -16,7 +18,7 @@ export interface LinkHandlers {
 export function NoteLink({ id, children, auto, h }: { id: number; children: ReactNode; auto?: boolean; h: LinkHandlers }) {
   return (
     <a
-      href={`/notes?note=${id}`}
+      href={h.href(id)}
       className={`note-link${auto ? ' auto' : ''}`}
       onClick={(e) => {
         if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
@@ -89,7 +91,7 @@ export function NoteBody({ text, index, h }: { text: string; index: LinkIndex; h
     ));
   };
   return (
-    <div className="note-body">
+    <div className="note-body prose">
       {parseBlocks(text).map((b, i) => {
         switch (b.t) {
           case 'h': {
@@ -116,20 +118,19 @@ export function NoteBody({ text, index, h }: { text: string; index: LinkIndex; h
 interface ViewProps {
   note: Note;
   index: LinkIndex;
-  ownerName?: string;
   backlinks: Pick<Note, 'id' | 'title' | 'kind'>[] | null;
   h: LinkHandlers;
   onTag: (tag: string) => void;
   onEdit: () => void;
 }
 
-export function NoteView({ note, index, ownerName, backlinks, h, onTag, onEdit }: ViewProps) {
+export function NoteView({ note, index, backlinks, h, onTag, onEdit }: ViewProps) {
   const facts = NOTE_FIELDS[note.kind].filter((f) => note.fields[f.key]);
   return (
     <article className={`note-read kind-${note.kind}`}>
       <header className="note-read-head">
         <div>
-          <span className={`kind-badge kind-${note.kind}`}>{NOTE_KIND_LABELS[note.kind].replace(/s$/, '')}</span>
+          <span className={`kind-badge kind-${note.kind}`}>{kindName(note.kind)}</span>
           <h2>{note.title}</h2>
           {note.aliases.length > 0 && <p className="note-aka">Also known as {note.aliases.join(', ')}</p>}
         </div>
@@ -171,7 +172,7 @@ export function NoteView({ note, index, ownerName, backlinks, h, onTag, onEdit }
         {note.tags.length > 0 && (
           <div className="chips">
             {note.tags.map((t) => (
-              <button key={t} className="chip tag" onClick={() => onTag(t)} title={`Show notes tagged “${t}”`}>#{t}</button>
+              <button key={t} className="chip note-tag" onClick={() => onTag(t)} title={`Show notes tagged “${t}”`}>#{t}</button>
             ))}
           </div>
         )}
@@ -191,9 +192,7 @@ export function NoteView({ note, index, ownerName, backlinks, h, onTag, onEdit }
             <p className="hint">No other note mentions this one yet.</p>
           )}
         </section>
-        <p className="hint">
-          {ownerName && <>{ownerName} · </>}Updated {parseAt(note.updatedAt).toLocaleString()}
-        </p>
+        <p className="hint">Updated {parseAt(note.updatedAt).toLocaleString()}</p>
       </footer>
     </article>
   );

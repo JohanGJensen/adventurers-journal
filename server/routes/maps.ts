@@ -60,12 +60,13 @@ function getMap(db: Db, characterId: number): JourneyMapDto {
   };
 }
 
+/** A map links only to notes of the campaign its character plays in. */
 function noteFor(db: Db, characterId: number, v: unknown): number | null {
   if (v == null) return null;
   const id = intParam(String(v), 'noteId');
-  const n = db.query('SELECT character_id FROM notes WHERE id = ?').get(id) as { character_id: number | null } | null;
+  const n = db.query('SELECT campaign_id FROM notes WHERE id = ?').get(id) as { campaign_id: number } | null;
   if (!n) throw new HttpError(404, `No note ${id}`);
-  if (n.character_id !== characterId) bad("noteId must be one of this character's notes");
+  if (n.campaign_id !== getCharacter(db, characterId).campaignId) bad("noteId must be one of the character's campaign notes");
   return id;
 }
 

@@ -28,7 +28,7 @@ function Prose({ text }: { text: string }) {
   const blocks = text.split(/\n\s*\n/).map((b) => b.trim()).filter(Boolean);
   if (!blocks.length) return <p className="hint">Nothing written yet.</p>;
   return (
-    <>
+    <div className="prose">
       {blocks.map((b, i) => {
         const lines = b.split('\n');
         return lines.every((l) => l.trimStart().startsWith('- ')) ? (
@@ -37,7 +37,7 @@ function Prose({ text }: { text: string }) {
           <p key={i}>{b}</p>
         );
       })}
-    </>
+    </div>
   );
 }
 
@@ -205,7 +205,7 @@ export function LorePage({ characterId }: { characterId: number }) {
         <a {...linkTo('/')}>← All characters</a>
         <a {...linkTo(`/c/${characterId}`)}>Sheet</a>
         <a {...linkTo(`/c/${characterId}/log`)}>History</a>
-        <a {...linkTo(`/notes?character=${characterId}`)}>Notes</a>
+        {character?.campaignId && <a {...linkTo(`/c/${characterId}/notes`)}>Notes</a>}
       </nav>
       <header className="list-head">
         <h1>Lore & Story{character ? ` · ${character.name}` : ''}</h1>

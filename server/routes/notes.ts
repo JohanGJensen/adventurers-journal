@@ -1,5 +1,5 @@
 import type { Db } from '../sqlite';
-import { buildLinkIndex, normName, refersTo, renameLinks, type LinkIndex } from '../../src/shared/noteLinks';
+import { buildLinkIndex, normName, refersTo, renameLinks } from '../../src/shared/noteLinks';
 import { NOTE_FIELDS, NOTE_KINDS, type Note, type NoteKind, type NoteRef } from '../../src/shared/types';
 import { getCampaign } from '../campaigns';
 import { getCharacter } from '../characters';
@@ -8,8 +8,7 @@ import { bad, isObj, optCampaignId } from '../validate';
 
 interface Row {
   id: number;
-  campaign_id: number | null;
-  character_id: number | null;
+  campaign_id: number;
   kind: NoteKind;
   title: string;
   body: string;
@@ -33,7 +32,6 @@ const parseFields = (s: string): Record<string, string> => {
 const toNote = (r: Row): Note => ({
   id: r.id,
   campaignId: r.campaign_id,
-  characterId: r.character_id,
   kind: r.kind,
   title: r.title,
   body: r.body,
@@ -93,17 +91,28 @@ function asFields(v: unknown, kind: NoteKind, lenient = false): Record<string, s
   return out;
 }
 
-function checkOwners(db: Db, campaignId: number | null, characterId: number | null) {
-  if (campaignId === null && characterId === null) bad('A note needs a campaignId or a characterId');
-  if (campaignId) getCampaign(db, campaignId);
-  if (characterId) getCharacter(db, characterId);
+/**
+ * The campaign a new note goes to: `campaignId`, or else the campaign of `characterId` (so callers
+ * holding only a character, like the map, needn't look it up). Every note belongs to a campaign.
+ */
+function campaignFor(db: Db, o: Record<string, unknown>): number {
+  const id = optCampaignId(o.campaignId);
+  if (id) return getCampaign(db, id).id;
+  if (o.characterId != null) {
+    const c = getCharacter(db, intParam(String(o.characterId), 'characterId'));
+    if (c.campaignId) return c.campaignId;
+    bad(`${c.name} isn't in a campaign yet; add them to one to keep notes`);
+  }
+  return bad('A note needs a campaignId');
 }
 
-/** Points [[old title]] links in other notes at the new title. Leaves updated_at alone: the author didn't edit them. */
-function rewriteLinks(db: Db, id: number, from: string, to: string) {
+/** Points [[old title]] links in the campaign's other notes at the new title. Leaves updated_at alone: the author didn't edit them. */
+function rewriteLinks(db: Db, n: Note, from: string, to: string) {
   const q = ftsQuery(from);
   if (!q) return;
-  const rows = db.query('SELECT n.id, n.body FROM notes_fts JOIN notes n ON n.id = notes_fts.rowid WHERE notes_fts MATCH ? AND n.id != ?').all(`body : (${q})`, id) as {
+  const rows = db
+    .query('SELECT n.id, n.body FROM notes_fts JOIN notes n ON n.id = notes_fts.rowid WHERE notes_fts MATCH ? AND n.id != ? AND n.campaign_id = ?')
+    .all(`body : (${q})`, n.id, n.campaignId) as {
     id: number;
     body: string;
   }[];
@@ -113,16 +122,6 @@ function rewriteLinks(db: Db, id: number, from: string, to: string) {
   }
 }
 
-const ownerWhere = (p: URLSearchParams, where: string[], args: (string | number)[]) => {
-  if (p.get('campaign')) {
-    where.push('campaign_id = ?');
-    args.push(intParam(p.get('campaign'), 'campaign'));
-  }
-  if (p.get('character')) {
-    where.push('character_id = ?');
-    args.push(intParam(p.get('character'), 'character'));
-  }
-};
 
 function allRefs(db: Db, where: string[] = [], args: (string | number)[] = []): NoteRef[] {
   const rows = db
@@ -140,10 +139,8 @@ export const noteRoutes: Route[] = [
     'GET',
     '/api/notes/index',
     ({ db, url }) => {
-      const where: string[] = [];
-      const args: (string | number)[] = [];
-      ownerWhere(url.searchParams, where, args);
-      return json(allRefs(db, where, args));
+      const campaign = url.searchParams.get('campaign');
+      return json(campaign ? allRefs(db, ['campaign_id = ?'], [intParam(campaign, 'campaign')]) : allRefs(db));
     },
   ],
   [
@@ -152,29 +149,22 @@ export const noteRoutes: Route[] = [
     ({ db, params }) => {
       const n = getNote(db, intParam(params.id, 'note id'));
       const names = [n.title, ...n.aliases];
-      // FTS narrows the candidates to notes containing every word of some name; refersTo() then resolves
-      // their links against all notes, the way the reader sees them.
+      // Links stay inside a campaign. FTS narrows the candidates to notes containing every word of
+      // some name; refersTo() then resolves their links against the campaign's notes, as the reader sees them.
       const qs = names.map(ftsQuery).filter((q): q is string => !!q);
       if (!qs.length) return json([]);
       const rows = db
-        .query(`SELECT n.* FROM notes_fts JOIN notes n ON n.id = notes_fts.rowid WHERE notes_fts MATCH ? AND n.id != ?`)
-        .all(`{title body} : (${qs.map((q) => `(${q})`).join(' OR ')})`, n.id) as Row[];
-      const fieldRows = db.query(`SELECT * FROM notes WHERE id != ? AND fields_json != '{}'`).all(n.id) as Row[];
-      const refs = allRefs(db);
-      // One index per owner: name clashes resolve toward the reading note's owner.
-      const indexes = new Map<string, LinkIndex>();
-      const indexFor = (m: Note) => {
-        const k = `${m.campaignId}:${m.characterId}`;
-        if (!indexes.has(k)) indexes.set(k, buildLinkIndex(refs, { id: 0, campaignId: m.campaignId, characterId: m.characterId }));
-        return indexes.get(k)!;
-      };
+        .query(`SELECT n.* FROM notes_fts JOIN notes n ON n.id = notes_fts.rowid WHERE notes_fts MATCH ? AND n.id != ? AND n.campaign_id = ?`)
+        .all(`{title body} : (${qs.map((q) => `(${q})`).join(' OR ')})`, n.id, n.campaignId) as Row[];
+      const fieldRows = db.query(`SELECT * FROM notes WHERE id != ? AND campaign_id = ? AND fields_json != '{}'`).all(n.id, n.campaignId) as Row[];
+      const index = buildLinkIndex(allRefs(db, ['campaign_id = ?'], [n.campaignId]));
       const seen = new Set<number>();
       const out: Pick<Note, 'id' | 'title' | 'kind'>[] = [];
       for (const r of [...rows, ...fieldRows].sort((a, b) => b.updated_at.localeCompare(a.updated_at))) {
         if (seen.has(r.id)) continue;
         seen.add(r.id);
         const m = toNote(r);
-        if (refersTo(m, indexFor(m), n.id)) out.push({ id: m.id, title: m.title, kind: m.kind });
+        if (refersTo(m, index, n.id)) out.push({ id: m.id, title: m.title, kind: m.kind });
       }
       return json(out);
     },
@@ -189,10 +179,6 @@ export const noteRoutes: Route[] = [
       if (p.get('campaign')) {
         where.push('n.campaign_id = ?');
         args.push(intParam(p.get('campaign'), 'campaign'));
-      }
-      if (p.get('character')) {
-        where.push('n.character_id = ?');
-        args.push(intParam(p.get('character'), 'character'));
       }
       if (p.get('kind')) {
         where.push('n.kind = ?');
@@ -219,18 +205,15 @@ export const noteRoutes: Route[] = [
     '/api/notes',
     async ({ db, req }) => {
       const b = await body(req);
-      if (!isObj(b)) bad('Body must be { title, body?, kind?, aliases?, tags?, fields?, campaignId?, characterId? }');
+      if (!isObj(b)) bad('Body must be { title, campaignId (or characterId), body?, kind?, aliases?, tags?, fields? }');
       const o = b as Record<string, unknown>;
-      const campaignId = optCampaignId(o.campaignId) ?? null;
-      const characterId = o.characterId == null ? null : intParam(String(o.characterId), 'characterId');
-      checkOwners(db, campaignId, characterId);
+      const campaignId = campaignFor(db, o);
       const title = asText(o.title ?? 'Untitled', 'title', 300).trim() || 'Untitled';
       const kind = o.kind === undefined ? 'note' : asKind(o.kind);
       const r = db
-        .query('INSERT INTO notes (campaign_id, character_id, kind, title, body, aliases, tags, fields_json) VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING *')
+        .query('INSERT INTO notes (campaign_id, kind, title, body, aliases, tags, fields_json) VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING *')
         .get(
           campaignId,
-          characterId,
           kind,
           title,
           asText(o.body ?? '', 'body', 200_000),
@@ -250,10 +233,8 @@ export const noteRoutes: Route[] = [
       const b = await body(req);
       if (!isObj(b)) bad('Body must be an object');
       const o = b as Record<string, unknown>;
-      const campaignId = o.campaignId === undefined ? n.campaignId : (optCampaignId(o.campaignId) ?? null);
-      const characterId =
-        o.characterId === undefined ? n.characterId : o.characterId === null ? null : intParam(String(o.characterId), 'characterId');
-      checkOwners(db, campaignId, characterId);
+      // A note can move to another campaign, never to none.
+      const campaignId = o.campaignId === undefined ? n.campaignId : getCampaign(db, optCampaignId(o.campaignId) ?? bad('campaignId must be a positive integer')).id;
       const title = o.title === undefined ? n.title : asText(o.title, 'title', 300).trim() || 'Untitled';
       const text = o.body === undefined ? n.body : asText(o.body, 'body', 200_000);
       const kind = o.kind === undefined ? n.kind : asKind(o.kind);
@@ -267,9 +248,9 @@ export const noteRoutes: Route[] = [
       aliases = aliases.filter((a) => normName(a) !== normName(title));
       db.transaction(() => {
         db.query(
-          `UPDATE notes SET campaign_id = ?, character_id = ?, kind = ?, title = ?, body = ?, aliases = ?, tags = ?, fields_json = ?, updated_at = datetime('now') WHERE id = ?`,
-        ).run(campaignId, characterId, kind, title, text, aliases.join('\n'), tags.join('\n'), JSON.stringify(fields), n.id);
-        if (renamed) rewriteLinks(db, n.id, n.title, title);
+          `UPDATE notes SET campaign_id = ?, kind = ?, title = ?, body = ?, aliases = ?, tags = ?, fields_json = ?, updated_at = datetime('now') WHERE id = ?`,
+        ).run(campaignId, kind, title, text, aliases.join('\n'), tags.join('\n'), JSON.stringify(fields), n.id);
+        if (renamed) rewriteLinks(db, { ...n, campaignId }, n.title, title);
       })();
       return json(getNote(db, n.id));
     },

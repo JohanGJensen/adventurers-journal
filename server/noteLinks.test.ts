@@ -9,8 +9,7 @@ const ref = (id: number, title: string, extra: Partial<NoteRef> = {}): NoteRef =
   aliases: [],
   tags: [],
   updatedAt: '',
-  campaignId: null,
-  characterId: 1,
+  campaignId: 1,
   fields: {},
   ...extra,
 });
@@ -53,9 +52,9 @@ describe('note links', () => {
   });
 
   test('same-owner note wins a name clash', () => {
-    const two = [ref(10, 'Tavern', { characterId: 1 }), ref(11, 'Tavern', { characterId: null, campaignId: 7 })];
+    const two = [ref(10, 'Tavern'), ref(11, 'Tavern', { campaignId: 7 })];
     expect(buildLinkIndex(two).byName.get('tavern')?.id).toBe(10);
-    expect(buildLinkIndex(two, { id: 99, campaignId: 7, characterId: null }).byName.get('tavern')?.id).toBe(11);
+    expect(buildLinkIndex(two, { id: 99, campaignId: 7 }).byName.get('tavern')?.id).toBe(11);
   });
 
   test('refersTo and renames', () => {

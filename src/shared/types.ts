@@ -204,8 +204,8 @@ export const NOTE_FIELDS: Record<NoteKind, readonly NoteFieldDef[]> = {
 
 export interface Note {
   id: number;
-  campaignId: number | null;
-  characterId: number | null;
+  /** Every note belongs to a campaign; the characters in it share its notes. */
+  campaignId: number;
   kind: NoteKind;
   title: string;
   body: string;

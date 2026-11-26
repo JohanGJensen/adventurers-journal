@@ -39,7 +39,9 @@ export type Route =
   | { name: 'log'; id: number }
   | { name: 'map'; id: number }
   | { name: 'lore'; id: number }
-  | { name: 'notes'; query: URLSearchParams }
+  | { name: 'notes'; id: number; query: URLSearchParams }
+  /** The old /notes?campaign=|character=|note= links; redirected to a character's Notes tab. */
+  | { name: 'legacyNotes'; query: URLSearchParams }
   | { name: 'homebrew' }
   | { name: 'homebrewEdit'; id: number | 'new'; query: URLSearchParams }
   | { name: 'missing' };
@@ -56,7 +58,9 @@ export function parseRoute(path: string): Route {
   if (m) return { name: 'map', id: Number(m[1]) };
   m = /^\/c\/(\d+)\/lore\/?$/.exec(pathname);
   if (m) return { name: 'lore', id: Number(m[1]) };
-  if (/^\/notes\/?$/.test(pathname)) return { name: 'notes', query: new URLSearchParams(search) };
+  m = /^\/c\/(\d+)\/notes\/?$/.exec(pathname);
+  if (m) return { name: 'notes', id: Number(m[1]), query: new URLSearchParams(search) };
+  if (/^\/notes\/?$/.test(pathname)) return { name: 'legacyNotes', query: new URLSearchParams(search) };
   if (/^\/homebrew\/?$/.test(pathname)) return { name: 'homebrew' };
   m = /^\/homebrew\/(new|\d+)\/?$/.exec(pathname);
   if (m) return { name: 'homebrewEdit', id: m[1] === 'new' ? 'new' : Number(m[1]), query: new URLSearchParams(search) };

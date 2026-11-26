@@ -29,21 +29,19 @@ export interface LinkIndex {
   auto: RegExp | null;
 }
 
-const ownerKey = (r: Pick<NoteRef, 'campaignId' | 'characterId'>) => (r.campaignId ? `k:${r.campaignId}` : `c:${r.characterId}`);
-
 /**
- * Name → note for every title and alias. When two notes share a name, the one with the same
- * owner as the note being read wins, otherwise the first in `refs`.
+ * Name → note for every title and alias. When two notes share a name, the one in the same campaign
+ * as the note being read wins, otherwise the first in `refs`. Callers usually pass one campaign's notes.
  */
-export function buildLinkIndex(refs: NoteRef[], self?: Pick<NoteRef, 'id' | 'campaignId' | 'characterId'> | null): LinkIndex {
+export function buildLinkIndex(refs: NoteRef[], self?: Pick<NoteRef, 'id' | 'campaignId'> | null): LinkIndex {
   const byName = new Map<string, NoteRef>();
-  const home = self ? ownerKey(self) : null;
+  const home = self?.campaignId ?? null;
   for (const r of refs) {
     for (const name of [r.title, ...r.aliases]) {
       const k = normName(name);
       if (!k) continue;
       const prev = byName.get(k);
-      if (!prev || (home && ownerKey(prev) !== home && ownerKey(r) === home)) byName.set(k, r);
+      if (!prev || (home && prev.campaignId !== home && r.campaignId === home)) byName.set(k, r);
     }
   }
   const autoNames = [...byName].filter(([, r]) => r.id !== self?.id).map(([k]) => k);
