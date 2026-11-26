@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { NOTE_KINDS, NOTE_KIND_LABELS, type Note, type NoteKind } from '../../shared/types';
-import { factLine, plainText, sortForKind, storage } from './common';
+import { factLine, LIST_FACTS, plainText, sortForKind, storage } from './common';
 
 const COLLAPSED_KEY = 'notes.collapsedKinds';
 
@@ -48,7 +48,7 @@ export function NoteSidebar({ notes, selectedId, draftTitle, ranked, flat, onOpe
             {open && (
               <ul className="note-list">
                 {g.notes.map((n) => {
-                  const facts = factLine(n, 2);
+                  const facts = factLine(n, 2, LIST_FACTS[n.kind]);
                   const status = n.kind === 'quest' ? n.fields.status : undefined;
                   return (
                     <li key={n.id}>

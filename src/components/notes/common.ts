@@ -63,8 +63,11 @@ export const isPortraitKind = (k: NoteKind) => k === 'player' || k === 'npc';
 export const plainText = (body: string) =>
   body.replace(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g, (_, t, l) => l ?? t).replace(/[#*_>`]/g, '').replace(/\s+/g, ' ').trim();
 
-export const factLine = (r: Pick<NoteRef, 'kind' | 'fields'>, max = 3) =>
-  NOTE_FIELDS[r.kind]
+/** Fields a sidebar row shows instead of the first ones: a player row reads "Bard · Half-elf", not the person's name. */
+export const LIST_FACTS: Partial<Record<NoteKind, readonly string[]>> = { player: ['class', 'race'] };
+
+export const factLine = (r: Pick<NoteRef, 'kind' | 'fields'>, max = 3, keys?: readonly string[]) =>
+  (keys ? keys.map((k) => NOTE_FIELDS[r.kind].find((f) => f.key === k)!) : NOTE_FIELDS[r.kind])
     .filter((f) => r.fields[f.key])
     .slice(0, max)
     .map((f) => (f.key === 'number' ? `#${r.fields[f.key]}` : r.fields[f.key]))
