@@ -127,8 +127,8 @@ export function NoteEditor({ noteId, draft, refs, savedState, image, imageBusy, 
               ) : (
                 <input
                   value={draft.fields[f.key] ?? ''}
-                  list={f.ref ? `note-refs-${f.ref}` : undefined}
-                  placeholder={f.ref ? `${kindName(f.ref)} name` : undefined}
+                  list={f.ref ? `note-refs-${f.ref}` : f.suggest ? `note-suggest-${f.key}` : undefined}
+                  placeholder={f.ref ? `${kindName(f.ref)} name` : f.suggest ? 'Pick or type…' : undefined}
                   onChange={(e) => setField(f.key, e.target.value)}
                 />
               )}
@@ -137,6 +137,11 @@ export function NoteEditor({ noteId, draft, refs, savedState, image, imageBusy, 
           {[...new Set(NOTE_FIELDS[draft.kind].map((f) => f.ref).filter((k): k is NoteKind => !!k))].map((k) => (
             <datalist key={k} id={`note-refs-${k}`}>
               {others.filter((r) => r.kind === k).map((r) => <option key={r.id} value={r.title} />)}
+            </datalist>
+          ))}
+          {NOTE_FIELDS[draft.kind].filter((f) => f.suggest).map((f) => (
+            <datalist key={f.key} id={`note-suggest-${f.key}`}>
+              {f.suggest!.map((o) => <option key={o} value={o} />)}
             </datalist>
           ))}
         </div>

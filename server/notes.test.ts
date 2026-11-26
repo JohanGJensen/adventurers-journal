@@ -130,6 +130,9 @@ describe('notes', () => {
   test('player notes: fields, and an item held by a player links back to them', async () => {
     const { call } = setup();
     expect((await call('POST', '/notes', { title: 'x', campaignId: 1, kind: 'player', fields: { status: 'asleep' } })).status).toBe(400);
+    expect((await call('POST', '/notes', { title: 'x', campaignId: 1, kind: 'player', fields: { level: '21' } })).status).toBe(400);
+    // suggestions aren't limits: a homebrew class is fine
+    expect((await call('POST', '/notes', { title: 'y', campaignId: 1, kind: 'player', fields: { class: 'Blood Hunter' } })).status).toBe(201);
     const anna = (
       await call('POST', '/notes', {
         title: 'Brynja',

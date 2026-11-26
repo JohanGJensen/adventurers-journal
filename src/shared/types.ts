@@ -168,7 +168,14 @@ export interface NoteFieldDef {
   options?: readonly string[];
   ref?: NoteKind;
   loose?: boolean;
+  /** Offered in a dropdown, but any text is accepted (homebrew classes, custom species, a free-form note). */
+  suggest?: readonly string[];
 }
+
+const CLASS_NAMES = ['Barbarian', 'Bard', 'Cleric', 'Druid', 'Fighter', 'Monk', 'Paladin', 'Ranger', 'Rogue', 'Sorcerer', 'Warlock', 'Wizard'];
+const SPECIES_NAMES = ['Aasimar', 'Dragonborn', 'Dwarf', 'Elf', 'Gnome', 'Goliath', 'Half-Elf', 'Half-Orc', 'Halfling', 'Human', 'Orc', 'Tiefling'];
+const RELATIONSHIPS = ['Close friend', 'Friend', 'Ally', 'Mentor', 'Family', 'Partner', 'Rival', 'Distrusted', 'Strangers'];
+const LEVELS = Array.from({ length: 20 }, (_, i) => String(i + 1));
 
 export const NOTE_FIELDS: Record<NoteKind, readonly NoteFieldDef[]> = {
   note: [],
@@ -180,11 +187,11 @@ export const NOTE_FIELDS: Record<NoteKind, readonly NoteFieldDef[]> = {
   // The other people at the table and their characters (not NPCs).
   player: [
     { key: 'player', label: 'Player' },
-    { key: 'race', label: 'Race' },
-    { key: 'class', label: 'Class' },
-    { key: 'level', label: 'Level' },
+    { key: 'race', label: 'Race', suggest: SPECIES_NAMES },
+    { key: 'class', label: 'Class', suggest: CLASS_NAMES },
+    { key: 'level', label: 'Level', options: LEVELS },
     { key: 'status', label: 'Status', options: ['active', 'absent', 'retired', 'dead'] },
-    { key: 'bond', label: 'Relationship' },
+    { key: 'bond', label: 'Relationship', suggest: RELATIONSHIPS },
   ],
   quest: [
     { key: 'status', label: 'Status', options: ['active', 'on hold', 'completed', 'failed'] },
