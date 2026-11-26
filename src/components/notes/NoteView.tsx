@@ -126,13 +126,14 @@ interface ViewProps {
 
 export function NoteView({ note, index, backlinks, h, onTag, onEdit }: ViewProps) {
   const facts = NOTE_FIELDS[note.kind].filter((f) => note.fields[f.key]);
-  const image = note.image ?? fallbackImage(note.kind);
+  const image = note.image ?? fallbackImage(note);
   return (
     <article className={`note-read kind-${note.kind} ${image ? 'has-image' : ''}`}>
       {image && (
         // Beside the title (and the facts, when there are any). Without an image of its own the note shows its kind's stand-in.
         <figure
-          className={`note-image ${isPortraitKind(note.kind) ? 'is-portrait' : 'is-picture'} ${note.image ? '' : 'is-fallback'}`}
+          // A stand-in is a medallion with its own rim, so it never gets the portrait's round crop and rings.
+          className={`note-image ${note.image && isPortraitKind(note.kind) ? 'is-portrait' : 'is-picture'} ${note.image ? '' : 'is-fallback'}`}
           style={{ gridRowEnd: facts.length ? 'span 2' : 'span 1' }}
         >
           <img src={image} alt={note.image ? note.title : ''} />
