@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="45%" r="70%">
+      <stop offset="0" stop-color="#3a2560"/><stop offset="0.6" stop-color="#1c1233"/><stop offset="1" stop-color="#0c0818"/>
+    </radialGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#fff6c2"/><stop offset="0.3" stop-color="#ffd23f" stop-opacity="0.8"/><stop offset="1" stop-color="#ff9a1f" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="arcane" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#e6f0ff"/><stop offset="0.3" stop-color="#8ab4ff" stop-opacity="0.75"/><stop offset="1" stop-color="#4d8bff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="aura" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#ff8a3d" stop-opacity="0.4"/><stop offset="1" stop-color="#ff8a3d" stop-opacity="0"/>
+    </radialGradient>
+    <symbol id="sparkle" viewBox="-10 -10 20 20">
+      <path d="M0-10 Q1.5-1.5 10 0 Q1.5 1.5 0 10 Q-1.5 1.5 -10 0 Q-1.5-1.5 0-10Z"/>
+    </symbol>
+  </defs>
+  <rect width="1024" height="1024" fill="url(#bg)"/>
+  <circle cx="512" cy="512" r="440" fill="url(#arcane)"/>
+  <ellipse cx="512" cy="860" rx="340" ry="40" fill="#000" opacity="0.35"/><circle cx="512" cy="430" r="320" fill="url(#arcane)" opacity="0.8"/><g stroke="#2a1206" stroke-width="16" stroke-linejoin="round" stroke-linecap="round" >
+    <!-- cover -->
+    <path d="M512 820 Q380 760 170 790 L190 450 Q380 420 512 500 Q644 420 834 450 L854 790 Q644 760 512 820 Z" fill="#7a2e14"/>
+    <!-- page block edges -->
+    <path d="M512 790 Q380 730 196 758 L210 440 Q380 410 512 480 Z" fill="#e9c98a"/>
+    <path d="M512 790 Q644 730 828 758 L814 440 Q644 410 512 480 Z" fill="#e9c98a"/>
+    <!-- pages -->
+    <path d="M512 760 Q380 700 220 724 L236 420 Q380 390 512 460 Z" fill="#fbe8bf"/>
+    <path d="M512 760 Q644 700 804 724 L788 420 Q644 390 512 460 Z" fill="#fbe8bf"/>
+    <path d="M512 460 Q600 420 788 420 L800 640 Q680 560 512 600 Z" fill="#fff6dc" stroke="none"/>
+    <path d="M512 760 Q644 700 804 724 L788 420 Q644 390 512 460 Z" fill="none"/>
+    <path d="M512 460 V760" fill="none" stroke-width="10"/>
+    <g fill="none" stroke="#d9b77c" stroke-width="8">
+      <path d="M270 480 Q380 460 470 500"/><path d="M268 540 Q380 520 470 560"/><path d="M266 600 Q380 580 470 620"/><path d="M264 660 Q380 640 470 680"/>
+      <path d="M554 500 Q644 460 752 480"/><path d="M554 560 Q644 520 754 540"/><path d="M554 620 Q644 580 756 600"/><path d="M554 680 Q644 640 758 660"/>
+    </g>
+    <!-- bookmark -->
+    <path d="M600 760 V870 L624 846 L648 870 V744" fill="#d6304a" stroke-width="12"/>
+  </g><g fill="none" stroke="#ffcc3d" stroke-width="12" stroke-linecap="round" stroke-linejoin="round">
+      <g transform="translate(512 330) rotate(0)"><path d="M0 -36 V36 M-22 -18 L22 18"/></g>
+      <g transform="translate(380 280) rotate(-12)"><path d="M-18 -30 L0 30 L18 -30"/></g>
+      <g transform="translate(650 270) rotate(10)"><path d="M-14 -30 V30 M-14 -30 L16 -12 L-14 4"/></g>
+      <g transform="translate(300 380) rotate(8)"><path d="M-16 -16 L16 16 M16 -16 L-16 16"/></g>
+      <g transform="translate(730 370) rotate(-8)"><path d="M0 -26 L22 0 L0 26 L-22 0 Z"/></g>
+      <g transform="translate(512 200) rotate(0)"><path d="M-18 -18 V18 H18"/></g>
+    </g>
+    <g fill="#fff3a8"><circle cx="440" cy="390" r="8"/><circle cx="600" cy="380" r="7"/><circle cx="560" cy="240" r="6"/><circle cx="430" cy="210" r="6"/></g>
+  
+  <g fill="#fff6c2" stroke="#2a1206" stroke-width="1.2">
+    <use href="#sparkle" x="140" y="190" width="60" height="60"/><use href="#sparkle" x="830" y="160" width="54" height="54"/><use href="#sparkle" x="880" y="560" width="40" height="40"/><use href="#sparkle" x="90" y="560" width="36" height="36"/>
+  </g>
+  <g fill="#ffd84a"><circle cx="300" cy="110" r="8"/><circle cx="930" cy="360" r="8"/><circle cx="120" cy="940" r="7"/><circle cx="900" cy="940" r="7"/></g>
+</svg>

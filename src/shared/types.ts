@@ -238,6 +238,8 @@ export interface Note {
   fields: Record<string, string>;
   /** An image data URL. Only on single-note responses (GET /notes/:id, POST, PATCH), never in lists. */
   image?: string | null;
+  /** Whether the note has an image, on every response (lists included). */
+  hasImage: boolean;
   createdAt: string;
   updatedAt: string;
 }

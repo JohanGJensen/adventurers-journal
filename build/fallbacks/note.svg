@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="45%" r="70%">
+      <stop offset="0" stop-color="#3a2560"/><stop offset="0.6" stop-color="#1c1233"/><stop offset="1" stop-color="#0c0818"/>
+    </radialGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#fff6c2"/><stop offset="0.3" stop-color="#ffd23f" stop-opacity="0.8"/><stop offset="1" stop-color="#ff9a1f" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="arcane" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#e6f0ff"/><stop offset="0.3" stop-color="#8ab4ff" stop-opacity="0.75"/><stop offset="1" stop-color="#4d8bff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="aura" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#ff8a3d" stop-opacity="0.4"/><stop offset="1" stop-color="#ff8a3d" stop-opacity="0"/>
+    </radialGradient>
+    <symbol id="sparkle" viewBox="-10 -10 20 20">
+      <path d="M0-10 Q1.5-1.5 10 0 Q1.5 1.5 0 10 Q-1.5 1.5 -10 0 Q-1.5-1.5 0-10Z"/>
+    </symbol>
+  </defs>
+  <rect width="1024" height="1024" fill="url(#bg)"/>
+  <circle cx="512" cy="512" r="440" fill="url(#aura)"/>
+  <ellipse cx="512" cy="860" rx="340" ry="40" fill="#000" opacity="0.35"/><g stroke="#2a1206" stroke-width="16" stroke-linejoin="round" stroke-linecap="round" >
+    <!-- parchment sheet -->
+    <g transform="rotate(-8 460 520)">
+      <path d="M220 220 H640 L700 280 V840 H220 Z" fill="#fbe8bf"/>
+      <path d="M560 300 H690 V830 H420 Q620 640 560 300 Z" fill="#e9c98a" stroke="none"/>
+      <path d="M640 220 V280 H700 Z" fill="#e9c98a"/>
+      <path d="M220 220 H640 L700 280 V840 H220 Z" fill="none"/>
+      <g fill="none" stroke="#c9a46a" stroke-width="9">
+        <path d="M280 320 H560"/><path d="M280 390 H620"/><path d="M280 460 H600"/><path d="M280 530 H520"/><path d="M280 600 H440"/>
+      </g>
+    </g>
+    <!-- feather -->
+    <path d="M640 640 Q700 440 880 150 Q900 330 800 480 Q740 570 660 640 Z" fill="#fff6dc"/>
+    <path d="M880 150 Q860 300 790 440 Q760 500 700 570 L660 640 Q740 570 800 480 Q900 330 880 150 Z" fill="#e0d2b4" stroke="none"/>
+    <path d="M640 640 Q700 440 880 150 Q900 330 800 480 Q740 570 660 640 Z" fill="none"/>
+    <path d="M660 640 Q760 420 870 170" fill="none" stroke-width="8"/>
+    <g fill="none" stroke-width="6"><path d="M720 500 L780 470"/><path d="M760 410 L820 380"/><path d="M800 320 L846 290"/></g>
+    <!-- inkpot -->
+    <path d="M560 640 Q560 610 600 606 H700 Q740 610 740 640 Q800 680 800 760 Q800 860 650 864 Q500 860 500 760 Q500 680 560 640 Z" fill="#2c2340"/>
+    <path d="M530 720 Q540 670 590 650 Q560 700 562 790 Q540 780 530 720 Z" fill="#5a4b80" stroke="none"/>
+    <path d="M560 640 Q560 610 600 606 H700 Q740 610 740 640 Q800 680 800 760 Q800 860 650 864 Q500 860 500 760 Q500 680 560 640 Z" fill="none"/>
+    <rect x="580" y="570" width="140" height="50" rx="14" fill="#ffcc3d"/>
+    <rect x="600" y="580" width="30" height="30" rx="6" fill="#fff3a8" stroke="none"/>
+    <!-- nib into the ink -->
+    <path d="M640 640 L620 600 L660 590 Z" fill="#2a1206" stroke-width="6"/>
+  </g>
+  
+  <g fill="#fff6c2" stroke="#2a1206" stroke-width="1.2">
+    <use href="#sparkle" x="150" y="200" width="60" height="60"/><use href="#sparkle" x="520" y="140" width="46" height="46"/><use href="#sparkle" x="880" y="600" width="40" height="40"/><use href="#sparkle" x="100" y="560" width="36" height="36"/>
+  </g>
+  <g fill="#ffd84a"><circle cx="330" cy="110" r="8"/><circle cx="940" cy="420" r="8"/><circle cx="110" cy="940" r="7"/><circle cx="900" cy="940" r="7"/></g>
+</svg>

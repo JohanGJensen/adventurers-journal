@@ -255,6 +255,7 @@ function NotesBody({ characterId, campaignId, campaignName, sharedWith, query }:
       const r = await api<Note>('PATCH', `/notes/${id}`, { image });
       if (r.error !== undefined) return toast(`Could not save the image: ${r.error}`, 'error');
       if (currentId.current === id) setCurrent(r.data);
+      void refresh(); // the sidebar thumbnail
       toast(image ? `Image added to “${r.data.title}”` : `Image removed from “${r.data.title}”`);
     } finally {
       setImageBusy(false);
