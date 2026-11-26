@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="45%" r="70%">
+      <stop offset="0" stop-color="#3a2560"/><stop offset="0.6" stop-color="#1c1233"/><stop offset="1" stop-color="#0c0818"/>
+    </radialGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#fff6c2"/><stop offset="0.3" stop-color="#ffd23f" stop-opacity="0.8"/><stop offset="1" stop-color="#ff9a1f" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="arcane" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#e6f0ff"/><stop offset="0.3" stop-color="#8ab4ff" stop-opacity="0.75"/><stop offset="1" stop-color="#4d8bff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="aura" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#ff8a3d" stop-opacity="0.4"/><stop offset="1" stop-color="#ff8a3d" stop-opacity="0"/>
+    </radialGradient>
+    <symbol id="sparkle" viewBox="-10 -10 20 20">
+      <path d="M0-10 Q1.5-1.5 10 0 Q1.5 1.5 0 10 Q-1.5 1.5 -10 0 Q-1.5-1.5 0-10Z"/>
+    </symbol>
+  </defs>
+  <rect width="1024" height="1024" fill="url(#bg)"/>
+  <circle cx="512" cy="512" r="440" fill="url(#aura)"/>
+  <g stroke="#2a1206" stroke-width="16" stroke-linejoin="round" stroke-linecap="round" >
+    
+  <g transform="rotate(-38 512 520)">
+    <path d="M492 120 L512 70 L532 120 V700 H492 Z" fill="#dfe6f0"/>
+    <path d="M512 84 L532 120 V700 H512 Z" fill="#a9b4c6" stroke="none"/>
+    <path d="M492 120 L512 70 L532 120 V700 H492 Z" fill="none"/>
+    <rect x="430" y="700" width="164" height="34" rx="16" fill="#ffcc3d"/>
+    <rect x="494" y="734" width="36" height="110" fill="#7a2e14"/>
+    <circle cx="512" cy="866" r="28" fill="#ffcc3d"/>
+  </g>
+    
+  <g transform="rotate(38 512 520)">
+    <path d="M492 120 L512 70 L532 120 V700 H492 Z" fill="#dfe6f0"/>
+    <path d="M512 84 L532 120 V700 H512 Z" fill="#a9b4c6" stroke="none"/>
+    <path d="M492 120 L512 70 L532 120 V700 H492 Z" fill="none"/>
+    <rect x="430" y="700" width="164" height="34" rx="16" fill="#ffcc3d"/>
+    <rect x="494" y="734" width="36" height="110" fill="#7a2e14"/>
+    <circle cx="512" cy="866" r="28" fill="#ffcc3d"/>
+  </g>
+    <!-- shield -->
+    <path d="M512 210 Q640 250 770 240 Q790 560 512 820 Q234 560 254 240 Q384 250 512 210 Z" fill="#2f4fb8"/>
+    <path d="M512 226 V804 Q270 560 268 254 Q384 264 512 226 Z" fill="#4d78e6" stroke="none"/>
+    <path d="M512 210 Q640 250 770 240 Q790 560 512 820 Q234 560 254 240 Q384 250 512 210 Z" fill="none"/>
+    <path d="M512 252 Q628 284 734 278 Q748 546 512 774 Q276 546 290 278 Q396 284 512 252 Z" fill="none" stroke="#ffcc3d" stroke-width="12"/>
+    <!-- crown charge -->
+    <path d="M400 560 L380 400 L450 470 L512 370 L574 470 L644 400 L624 560 Z" fill="#ffcc3d"/>
+    <path d="M512 390 L560 470 L574 470 L624 420 L610 540 L512 540 Z" fill="#e0a92a" stroke="none"/>
+    <path d="M400 560 L380 400 L450 470 L512 370 L574 470 L644 400 L624 560 Z" fill="none"/>
+    <rect x="396" y="556" width="232" height="44" rx="10" fill="#ffcc3d"/>
+    <g fill="#d6304a" stroke-width="8"><circle cx="446" cy="578" r="12"/><circle cx="512" cy="578" r="12"/><circle cx="578" cy="578" r="12"/></g>
+    <circle cx="380" cy="400" r="14" fill="#fff3a8" stroke-width="8"/>
+    <circle cx="512" cy="368" r="14" fill="#fff3a8" stroke-width="8"/>
+    <circle cx="644" cy="400" r="14" fill="#fff3a8" stroke-width="8"/>
+    <!-- banner -->
+    <path d="M190 800 L280 790 L280 880 L190 890 L224 846 Z" fill="#9e2238"/>
+    <path d="M834 800 L744 790 L744 880 L834 890 L800 846 Z" fill="#9e2238"/>
+    <path d="M260 760 Q512 830 764 760 L764 860 Q512 930 260 860 Z" fill="#d6304a"/>
+    <path d="M276 778 Q512 842 748 778 L748 800 Q512 862 276 800 Z" fill="#ff5f6f" stroke="none"/>
+    <path d="M260 760 Q512 830 764 760 L764 860 Q512 930 260 860 Z" fill="none"/>
+  </g>
+  
+  <g fill="#fff6c2" stroke="#2a1206" stroke-width="1.2">
+    <use href="#sparkle" x="130" y="200" width="60" height="60"/><use href="#sparkle" x="830" y="150" width="54" height="54"/><use href="#sparkle" x="880" y="560" width="40" height="40"/><use href="#sparkle" x="100" y="560" width="34" height="34"/>
+  </g>
+  <g fill="#ffd84a"><circle cx="300" cy="120" r="8"/><circle cx="930" cy="380" r="8"/><circle cx="120" cy="960" r="7"/><circle cx="900" cy="960" r="7"/></g>
+</svg>

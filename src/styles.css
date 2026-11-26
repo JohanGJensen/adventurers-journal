@@ -547,6 +547,12 @@ label.btn { display: inline-block; }
 .note-row { width: 100%; text-align: left; display: grid; gap: 2px; padding: 7px 10px; border-radius: 3px; border: 1px solid transparent; border-left: 3px solid transparent; background: transparent; color: inherit; }
 .note-row:hover { border-color: var(--line); border-left-color: var(--kind); }
 .note-row.on { border-color: var(--accent); border-left-color: var(--kind); background: var(--accent-soft); }
+/* Thumbnail in its own column, the text beside it. */
+.note-row { grid-template-columns: 40px minmax(0, 1fr); column-gap: 10px; }
+.note-row > * { grid-column: 2; }
+.note-row > .note-thumb { grid-column: 1; grid-row: 1 / span 3; align-self: start; width: 40px; height: 40px; margin-top: 2px; }
+.note-thumb img { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: 3px; box-shadow: 0 0 0 1px var(--gilt); }
+.note-thumb.is-portrait img { border-radius: 50%; }
 .note-row strong { font-size: 1.02rem; font-weight: 600; }
 .note-row small { color: var(--muted); font-size: .84rem; }
 /* Every title reads at full strength; a finished quest just gets a mark after its name. */
@@ -1486,6 +1492,9 @@ button.linkish.more { color: var(--muted); font-size: .9rem; }
   width: 132px; height: 132px; object-fit: cover; border-radius: 50%;
   border: 3px solid var(--card); box-shadow: 0 0 0 2px var(--gilt), 0 0 0 4px var(--kind), 0 4px 12px rgb(0 0 0 / 30%);
 }
+/* A kind's stand-in is a placeholder, not the note's own picture: smaller and quieter. */
+.note-image.is-fallback.is-picture img { width: 140px; height: 140px; max-width: none; max-height: none; }
+.note-image.is-fallback img { opacity: .9; }
 .note-image.is-picture img { max-width: min(260px, 40vw); max-height: 220px; border-radius: 3px; border: 1px solid var(--line); box-shadow: 0 0 0 3px var(--card), 0 0 0 4px var(--gilt), 0 4px 12px rgb(0 0 0 / 25%); }
 @media (max-width: 560px) {
   .note-read.has-image { grid-template-columns: 1fr; }

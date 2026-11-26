@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { NOTE_KINDS, NOTE_KIND_LABELS, type Note, type NoteKind } from '../../shared/types';
-import { factLine, LIST_FACTS, plainText, sortForKind, storage } from './common';
+import { factLine, isPortraitKind, LIST_FACTS, plainText, sortForKind, storage, thumbSrc } from './common';
 
 const COLLAPSED_KEY = 'notes.collapsedKinds';
 
@@ -50,9 +50,14 @@ export function NoteSidebar({ notes, selectedId, draftTitle, ranked, flat, onOpe
                 {g.notes.map((n) => {
                   const facts = factLine(n, 2, LIST_FACTS[n.kind]);
                   const status = n.kind === 'quest' ? n.fields.status : undefined;
+                  const thumb = thumbSrc(n);
                   return (
                     <li key={n.id}>
                       <button className={`note-row ${n.id === selectedId ? 'on' : ''} ${status ? `status-${status.replace(' ', '-')}` : ''}`} onClick={() => onOpen(n)}>
+                        {/* Always a slot, so rows line up whether or not they have a picture. */}
+                        <span className={`note-thumb ${isPortraitKind(n.kind) ? 'is-portrait' : ''}`} aria-hidden>
+                          {thumb && <img src={thumb} alt="" loading="lazy" />}
+                        </span>
                         <strong>{n.id === selectedId && draftTitle !== null ? draftTitle : n.title}</strong>
                         {facts && <small>{facts}</small>}
                         {n.body && <span className="note-snippet">{plainText(n.body).slice(0, 140)}</span>}

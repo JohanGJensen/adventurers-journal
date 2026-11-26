@@ -59,6 +59,13 @@ export const kindName = (k: NoteKind, lower = false) => {
 /** People get a round, face-cropped portrait; everything else keeps its picture's shape. */
 export const isPortraitKind = (k: NoteKind) => k === 'player' || k === 'npc';
 
+/** The stand-in picture for a note without its own (public/fallbacks, made by scripts/gen-fallbacks.ts). Players get none: they're real people. */
+export const fallbackImage = (k: NoteKind): string | null => (k === 'player' ? null : `/fallbacks/${k}.png`);
+
+/** A list row's thumbnail: the note's own image, else its kind's stand-in. `updatedAt` busts the cache when the image changes. */
+export const thumbSrc = (r: Pick<NoteRef, 'id' | 'kind' | 'hasImage' | 'updatedAt'>) =>
+  r.hasImage ? `/api/notes/${r.id}/image?v=${encodeURIComponent(r.updatedAt)}` : fallbackImage(r.kind);
+
 /** Plain text of a note body for snippets: links show their label, markdown marks are dropped. */
 export const plainText = (body: string) =>
   body.replace(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g, (_, t, l) => l ?? t).replace(/[#*_>`]/g, '').replace(/\s+/g, ' ').trim();

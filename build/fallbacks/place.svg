@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="45%" r="70%">
+      <stop offset="0" stop-color="#3a2560"/><stop offset="0.6" stop-color="#1c1233"/><stop offset="1" stop-color="#0c0818"/>
+    </radialGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#fff6c2"/><stop offset="0.3" stop-color="#ffd23f" stop-opacity="0.8"/><stop offset="1" stop-color="#ff9a1f" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="arcane" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#e6f0ff"/><stop offset="0.3" stop-color="#8ab4ff" stop-opacity="0.75"/><stop offset="1" stop-color="#4d8bff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="aura" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#ff8a3d" stop-opacity="0.4"/><stop offset="1" stop-color="#ff8a3d" stop-opacity="0"/>
+    </radialGradient>
+    <symbol id="sparkle" viewBox="-10 -10 20 20">
+      <path d="M0-10 Q1.5-1.5 10 0 Q1.5 1.5 0 10 Q-1.5 1.5 -10 0 Q-1.5-1.5 0-10Z"/>
+    </symbol>
+  </defs>
+  <rect width="1024" height="1024" fill="url(#bg)"/>
+  <circle cx="512" cy="512" r="440" fill="url(#aura)"/>
+  <g stroke="#2a1206" stroke-width="16" stroke-linejoin="round" stroke-linecap="round" >
+    <!-- moon -->
+    <circle cx="770" cy="230" r="86" fill="#fff3b0"/>
+    <path d="M800 160 Q860 210 840 290 Q800 330 740 310 Q820 260 800 160 Z" fill="#f2d97a" stroke="none"/>
+    <circle cx="770" cy="230" r="86" fill="none"/>
+    <!-- hill -->
+    <path d="M-20 1044 Q160 690 512 670 Q864 690 1044 1044 Z" fill="#4f8a3c"/>
+    <path d="M40 1000 Q200 730 512 690 Q300 760 170 1000 Z" fill="#6fae4f" stroke="none"/>
+    <path d="M-20 1044 Q160 690 512 670 Q864 690 1044 1044" fill="none"/>
+    <!-- road -->
+    <path d="M478 712 Q430 790 520 840 Q620 900 540 1030 L660 1030 Q730 900 600 830 Q520 790 546 712 Z" fill="#e8cf96" stroke-width="12"/>
+    <!-- side towers -->
+    <rect x="300" y="430" width="120" height="280" fill="#c9b28a"/>
+    <rect x="604" y="430" width="120" height="280" fill="#c9b28a"/>
+    <rect x="384" y="440" width="34" height="268" fill="#9e8562" stroke="none"/>
+    <rect x="688" y="440" width="34" height="268" fill="#9e8562" stroke="none"/>
+    <rect x="300" y="430" width="120" height="280" fill="none"/>
+    <rect x="604" y="430" width="120" height="280" fill="none"/>
+    <path d="M286 436 L360 270 L434 436 Z" fill="#d6304a"/>
+    <path d="M590 436 L664 270 L738 436 Z" fill="#d6304a"/>
+    <path d="M360 284 L304 430 L340 430 Z" fill="#ff5f6f" stroke="none"/>
+    <path d="M664 284 L608 430 L644 430 Z" fill="#ff5f6f" stroke="none"/>
+    <!-- keep -->
+    <path d="M400 360 H624 V712 H400 Z" fill="#d8c29a"/>
+    <path d="M576 370 H620 V708 H576 Z" fill="#9e8562" stroke="none"/>
+    <path d="M400 360 H624 V712 H400 Z" fill="none"/>
+    <path d="M392 360 V310 H436 V340 H474 V310 H514 V340 H552 V310 H592 V340 H632 V360 Z" fill="#d8c29a"/>
+    <!-- door and windows, lamp-lit -->
+    <path d="M466 712 V630 Q512 580 558 630 V712 Z" fill="#5a2a12"/>
+    <path d="M478 712 V634 Q512 598 546 634 V712 Z" fill="#ffb53d" stroke="none"/>
+    <g fill="#ffd84a" stroke-width="10">
+      <path d="M492 470 V430 Q512 410 532 430 V470 Z"/>
+      <path d="M346 540 V506 Q360 492 374 506 V540 Z"/>
+      <path d="M650 540 V506 Q664 492 678 506 V540 Z"/>
+    </g>
+    <!-- banner -->
+    <path d="M512 310 V200" fill="none" stroke-width="10"/>
+    <path d="M512 204 Q560 190 600 214 Q560 236 512 236 Z" fill="#ffcc3d" stroke-width="10"/>
+  </g><circle cx="512" cy="660" r="70" fill="url(#glow)" opacity="0.45"/>
+  
+  <g fill="#fff6c2" stroke="#2a1206" stroke-width="1.2">
+    <use href="#sparkle" x="150" y="170" width="60" height="60"/><use href="#sparkle" x="560" y="120" width="40" height="40"/><use href="#sparkle" x="890" y="420" width="44" height="44"/><use href="#sparkle" x="110" y="450" width="34" height="34"/>
+  </g>
+  <g fill="#ffd84a"><circle cx="300" cy="120" r="8"/><circle cx="920" cy="120" r="7"/><circle cx="80" cy="300" r="7"/><circle cx="660" cy="80" r="6"/></g>
+</svg>

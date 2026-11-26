@@ -40,6 +40,7 @@ const toNote = (r: Row): Note => ({
   aliases: lines(r.aliases),
   tags: lines(r.tags),
   fields: parseFields(r.fields_json),
+  hasImage: r.image !== null,
   createdAt: r.created_at,
   updatedAt: r.updated_at,
 });
@@ -231,6 +232,20 @@ export const noteRoutes: Route[] = [
     },
   ],
   ['GET', '/api/notes/:id', ({ db, params }) => json(withImage(getRow(db, intParam(params.id, 'note id'))))],
+  [
+    'GET',
+    '/api/notes/:id/image',
+    // The image on its own, so lists (which leave images out) can still show a thumbnail. Clients add ?v=<updatedAt>,
+    // which is what makes the long cache safe.
+    ({ db, params }) => {
+      const { image } = getRow(db, intParam(params.id, 'note id'));
+      if (image === null) throw new HttpError(404, 'This note has no image');
+      if (image.startsWith('/')) return new Response(null, { status: 302, headers: { location: image } });
+      const m = /^data:([^;]+);base64,(.*)$/.exec(image);
+      if (!m) throw new HttpError(404, 'This note has no image');
+      return new Response(Buffer.from(m[2], 'base64'), { headers: { 'content-type': m[1], 'cache-control': 'private, max-age=31536000, immutable' } });
+    },
+  ],
   [
     'PATCH',
     '/api/notes/:id',

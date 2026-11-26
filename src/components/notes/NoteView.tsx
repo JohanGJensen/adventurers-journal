@@ -2,7 +2,7 @@ import { Fragment, type ReactNode } from 'react';
 import { parseBlocks, parseInline, type Inline } from '../../lib/markdown';
 import { resolveName, segmentText, type LinkIndex } from '../../shared/noteLinks';
 import { NOTE_FIELDS, type Note, type NoteKind } from '../../shared/types';
-import { isPortraitKind, kindName, parseAt } from './common';
+import { fallbackImage, isPortraitKind, kindName, parseAt } from './common';
 
 export interface LinkHandlers {
   /** The page URL of note `id`, for new-tab opens. */
@@ -126,12 +126,16 @@ interface ViewProps {
 
 export function NoteView({ note, index, backlinks, h, onTag, onEdit }: ViewProps) {
   const facts = NOTE_FIELDS[note.kind].filter((f) => note.fields[f.key]);
+  const image = note.image ?? fallbackImage(note.kind);
   return (
-    <article className={`note-read kind-${note.kind} ${note.image ? 'has-image' : ''}`}>
-      {note.image && (
-        // Beside the title (and the facts, when there are any).
-        <figure className={`note-image ${isPortraitKind(note.kind) ? 'is-portrait' : 'is-picture'}`} style={{ gridRowEnd: facts.length ? 'span 2' : 'span 1' }}>
-          <img src={note.image} alt={note.title} />
+    <article className={`note-read kind-${note.kind} ${image ? 'has-image' : ''}`}>
+      {image && (
+        // Beside the title (and the facts, when there are any). Without an image of its own the note shows its kind's stand-in.
+        <figure
+          className={`note-image ${isPortraitKind(note.kind) ? 'is-portrait' : 'is-picture'} ${note.image ? '' : 'is-fallback'}`}
+          style={{ gridRowEnd: facts.length ? 'span 2' : 'span 1' }}
+        >
+          <img src={image} alt={note.image ? note.title : ''} />
         </figure>
       )}
       <header className="note-read-head">

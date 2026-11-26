@@ -11,6 +11,7 @@ const ref = (id: number, title: string, extra: Partial<NoteRef> = {}): NoteRef =
   updatedAt: '',
   campaignId: 1,
   fields: {},
+  hasImage: false,
   ...extra,
 });
 

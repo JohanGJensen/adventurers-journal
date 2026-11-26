@@ -163,6 +163,23 @@ describe('notes', () => {
     expect((await call('PATCH', `/notes/${n.id}`, { image: null })).body.image).toBeNull();
   });
 
+  test('hasImage on lists, and the image served on its own', async () => {
+    const { call, db } = setup();
+    const app = createApp(db);
+    const png = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
+    const n = (await call('POST', '/notes', { title: 'Sildar', kind: 'npc', campaignId: 1 })).body;
+    expect(n.hasImage).toBe(false);
+    expect((await app.fetch(new Request(`http://x/api/notes/${n.id}/image`))).status).toBe(404);
+    expect((await call('PATCH', `/notes/${n.id}`, { image: png })).body.hasImage).toBe(true);
+    expect((await call('GET', '/notes?campaign=1')).body[0].hasImage).toBe(true);
+    expect((await call('GET', '/notes/index?campaign=1')).body[0].hasImage).toBe(true);
+    const res = await app.fetch(new Request(`http://x/api/notes/${n.id}/image?v=1`));
+    expect(res.status).toBe(200);
+    expect(res.headers.get('content-type')).toBe('image/png');
+    expect(Buffer.from(await res.arrayBuffer()).equals(Buffer.from(png.split(',')[1], 'base64'))).toBe(true);
+    expect((await app.fetch(new Request('http://x/api/notes/999/image'))).status).toBe(404);
+  });
+
   test('ftsQuery', () => {
     expect(ftsQuery('  ')).toBeNull();
     expect(ftsQuery('wolf "pen')).toBe('"wolf"* "pen"*');
