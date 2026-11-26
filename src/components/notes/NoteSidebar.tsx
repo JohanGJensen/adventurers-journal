@@ -55,7 +55,7 @@ export function NoteSidebar({ notes, selectedId, draftTitle, ranked, flat, onOpe
                     <li key={n.id}>
                       <button className={`note-row ${n.id === selectedId ? 'on' : ''} ${status ? `status-${status.replace(' ', '-')}` : ''}`} onClick={() => onOpen(n)}>
                         {/* Always a slot, so rows line up whether or not they have a picture. */}
-                        <span className={`note-thumb ${isPortraitKind(n.kind) ? 'is-portrait' : ''}`} aria-hidden>
+                        <span className={`note-thumb ${!n.hasImage ? 'is-fallback' : isPortraitKind(n.kind) ? 'is-portrait' : ''}`} aria-hidden>
                           {thumb && <img src={thumb} alt="" loading="lazy" />}
                         </span>
                         <strong>{n.id === selectedId && draftTitle !== null ? draftTitle : n.title}</strong>
