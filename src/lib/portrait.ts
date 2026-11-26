@@ -1,10 +1,9 @@
-// Character portraits: an image file scaled to a small square data URL. The app's content security policy only
+// Character and note images: an image file scaled to a small data URL. The app's content security policy only
 // shows local and data: images, and a small image keeps the character row (and backups) light.
 
 const PORTRAIT_SIZE = 320;
 
-/** Reads an image file, centre-crops it to a square (biased up so faces stay in frame) and scales it down. */
-export async function portraitFrom(file: File): Promise<string> {
+async function loadImage(file: File): Promise<HTMLImageElement> {
   if (!file.type.startsWith('image/')) throw new Error(`${file.name} is not an image`);
   // A data: URL, not a blob: one: the app's content security policy only allows 'self' and data: images.
   const source = await new Promise<string>((res, rej) => {
@@ -19,12 +18,33 @@ export async function portraitFrom(file: File): Promise<string> {
     img.onerror = () => rej(new Error(`Couldn't read ${file.name} as an image`));
     img.src = source;
   });
+  return img;
+}
+
+/** WebP keeps transparency; browsers without a WebP encoder return PNG, so fall back to JPEG then. */
+function encode(canvas: HTMLCanvasElement): string {
+  const webp = canvas.toDataURL('image/webp', 0.85);
+  return webp.startsWith('data:image/webp') ? webp : canvas.toDataURL('image/jpeg', 0.85);
+}
+
+/** Reads an image file, centre-crops it to a square (biased up so faces stay in frame) and scales it down. */
+export async function portraitFrom(file: File): Promise<string> {
+  const img = await loadImage(file);
   const side = Math.min(img.width, img.height);
   const canvas = document.createElement('canvas');
   canvas.width = canvas.height = Math.min(PORTRAIT_SIZE, side);
   const ctx = canvas.getContext('2d')!;
   ctx.drawImage(img, (img.width - side) / 2, Math.max(0, (img.height - side) * 0.2), side, side, 0, 0, canvas.width, canvas.height);
-  // WebP keeps transparency; browsers without a WebP encoder return PNG, so fall back to JPEG then.
-  const webp = canvas.toDataURL('image/webp', 0.85);
-  return webp.startsWith('data:image/webp') ? webp : canvas.toDataURL('image/jpeg', 0.85);
+  return encode(canvas);
+}
+
+/** Reads an image file and scales it so its longer side is at most `max`, keeping its shape (places, items, maps). */
+export async function pictureFrom(file: File, max = 640): Promise<string> {
+  const img = await loadImage(file);
+  const scale = Math.min(1, max / Math.max(img.width, img.height));
+  const canvas = document.createElement('canvas');
+  canvas.width = Math.round(img.width * scale);
+  canvas.height = Math.round(img.height * scale);
+  canvas.getContext('2d')!.drawImage(img, 0, 0, canvas.width, canvas.height);
+  return encode(canvas);
 }

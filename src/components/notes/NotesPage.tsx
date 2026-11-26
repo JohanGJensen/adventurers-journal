@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { api } from '../../lib/client';
+import { pictureFrom, portraitFrom } from '../../lib/portrait';
 import { linkTo, navigate } from '../../lib/router';
 import { toast } from '../../lib/toast';
 import { buildLinkIndex } from '../../shared/noteLinks';
 import { NOTE_KINDS, NOTE_KIND_LABELS, type Campaign, type CharacterDto, type CharacterSummary, type Note, type NoteKind, type NoteRef } from '../../shared/types';
 import { Loader } from '../Loader';
-import { draftBody, factLine, kindName, parseAt, plainText, sameDraft, sortForKind, toDraft, type Draft } from './common';
+import { draftBody, factLine, isPortraitKind, kindName, parseAt, plainText, sameDraft, sortForKind, toDraft, type Draft } from './common';
 import { NoteEditor } from './NoteEditor';
 import { NoteSidebar } from './NoteSidebar';
 import { NoteLink, NoteView, type LinkHandlers } from './NoteView';
@@ -230,6 +231,32 @@ function NotesBody({ characterId, campaignId, campaignName, sharedWith, query }:
     navigate(href({ note: null }));
   };
 
+  const [imageBusy, setImageBusy] = useState(false);
+  /** Adds, replaces or (null) removes the open note's image. Saves straight away, after any pending text edits. */
+  const setImage = async (file: File | null) => {
+    const id = currentId.current;
+    const n = current;
+    if (id === null || !n) return;
+    setImageBusy(true);
+    try {
+      let image: string | null = null;
+      if (file) {
+        try {
+          image = await (isPortraitKind(draftRef.current?.kind ?? n.kind) ? portraitFrom(file) : pictureFrom(file));
+        } catch (e) {
+          return toast(e instanceof Error ? e.message : String(e), 'error');
+        }
+      }
+      if (!(await save())) return;
+      const r = await api<Note>('PATCH', `/notes/${id}`, { image });
+      if (r.error !== undefined) return toast(`Could not save the image: ${r.error}`, 'error');
+      if (currentId.current === id) setCurrent(r.data);
+      toast(image ? `Image added to “${r.data.title}”` : `Image removed from “${r.data.title}”`);
+    } finally {
+      setImageBusy(false);
+    }
+  };
+
   const done = async () => {
     if (await save()) setMode('read');
   };
@@ -371,6 +398,9 @@ function NotesBody({ characterId, campaignId, campaignName, sharedWith, query }:
               draft={draft}
               refs={refs}
               savedState={saved.current && sameDraft(draft, saved.current) ? 'saved' : 'dirty'}
+              image={current.image}
+              imageBusy={imageBusy}
+              onImage={(f) => void setImage(f)}
               onChange={setDraft}
               onSave={() => void save()}
               onDone={() => void done()}
@@ -386,7 +416,7 @@ function NotesBody({ characterId, campaignId, campaignName, sharedWith, query }:
 }
 
 /** Kinds on the dashboard, most-used first; quests also get their own "open quests" list above. */
-const DASH_KINDS: NoteKind[] = ['session', 'npc', 'place', 'quest', 'faction', 'item', 'lore', 'note'];
+const DASH_KINDS: NoteKind[] = ['session', 'player', 'npc', 'place', 'quest', 'faction', 'item', 'lore', 'note'];
 const STARTERS: NoteKind[] = ['session', 'quest', 'npc', 'place'];
 
 /** The landing panel: open quests, a card per kind with its latest notes, and what changed lately. */

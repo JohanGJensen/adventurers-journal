@@ -2,7 +2,7 @@ import { Fragment, type ReactNode } from 'react';
 import { parseBlocks, parseInline, type Inline } from '../../lib/markdown';
 import { resolveName, segmentText, type LinkIndex } from '../../shared/noteLinks';
 import { NOTE_FIELDS, type Note, type NoteKind } from '../../shared/types';
-import { kindName, parseAt } from './common';
+import { isPortraitKind, kindName, parseAt } from './common';
 
 export interface LinkHandlers {
   /** The page URL of note `id`, for new-tab opens. */
@@ -127,7 +127,13 @@ interface ViewProps {
 export function NoteView({ note, index, backlinks, h, onTag, onEdit }: ViewProps) {
   const facts = NOTE_FIELDS[note.kind].filter((f) => note.fields[f.key]);
   return (
-    <article className={`note-read kind-${note.kind}`}>
+    <article className={`note-read kind-${note.kind} ${note.image ? 'has-image' : ''}`}>
+      {note.image && (
+        // Beside the title (and the facts, when there are any).
+        <figure className={`note-image ${isPortraitKind(note.kind) ? 'portrait' : 'picture'}`} style={{ gridRowEnd: facts.length ? 'span 2' : 'span 1' }}>
+          <img src={note.image} alt={note.title} />
+        </figure>
+      )}
       <header className="note-read-head">
         <div>
           <span className={`kind-badge kind-${note.kind}`}>{kindName(note.kind)}</span>
@@ -148,7 +154,7 @@ export function NoteView({ note, index, backlinks, h, onTag, onEdit }: ViewProps
                 <dd>
                   {target ? (
                     <NoteLink id={target.id} h={h}>{v}</NoteLink>
-                  ) : f.ref ? (
+                  ) : f.ref && !f.loose ? (
                     <MissingLink title={v} kind={f.ref} h={h}>{v}</MissingLink>
                   ) : (
                     v

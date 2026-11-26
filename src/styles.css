@@ -501,16 +501,18 @@ label.btn { display: inline-block; }
 :root {
   --kind-note: #7a6a55; --kind-session: #4f6d8a; --kind-quest: #a8322a; --kind-npc: #2f7a5a;
   --kind-place: #8a6418; --kind-faction: #5b3a62; --kind-item: #b0662a; --kind-lore: #5a5a9a;
+  --kind-player: #9a3f66;
 }
 @media (prefers-color-scheme: dark) {
   :root {
     --kind-note: #b8a68a; --kind-session: #8fb0cf; --kind-quest: #e0776b; --kind-npc: #7cc4a1;
     --kind-place: #e0b456; --kind-faction: #c59acc; --kind-item: #e89e62; --kind-lore: #a8a8e0;
+    --kind-player: #e59bbd;
   }
 }
 .kind-note { --kind: var(--kind-note); } .kind-session { --kind: var(--kind-session); } .kind-quest { --kind: var(--kind-quest); }
 .kind-npc { --kind: var(--kind-npc); } .kind-place { --kind: var(--kind-place); } .kind-faction { --kind: var(--kind-faction); }
-.kind-item { --kind: var(--kind-item); } .kind-lore { --kind: var(--kind-lore); }
+.kind-item { --kind: var(--kind-item); } .kind-lore { --kind: var(--kind-lore); } .kind-player { --kind: var(--kind-player); }
 .kind-dot { display: inline-block; width: .6em; height: .6em; border-radius: 50%; background: var(--kind); vertical-align: .05em; flex: none; }
 .kind-badge { display: inline-block; font-size: .7rem; letter-spacing: .08em; text-transform: uppercase; font-weight: 600; color: var(--kind); border: 1px solid var(--kind); border-radius: 2px; padding: 0 5px; }
 
@@ -571,7 +573,7 @@ label.btn { display: inline-block; }
 .note-facts dd { margin: 0; font-weight: 600; font-size: 1.02rem; }
 .fact.status-active dd, .fact.status-alive dd { color: var(--kind-npc); }
 .fact.status-failed dd, .fact.status-dead dd { color: var(--cap); }
-.fact.status-completed dd { color: var(--muted); }
+.fact.status-completed dd, .fact.status-absent dd, .fact.status-retired dd { color: var(--muted); }
 .note-link { color: var(--accent); text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--accent) 55%, transparent); text-underline-offset: 2px; cursor: pointer; }
 .note-link:hover, .note-link:focus-visible { text-decoration-color: currentColor; }
 /* Explicit [[links]] and auto-linked mentions look the same: a link to a note always reads as one. */
@@ -1453,3 +1455,26 @@ button.linkish.more { color: var(--muted); font-size: .9rem; }
 
 /* On a phone the index and the note can't sit side by side: an open note takes the screen, the crumbs lead back. */
 @media (max-width: 760px) { .notes-layout.has-note .notes-side { display: none; } }
+
+/* Note images: beside the title and facts; people get a round framed portrait, the rest keep their shape. */
+.note-read.has-image { grid-template-columns: minmax(0, 1fr) auto; column-gap: 18px; }
+.note-read.has-image > * { grid-column: 1 / -1; }
+.note-read.has-image > :is(.note-read-head, .note-facts) { grid-column: 1; }
+.note-read.has-image > .note-image { grid-column: 2; grid-row-start: 1; }
+.note-image { margin: 0; align-self: start; }
+.note-image img { display: block; }
+.note-image.portrait img {
+  width: 132px; height: 132px; object-fit: cover; border-radius: 50%;
+  border: 3px solid var(--card); box-shadow: 0 0 0 2px var(--gilt), 0 0 0 4px var(--kind), 0 4px 12px rgb(0 0 0 / 30%);
+}
+.note-image.picture img { max-width: min(260px, 40vw); max-height: 220px; border-radius: 3px; border: 1px solid var(--line); box-shadow: 0 0 0 3px var(--card), 0 0 0 4px var(--gilt), 0 4px 12px rgb(0 0 0 / 25%); }
+@media (max-width: 560px) {
+  .note-read.has-image { grid-template-columns: 1fr; }
+  .note-read.has-image > .note-image { grid-column: 1; grid-row: auto !important; justify-self: center; }
+}
+.note-image-edit { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.note-image-edit img { width: 56px; height: 56px; object-fit: cover; border: 1px solid var(--line); }
+.note-image-edit img.portrait { border-radius: 50%; }
+.note-image-edit img.picture { border-radius: 3px; }
+.note-image-edit label.btn { cursor: pointer; }
+.note-image-edit label.btn.busy { opacity: .6; cursor: progress; }

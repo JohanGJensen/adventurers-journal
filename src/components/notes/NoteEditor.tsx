@@ -1,13 +1,17 @@
 import { useMemo, useRef, useState } from 'react';
 import { normName } from '../../shared/noteLinks';
 import { NOTE_FIELDS, NOTE_KINDS, type NoteKind, type NoteRef } from '../../shared/types';
-import { kindName, type Draft } from './common';
+import { isPortraitKind, kindName, type Draft } from './common';
 
 interface Props {
   noteId: number;
   draft: Draft;
   refs: NoteRef[];
   savedState: 'saved' | 'dirty';
+  /** The saved image (undefined while unknown); changing it saves at once, outside the draft. */
+  image: string | null | undefined;
+  imageBusy: boolean;
+  onImage: (file: File | null) => void;
   onChange: (d: Draft) => void;
   onSave: () => void;
   onDone: () => void;
@@ -16,7 +20,7 @@ interface Props {
 
 const OPEN_LINK = /\[\[([^[\]\n|]*)$/;
 
-export function NoteEditor({ noteId, draft, refs, savedState, onChange, onSave, onDone, onDelete }: Props) {
+export function NoteEditor({ noteId, draft, refs, savedState, image, imageBusy, onImage, onChange, onSave, onDone, onDelete }: Props) {
   const set = <K extends keyof Draft>(k: K, v: Draft[K]) => onChange({ ...draft, [k]: v });
   const setField = (k: string, v: string) => onChange({ ...draft, fields: { ...draft.fields, [k]: v } });
   const area = useRef<HTMLTextAreaElement>(null);
@@ -87,6 +91,28 @@ export function NoteEditor({ noteId, draft, refs, savedState, onChange, onSave, 
         <button type="button" className="btn" onClick={onDone} title="Save and read (Ctrl+E)">Done</button>
       </div>
       <input className="note-title" aria-label="Title" value={draft.title} onChange={(e) => set('title', e.target.value)} />
+      <div className="note-image-edit">
+        {image && <img src={image} alt="" className={isPortraitKind(draft.kind) ? 'portrait' : 'picture'} />}
+        <label className={`btn ghost small ${imageBusy ? 'busy' : ''}`}>
+          {imageBusy ? 'Saving…' : image ? 'Change image' : isPortraitKind(draft.kind) ? 'Add portrait' : 'Add image'}
+          <input
+            type="file"
+            accept="image/*"
+            className="visually-hidden"
+            disabled={imageBusy}
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              e.target.value = '';
+              if (f) onImage(f);
+            }}
+          />
+        </label>
+        {image && !imageBusy && (
+          <button type="button" className="btn ghost small danger-text" onClick={() => onImage(null)}>
+            Remove image
+          </button>
+        )}
+      </div>
 
       {NOTE_FIELDS[draft.kind].length > 0 && (
         <div className="note-field-grid">
@@ -101,8 +127,8 @@ export function NoteEditor({ noteId, draft, refs, savedState, onChange, onSave, 
               ) : (
                 <input
                   value={draft.fields[f.key] ?? ''}
-                  list={f.ref ? `note-refs-${f.ref}` : undefined}
-                  placeholder={f.ref ? `${kindName(f.ref)} name` : undefined}
+                  list={f.ref ? `note-refs-${f.ref}` : f.suggest ? `note-suggest-${f.key}` : undefined}
+                  placeholder={f.ref ? `${kindName(f.ref)} name` : f.suggest ? 'Pick or type…' : undefined}
                   onChange={(e) => setField(f.key, e.target.value)}
                 />
               )}
@@ -111,6 +137,11 @@ export function NoteEditor({ noteId, draft, refs, savedState, onChange, onSave, 
           {[...new Set(NOTE_FIELDS[draft.kind].map((f) => f.ref).filter((k): k is NoteKind => !!k))].map((k) => (
             <datalist key={k} id={`note-refs-${k}`}>
               {others.filter((r) => r.kind === k).map((r) => <option key={r.id} value={r.title} />)}
+            </datalist>
+          ))}
+          {NOTE_FIELDS[draft.kind].filter((f) => f.suggest).map((f) => (
+            <datalist key={f.key} id={`note-suggest-${f.key}`}>
+              {f.suggest!.map((o) => <option key={o} value={o} />)}
             </datalist>
           ))}
         </div>
