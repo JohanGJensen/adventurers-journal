@@ -58,8 +58,11 @@ sudo dnf install ./release/adventurers-journal-*.rpm
 Run this on a Mac (electron-builder can only make a `.dmg` on macOS):
 
 ```sh
-bun run dist   # builds release/adventurers-journal-<version>-<arch>.dmg for arm64 and x64
+bun run dist          # builds release/adventurers-journal-<version>-<arch>.dmg for arm64 and x64
+bun run install:mac   # installs the .dmg for this Mac into /Applications, replacing the old copy
 ```
+
+`install:mac` quits the app if it's running, and removes the unpacked `.app` copies the build leaves in `release/`, so Spotlight only finds the installed app.
 
 The app is unsigned. The first time you launch it, right-click it and choose **Open**, or clear the quarantine flag:
 
@@ -110,6 +113,7 @@ This starts Vite (with hot reload for the UI), rebuilds the Electron main proces
 | `bun run check`         | Type-check, run the tests, and smoke-test the server on Electron's Node |
 | `bun run dist`          | Check, build and package the app for this platform (Linux or macOS)   |
 | `bun run install:linux` | Install the packaged AppImage for the current user                    |
+| `bun run install:mac`   | Install the packaged .dmg into /Applications and remove stray builds  |
 
 Two standalone scripts aren't wired into `package.json`, because you rarely need them:
 
