@@ -92,7 +92,7 @@ export function NoteEditor({ noteId, draft, refs, savedState, image, imageBusy, 
       </div>
       <input className="note-title" aria-label="Title" value={draft.title} onChange={(e) => set('title', e.target.value)} />
       <div className="note-image-edit">
-        {image && <img src={image} alt="" className={isPortraitKind(draft.kind) ? 'portrait' : 'picture'} />}
+        {image && <img src={image} alt="" className={isPortraitKind(draft.kind) ? 'is-portrait' : 'is-picture'} />}
         <label className={`btn ghost small ${imageBusy ? 'busy' : ''}`}>
           {imageBusy ? 'Saving…' : image ? 'Change image' : isPortraitKind(draft.kind) ? 'Add portrait' : 'Add image'}
           <input

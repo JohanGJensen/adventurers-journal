@@ -1232,11 +1232,12 @@ button.linkish { font: inherit; padding: 0; background: none; border: 0; color: 
 .visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 .portrait-upload { position: relative; flex: none; }
 .portrait-upload-label { position: relative; display: block; cursor: pointer; border-radius: 50%; }
+/* Block, not inline: an inline image leaves room under the baseline, and the round overlay turns into an oval. */
+.portrait-upload-label > :not(.portrait-upload-overlay, input) { display: block; }
 .portrait-upload-overlay {
   position: absolute; inset: 0; border-radius: 50%; display: grid; place-content: center; justify-items: center; gap: 4px;
   background: radial-gradient(circle, rgb(20 12 4 / 55%), rgb(20 12 4 / 72%)); color: #f7e6c6;
   font: italic .95rem 'EB Garamond', serif; text-align: center; opacity: 0; transition: opacity .2s;
-  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--glow) 70%, transparent);
 }
 .portrait-upload-icon { width: 28px; height: 28px; filter: drop-shadow(0 0 4px var(--glow)); }
 .portrait-upload.compact .portrait-upload-icon { width: 20px; height: 20px; }
@@ -1254,6 +1255,23 @@ button.linkish { font: inherit; padding: 0; background: none; border: 0; color: 
 .portrait-upload:is(:hover, :focus-within) .portrait-remove { opacity: 1; }
 @media (hover: none) { .portrait-remove { opacity: 1; } }
 .char-head { display: flex; gap: 12px; align-items: center; }
+
+/* Portrait framing dialog: the picture moves under a round window the size of the stored square. */
+.dialog.portrait-cropper { width: min(360px, calc(100vw - 32px)); justify-items: center; text-align: center; }
+@media (max-width: 420px) { .dialog.tome.portrait-cropper { padding: 24px 20px 20px; } }
+.portrait-crop {
+  position: relative; overflow: hidden; flex: none; touch-action: none; cursor: grab; user-select: none;
+  border-radius: 3px; background: var(--bg-2); outline-offset: 3px;
+}
+.portrait-crop:active { cursor: grabbing; }
+.portrait-crop:focus-visible { outline: 2px solid var(--gilt); }
+.portrait-crop img { position: absolute; left: 0; top: 0; max-width: none; transform-origin: 0 0; pointer-events: none; }
+.portrait-crop::after {
+  content: ''; position: absolute; inset: 0; border-radius: 50%; pointer-events: none;
+  box-shadow: 0 0 0 2px var(--gilt), 0 0 0 999px rgb(20 12 4 / 60%);
+}
+.portrait-zoom { display: flex; align-items: center; gap: 10px; width: 100%; max-width: 260px; }
+.portrait-zoom input { flex: 1; accent-color: var(--accent); }
 .char-head .char-link { flex: 1; min-width: 0; }
 
 /* ---------- Tool kit ---------- */
@@ -1456,25 +1474,26 @@ button.linkish.more { color: var(--muted); font-size: .9rem; }
 /* On a phone the index and the note can't sit side by side: an open note takes the screen, the crumbs lead back. */
 @media (max-width: 760px) { .notes-layout.has-note .notes-side { display: none; } }
 
-/* Note images: beside the title and facts; people get a round framed portrait, the rest keep their shape. */
+/* Note images: beside the title and facts; people get a round framed portrait, the rest keep their shape.
+   is-portrait, not portrait: .portrait is the character sheet's 148px framed circle and would wrap the figure in a second frame. */
 .note-read.has-image { grid-template-columns: minmax(0, 1fr) auto; column-gap: 18px; }
 .note-read.has-image > * { grid-column: 1 / -1; }
 .note-read.has-image > :is(.note-read-head, .note-facts) { grid-column: 1; }
 .note-read.has-image > .note-image { grid-column: 2; grid-row-start: 1; }
 .note-image { margin: 0; align-self: start; }
 .note-image img { display: block; }
-.note-image.portrait img {
+.note-image.is-portrait img {
   width: 132px; height: 132px; object-fit: cover; border-radius: 50%;
   border: 3px solid var(--card); box-shadow: 0 0 0 2px var(--gilt), 0 0 0 4px var(--kind), 0 4px 12px rgb(0 0 0 / 30%);
 }
-.note-image.picture img { max-width: min(260px, 40vw); max-height: 220px; border-radius: 3px; border: 1px solid var(--line); box-shadow: 0 0 0 3px var(--card), 0 0 0 4px var(--gilt), 0 4px 12px rgb(0 0 0 / 25%); }
+.note-image.is-picture img { max-width: min(260px, 40vw); max-height: 220px; border-radius: 3px; border: 1px solid var(--line); box-shadow: 0 0 0 3px var(--card), 0 0 0 4px var(--gilt), 0 4px 12px rgb(0 0 0 / 25%); }
 @media (max-width: 560px) {
   .note-read.has-image { grid-template-columns: 1fr; }
   .note-read.has-image > .note-image { grid-column: 1; grid-row: auto !important; justify-self: center; }
 }
 .note-image-edit { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .note-image-edit img { width: 56px; height: 56px; object-fit: cover; border: 1px solid var(--line); }
-.note-image-edit img.portrait { border-radius: 50%; }
-.note-image-edit img.picture { border-radius: 3px; }
+.note-image-edit img.is-portrait { border-radius: 50%; }
+.note-image-edit img.is-picture { border-radius: 3px; }
 .note-image-edit label.btn { cursor: pointer; }
 .note-image-edit label.btn.busy { opacity: .6; cursor: progress; }

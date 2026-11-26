@@ -130,7 +130,7 @@ export function NoteView({ note, index, backlinks, h, onTag, onEdit }: ViewProps
     <article className={`note-read kind-${note.kind} ${note.image ? 'has-image' : ''}`}>
       {note.image && (
         // Beside the title (and the facts, when there are any).
-        <figure className={`note-image ${isPortraitKind(note.kind) ? 'portrait' : 'picture'}`} style={{ gridRowEnd: facts.length ? 'span 2' : 'span 1' }}>
+        <figure className={`note-image ${isPortraitKind(note.kind) ? 'is-portrait' : 'is-picture'}`} style={{ gridRowEnd: facts.length ? 'span 2' : 'span 1' }}>
           <img src={note.image} alt={note.title} />
         </figure>
       )}

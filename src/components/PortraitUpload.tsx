@@ -1,9 +1,9 @@
 // Wraps a portrait so it can be replaced from an image file (or removed). Saves through PATCH /characters/:id.
 import { useState, type ReactNode } from 'react';
 import { api } from '../lib/client';
-import { portraitFrom } from '../lib/portrait';
 import { toast } from '../lib/toast';
 import type { CharacterDto } from '../shared/types';
+import { usePortraitPicker } from './PortraitCropper';
 
 const Quill = () => (
   <svg className="portrait-upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -31,6 +31,7 @@ export function PortraitUpload({
   children: ReactNode;
 }) {
   const [busy, setBusy] = useState(false);
+  const picker = usePortraitPicker();
 
   const save = async (portrait: string | null) => {
     setBusy(true);
@@ -46,13 +47,13 @@ export function PortraitUpload({
 
   const pick = async (file: File | undefined) => {
     if (!file) return;
-    let url: string;
+    let url: string | null;
     try {
-      url = await portraitFrom(file);
+      url = await picker.pick(file);
     } catch (e) {
       return toast(e instanceof Error ? e.message : String(e), 'error');
     }
-    await save(url);
+    if (url) await save(url);
   };
 
   const label = hasPortrait ? `Change ${name}’s portrait` : `Add a portrait for ${name}`;
@@ -88,6 +89,7 @@ export function PortraitUpload({
           ×
         </button>
       )}
+      {picker.dialog}
     </div>
   );
 }

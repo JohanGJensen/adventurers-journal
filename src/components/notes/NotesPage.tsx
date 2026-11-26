@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { api } from '../../lib/client';
-import { pictureFrom, portraitFrom } from '../../lib/portrait';
+import { pictureFrom } from '../../lib/portrait';
+import { usePortraitPicker } from '../PortraitCropper';
 import { linkTo, navigate } from '../../lib/router';
 import { toast } from '../../lib/toast';
 import { buildLinkIndex } from '../../shared/noteLinks';
@@ -232,21 +233,24 @@ function NotesBody({ characterId, campaignId, campaignName, sharedWith, query }:
   };
 
   const [imageBusy, setImageBusy] = useState(false);
+  const picker = usePortraitPicker();
   /** Adds, replaces or (null) removes the open note's image. Saves straight away, after any pending text edits. */
   const setImage = async (file: File | null) => {
     const id = currentId.current;
     const n = current;
     if (id === null || !n) return;
+    let image: string | null = null;
+    if (file) {
+      try {
+        image = await (isPortraitKind(draftRef.current?.kind ?? n.kind) ? picker.pick(file) : pictureFrom(file));
+      } catch (e) {
+        return toast(e instanceof Error ? e.message : String(e), 'error');
+      }
+      if (!image) return; // framing cancelled: keep the current image
+      if (currentId.current !== id) return; // another note was opened meanwhile
+    }
     setImageBusy(true);
     try {
-      let image: string | null = null;
-      if (file) {
-        try {
-          image = await (isPortraitKind(draftRef.current?.kind ?? n.kind) ? portraitFrom(file) : pictureFrom(file));
-        } catch (e) {
-          return toast(e instanceof Error ? e.message : String(e), 'error');
-        }
-      }
       if (!(await save())) return;
       const r = await api<Note>('PATCH', `/notes/${id}`, { image });
       if (r.error !== undefined) return toast(`Could not save the image: ${r.error}`, 'error');
@@ -411,6 +415,7 @@ function NotesBody({ characterId, campaignId, campaignName, sharedWith, query }:
       </div>
 
       {preview && <LinkPreview refs={refs} notes={notes} {...preview} />}
+      {picker.dialog}
     </>
   );
 }
