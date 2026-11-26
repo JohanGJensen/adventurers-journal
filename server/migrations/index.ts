@@ -8,6 +8,7 @@ import m005 from './005_map_drawing.sql' with { type: 'text' };
 import m006 from './006_lore.sql' with { type: 'text' };
 import m007 from './007_notes_meta.sql' with { type: 'text' };
 import m008 from './008_campaign_notes.sql' with { type: 'text' };
+import m009 from './009_note_images.sql' with { type: 'text' };
 
 export const MIGRATIONS: { n: number; sql: string }[] = [
   { n: 1, sql: m001 },
@@ -18,4 +19,5 @@ export const MIGRATIONS: { n: number; sql: string }[] = [
   { n: 6, sql: m006 },
   { n: 7, sql: m007 },
   { n: 8, sql: m008 },
+  { n: 9, sql: m009 },
 ];

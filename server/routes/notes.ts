@@ -4,7 +4,7 @@ import { NOTE_FIELDS, NOTE_KINDS, type Note, type NoteKind, type NoteRef } from 
 import { getCampaign } from '../campaigns';
 import { getCharacter } from '../characters';
 import { body, HttpError, intParam, json, type Route } from '../http';
-import { bad, isObj, optCampaignId } from '../validate';
+import { asPortrait, bad, isObj, optCampaignId } from '../validate';
 
 interface Row {
   id: number;
@@ -15,6 +15,7 @@ interface Row {
   aliases: string;
   tags: string;
   fields_json: string;
+  image: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -29,6 +30,7 @@ const parseFields = (s: string): Record<string, string> => {
   }
 };
 
+/** A note without its image: what lists return. */
 const toNote = (r: Row): Note => ({
   id: r.id,
   campaignId: r.campaign_id,
@@ -42,11 +44,15 @@ const toNote = (r: Row): Note => ({
   updatedAt: r.updated_at,
 });
 
-function getNote(db: Db, id: number): Note {
+/** A whole note, image included: single-note responses only (images run to ~1.5 MB). */
+const withImage = (r: Row): Note => ({ ...toNote(r), image: r.image });
+
+function getRow(db: Db, id: number): Row {
   const r = db.query('SELECT * FROM notes WHERE id = ?').get(id) as Row | null;
   if (!r) throw new HttpError(404, `No note ${id}`);
-  return toNote(r);
+  return r;
 }
+const getNote = (db: Db, id: number): Note => toNote(getRow(db, id));
 
 /** User text → an FTS5 query of quoted prefix tokens, so input can never be a syntax error. */
 export const ftsQuery = (q: string): string | null => {
@@ -221,15 +227,16 @@ export const noteRoutes: Route[] = [
           asNames(o.tags ?? [], 'tags', true).join('\n'),
           JSON.stringify(asFields(o.fields ?? {}, kind)),
         ) as Row;
-      return json(toNote(r), 201);
+      return json(withImage(r), 201);
     },
   ],
-  ['GET', '/api/notes/:id', ({ db, params }) => json(getNote(db, intParam(params.id, 'note id')))],
+  ['GET', '/api/notes/:id', ({ db, params }) => json(withImage(getRow(db, intParam(params.id, 'note id'))))],
   [
     'PATCH',
     '/api/notes/:id',
     async ({ db, params, req }) => {
-      const n = getNote(db, intParam(params.id, 'note id'));
+      const row = getRow(db, intParam(params.id, 'note id'));
+      const n = toNote(row);
       const b = await body(req);
       if (!isObj(b)) bad('Body must be an object');
       const o = b as Record<string, unknown>;
@@ -238,6 +245,7 @@ export const noteRoutes: Route[] = [
       const title = o.title === undefined ? n.title : asText(o.title, 'title', 300).trim() || 'Untitled';
       const text = o.body === undefined ? n.body : asText(o.body, 'body', 200_000);
       const kind = o.kind === undefined ? n.kind : asKind(o.kind);
+      const image = o.image === undefined ? row.image : o.image === null ? null : asPortrait(o.image);
       let aliases = o.aliases === undefined ? n.aliases : asNames(o.aliases, 'aliases', false);
       const tags = o.tags === undefined ? n.tags : asNames(o.tags, 'tags', true);
       // On a kind change, fields the new kind doesn't define are dropped.
@@ -248,11 +256,11 @@ export const noteRoutes: Route[] = [
       aliases = aliases.filter((a) => normName(a) !== normName(title));
       db.transaction(() => {
         db.query(
-          `UPDATE notes SET campaign_id = ?, kind = ?, title = ?, body = ?, aliases = ?, tags = ?, fields_json = ?, updated_at = datetime('now') WHERE id = ?`,
-        ).run(campaignId, kind, title, text, aliases.join('\n'), tags.join('\n'), JSON.stringify(fields), n.id);
+          `UPDATE notes SET campaign_id = ?, kind = ?, title = ?, body = ?, aliases = ?, tags = ?, fields_json = ?, image = ?, updated_at = datetime('now') WHERE id = ?`,
+        ).run(campaignId, kind, title, text, aliases.join('\n'), tags.join('\n'), JSON.stringify(fields), image, n.id);
         if (renamed) rewriteLinks(db, { ...n, campaignId }, n.title, title);
       })();
-      return json(getNote(db, n.id));
+      return json(withImage(getRow(db, n.id)));
     },
   ],
   [

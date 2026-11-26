@@ -56,6 +56,9 @@ export const kindName = (k: NoteKind, lower = false) => {
   return lower && k !== 'npc' ? s.toLowerCase() : s;
 };
 
+/** People get a round, face-cropped portrait; everything else keeps its picture's shape. */
+export const isPortraitKind = (k: NoteKind) => k === 'player' || k === 'npc';
+
 /** Plain text of a note body for snippets: links show their label, markdown marks are dropped. */
 export const plainText = (body: string) =>
   body.replace(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g, (_, t, l) => l ?? t).replace(/[#*_>`]/g, '').replace(/\s+/g, ' ').trim();

@@ -127,6 +127,39 @@ describe('notes', () => {
     expect((db.query('SELECT campaign_id AS k FROM characters WHERE id = 1').get() as { k: null }).k).toBeNull();
   });
 
+  test('player notes: fields, and an item held by a player links back to them', async () => {
+    const { call } = setup();
+    expect((await call('POST', '/notes', { title: 'x', campaignId: 1, kind: 'player', fields: { status: 'asleep' } })).status).toBe(400);
+    const anna = (
+      await call('POST', '/notes', {
+        title: 'Brynja',
+        kind: 'player',
+        campaignId: 1,
+        fields: { player: 'Anna', race: 'Half-elf', class: 'Bard', level: '5', status: 'active', bond: 'Owes me a favour', attitude: 'x' },
+      })
+    ).body;
+    expect(anna.fields).toEqual({ player: 'Anna', race: 'Half-elf', class: 'Bard', level: '5', status: 'active', bond: 'Owes me a favour' });
+    await call('POST', '/notes', { title: 'Lute of Echoes', kind: 'item', campaignId: 1, fields: { holder: 'Brynja' } });
+    await call('POST', '/notes', { title: 'Old map', kind: 'item', campaignId: 1, fields: { holder: 'Faelan' } });
+    expect(titles(await call('GET', `/notes/${anna.id}/backlinks`))).toEqual(['Lute of Echoes']);
+  });
+
+  test('a note image: stored, only on single-note responses, removable, validated, not searchable', async () => {
+    const { call } = setup();
+    const png = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
+    const n = (await call('POST', '/notes', { title: 'Brynja', kind: 'player', campaignId: 1 })).body;
+    expect(n.image).toBeNull();
+    expect((await call('PATCH', `/notes/${n.id}`, { image: 'https://example.com/x.png' })).status).toBe(400);
+    expect((await call('PATCH', `/notes/${n.id}`, { image: png })).body.image).toBe(png);
+    // a text edit keeps the image
+    expect((await call('PATCH', `/notes/${n.id}`, { body: 'Sings badly' })).body.image).toBe(png);
+    expect((await call('GET', `/notes/${n.id}`)).body.image).toBe(png);
+    expect((await call('GET', '/notes?campaign=1')).body[0].image).toBeUndefined();
+    expect((await call('GET', '/notes/index?campaign=1')).body[0].image).toBeUndefined();
+    expect(titles(await call('GET', '/notes?q=iVBORw0KGgo'))).toEqual([]);
+    expect((await call('PATCH', `/notes/${n.id}`, { image: null })).body.image).toBeNull();
+  });
+
   test('ftsQuery', () => {
     expect(ftsQuery('  ')).toBeNull();
     expect(ftsQuery('wolf "pen')).toBe('"wolf"* "pen"*');

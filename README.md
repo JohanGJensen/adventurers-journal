@@ -12,7 +12,7 @@ Adventurers Journal is an [Electron](https://www.electronjs.org/) app with a Rea
 - **Level-up wizard**: levels 1 → 20, asking only for the choices each level grants.
 - **Homebrew**: a library and editor for your own subclasses.
 - **Characters and campaigns**: keep several characters and campaigns, each character with a history log. Notes belong to the campaign and every character in it shares them, on the character's Notes tab.
-- **Linked notes**: notes for sessions, quests, NPCs, places, factions, items and lore, each with its own fields (quest status, NPC attitude, …). Write `[[Neverwinter]]` to link a note, or just mention a note's title or alias. Every note lists the notes that mention it. The Notes tab opens on a campaign overview (open quests, a card per kind, recent changes); the index filters by kind and tag.
+- **Linked notes**: notes for sessions, the other players and their characters, quests, NPCs, places, factions, items and lore, each with its own fields (quest status, NPC attitude, …) and an optional image or portrait. Write `[[Neverwinter]]` to link a note, or just mention a note's title or alias. Every note lists the notes that mention it. The Notes tab opens on a campaign overview (open quests, a card per kind, recent changes); the index filters by kind and tag.
 - **Import and backup**: import a character from a JSON sheet, and back up the whole database to a file.
 
 ## Installation

@@ -143,12 +143,13 @@ export interface Campaign {
   createdAt: string;
 }
 
-export const NOTE_KINDS = ['note', 'session', 'quest', 'npc', 'place', 'faction', 'item', 'lore'] as const;
+export const NOTE_KINDS = ['note', 'session', 'player', 'quest', 'npc', 'place', 'faction', 'item', 'lore'] as const;
 export type NoteKind = (typeof NOTE_KINDS)[number];
 
 export const NOTE_KIND_LABELS: Record<NoteKind, string> = {
   note: 'Notes',
   session: 'Sessions',
+  player: 'Players',
   quest: 'Quests',
   npc: 'NPCs',
   place: 'Places',
@@ -157,12 +158,16 @@ export const NOTE_KIND_LABELS: Record<NoteKind, string> = {
   lore: 'Lore',
 };
 
-/** A kind-specific field. `options` makes it a pick list; `ref` means the value names another note of that kind. */
+/**
+ * A kind-specific field. `options` makes it a pick list; `ref` means the value names another note of that kind.
+ * `loose` refs link when a note matches and are plain text otherwise (not a "create this note" link).
+ */
 export interface NoteFieldDef {
   key: string;
   label: string;
   options?: readonly string[];
   ref?: NoteKind;
+  loose?: boolean;
 }
 
 export const NOTE_FIELDS: Record<NoteKind, readonly NoteFieldDef[]> = {
@@ -171,6 +176,15 @@ export const NOTE_FIELDS: Record<NoteKind, readonly NoteFieldDef[]> = {
     { key: 'number', label: 'Session #' },
     { key: 'playedOn', label: 'Played on' },
     { key: 'gameDate', label: 'In-game date' },
+  ],
+  // The other people at the table and their characters (not NPCs).
+  player: [
+    { key: 'player', label: 'Player' },
+    { key: 'race', label: 'Race' },
+    { key: 'class', label: 'Class' },
+    { key: 'level', label: 'Level' },
+    { key: 'status', label: 'Status', options: ['active', 'absent', 'retired', 'dead'] },
+    { key: 'bond', label: 'Relationship' },
   ],
   quest: [
     { key: 'status', label: 'Status', options: ['active', 'on hold', 'completed', 'failed'] },
@@ -197,7 +211,7 @@ export const NOTE_FIELDS: Record<NoteKind, readonly NoteFieldDef[]> = {
   item: [
     { key: 'type', label: 'Type' },
     { key: 'rarity', label: 'Rarity', options: ['common', 'uncommon', 'rare', 'very rare', 'legendary', 'artifact'] },
-    { key: 'holder', label: 'Held by' },
+    { key: 'holder', label: 'Held by', ref: 'player', loose: true },
   ],
   lore: [{ key: 'topic', label: 'Topic / era' }],
 };
@@ -215,12 +229,14 @@ export interface Note {
   tags: string[];
   /** Kind-specific values, keyed by NOTE_FIELDS[kind][].key. */
   fields: Record<string, string>;
+  /** An image data URL. Only on single-note responses (GET /notes/:id, POST, PATCH), never in lists. */
+  image?: string | null;
   createdAt: string;
   updatedAt: string;
 }
 
 /** The light shape used to resolve links: no body. */
-export type NoteRef = Omit<Note, 'body' | 'createdAt'>;
+export type NoteRef = Omit<Note, 'body' | 'createdAt' | 'image'>;
 
 /** The trait lists on a character's Lore page. */
 export const TRAIT_KINDS = ['personality', 'ideals', 'bonds', 'flaws'] as const;
