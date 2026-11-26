@@ -22,13 +22,13 @@ import {
   type MagicInitiatePick,
 } from '../../lib/create';
 import { fetchClassSpellList, type ClassSpell } from '../../lib/api';
-import { portraitFrom } from '../../lib/portrait';
 import { ABILITIES, ABILITY_NAMES, SKILLS, fmt, modifier, titleCase, type Ability } from '../../lib/rules';
 import type { Campaign, CreateOptions, CreateText, EquipOption, NameChoice } from '../../shared/types';
 import { ClassEmblem } from '../ClassEmblem';
 import { SpellPicker, useSpellFilters } from '../SpellPicker';
 import { SpellCounters } from '../SpellBrowser';
 import { Loader } from '../Loader';
+import { usePortraitPicker } from '../PortraitCropper';
 
 export interface StepProps {
   d: CreateDraft;
@@ -773,6 +773,7 @@ export function DetailsStep({
   onCampaign,
 }: StepProps & { campaigns: Campaign[]; campaignId: number | ''; onCampaign: (id: number | '') => void }) {
   const [error, setError] = useState('');
+  const picker = usePortraitPicker();
   return (
     <section className="card details-card">
       <h2>Who are they?</h2>
@@ -798,7 +799,8 @@ export function DetailsStep({
                   if (!f) return;
                   try {
                     setError('');
-                    patch({ portrait: await portraitFrom(f) });
+                    const portrait = await picker.pick(f);
+                    if (portrait) patch({ portrait });
                   } catch (err) {
                     setError(err instanceof Error ? err.message : String(err));
                   }
@@ -812,6 +814,7 @@ export function DetailsStep({
             )}
           </div>
           {error && <p className="hint warn">{error}</p>}
+          {picker.dialog}
         </div>
         <div className="details-fields">
           <label className="field">

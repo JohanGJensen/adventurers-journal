@@ -1,9 +1,9 @@
 // Character and note images: an image file scaled to a small data URL. The app's content security policy only
 // shows local and data: images, and a small image keeps the character row (and backups) light.
 
-const PORTRAIT_SIZE = 320;
+export const PORTRAIT_SIZE = 320;
 
-async function loadImage(file: File): Promise<HTMLImageElement> {
+export async function loadImage(file: File): Promise<HTMLImageElement> {
   if (!file.type.startsWith('image/')) throw new Error(`${file.name} is not an image`);
   // A data: URL, not a blob: one: the app's content security policy only allows 'self' and data: images.
   const source = await new Promise<string>((res, rej) => {
@@ -27,14 +27,24 @@ function encode(canvas: HTMLCanvasElement): string {
   return webp.startsWith('data:image/webp') ? webp : canvas.toDataURL('image/jpeg', 0.85);
 }
 
-/** Reads an image file, centre-crops it to a square (biased up so faces stay in frame) and scales it down. */
-export async function portraitFrom(file: File): Promise<string> {
-  const img = await loadImage(file);
+/** A square of the source image, in its own pixels. */
+export interface Crop {
+  x: number;
+  y: number;
+  side: number;
+}
+
+/** The default framing: the largest centred square, biased up so faces stay in frame. */
+export function defaultCrop(img: HTMLImageElement): Crop {
   const side = Math.min(img.width, img.height);
+  return { x: (img.width - side) / 2, y: Math.max(0, (img.height - side) * 0.2), side };
+}
+
+/** Draws one square of the image onto a portrait-sized canvas. */
+export function cropPortrait(img: HTMLImageElement, crop: Crop): string {
   const canvas = document.createElement('canvas');
-  canvas.width = canvas.height = Math.min(PORTRAIT_SIZE, side);
-  const ctx = canvas.getContext('2d')!;
-  ctx.drawImage(img, (img.width - side) / 2, Math.max(0, (img.height - side) * 0.2), side, side, 0, 0, canvas.width, canvas.height);
+  canvas.width = canvas.height = Math.round(Math.min(PORTRAIT_SIZE, crop.side));
+  canvas.getContext('2d')!.drawImage(img, crop.x, crop.y, crop.side, crop.side, 0, 0, canvas.width, canvas.height);
   return encode(canvas);
 }
 
