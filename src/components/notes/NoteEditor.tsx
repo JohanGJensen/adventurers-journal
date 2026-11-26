@@ -1,13 +1,12 @@
-import { useMemo, useRef, useState, type ReactNode } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { normName } from '../../shared/noteLinks';
-import { NOTE_FIELDS, NOTE_KINDS, NOTE_KIND_LABELS, type NoteKind, type NoteRef } from '../../shared/types';
-import type { Draft } from './common';
+import { NOTE_FIELDS, NOTE_KINDS, type NoteKind, type NoteRef } from '../../shared/types';
+import { kindName, type Draft } from './common';
 
 interface Props {
   noteId: number;
   draft: Draft;
   refs: NoteRef[];
-  ownerOptions: ReactNode;
   savedState: 'saved' | 'dirty';
   onChange: (d: Draft) => void;
   onSave: () => void;
@@ -17,7 +16,7 @@ interface Props {
 
 const OPEN_LINK = /\[\[([^[\]\n|]*)$/;
 
-export function NoteEditor({ noteId, draft, refs, ownerOptions, savedState, onChange, onSave, onDone, onDelete }: Props) {
+export function NoteEditor({ noteId, draft, refs, savedState, onChange, onSave, onDone, onDelete }: Props) {
   const set = <K extends keyof Draft>(k: K, v: Draft[K]) => onChange({ ...draft, [k]: v });
   const setField = (k: string, v: string) => onChange({ ...draft, fields: { ...draft.fields, [k]: v } });
   const area = useRef<HTMLTextAreaElement>(null);
@@ -75,16 +74,19 @@ export function NoteEditor({ noteId, draft, refs, ownerOptions, savedState, onCh
         if (!e.currentTarget.contains(e.relatedTarget as Node | null)) onSave();
       }}
     >
-      <input className="note-title" aria-label="Title" value={draft.title} onChange={(e) => set('title', e.target.value)} />
-      <div className="row-form">
+      {/* Actions on top, so a long note never hides them. */}
+      <div className="row-form note-edit-bar">
         <select aria-label="Note kind" value={draft.kind} onChange={(e) => set('kind', e.target.value as NoteKind)}>
-          {NOTE_KINDS.map((k) => <option key={k} value={k}>{NOTE_KIND_LABELS[k].replace(/s$/, '')}</option>)}
+          {NOTE_KINDS.map((k) => <option key={k} value={k}>{kindName(k)}</option>)}
         </select>
-        <select aria-label="Belongs to" value={draft.owner} onChange={(e) => set('owner', e.target.value)}>
-          {ownerOptions}
-        </select>
-        <span className="hint save-state">{savedState === 'saved' ? 'Saved' : 'Unsaved — saves when you leave the editor or press Ctrl+S'}</span>
+        <span className={`save-state ${savedState}`} role="status" title="Saves when you click away, or with Ctrl+S">
+          {savedState === 'saved' ? '✓ Saved' : '● Unsaved'}
+        </span>
+        <span className="spacer" />
+        <button type="button" className="btn ghost danger-text small" onClick={onDelete}>Delete</button>
+        <button type="button" className="btn" onClick={onDone} title="Save and read (Ctrl+E)">Done</button>
       </div>
+      <input className="note-title" aria-label="Title" value={draft.title} onChange={(e) => set('title', e.target.value)} />
 
       {NOTE_FIELDS[draft.kind].length > 0 && (
         <div className="note-field-grid">
@@ -100,7 +102,7 @@ export function NoteEditor({ noteId, draft, refs, ownerOptions, savedState, onCh
                 <input
                   value={draft.fields[f.key] ?? ''}
                   list={f.ref ? `note-refs-${f.ref}` : undefined}
-                  placeholder={f.ref ? `${NOTE_KIND_LABELS[f.ref].replace(/s$/, '')} name` : undefined}
+                  placeholder={f.ref ? `${kindName(f.ref)} name` : undefined}
                   onChange={(e) => setField(f.key, e.target.value)}
                 />
               )}
@@ -176,12 +178,6 @@ export function NoteEditor({ noteId, draft, refs, ownerOptions, savedState, onCh
         )}
       </div>
 
-      <div className="row-form">
-        <button type="button" className="btn" onClick={onDone} title="Save and read (Ctrl+E)">Done</button>
-        <button type="button" className="btn ghost" onClick={onSave}>Save</button>
-        <span className="spacer" />
-        <button type="button" className="btn ghost danger-text" onClick={onDelete}>Delete</button>
-      </div>
     </form>
   );
 }

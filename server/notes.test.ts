@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'bun:test';
 import { createApp } from './app';
 import { openDb } from './db';
+import { MIGRATIONS } from './migrations';
 import { ftsQuery } from './routes/notes';
 import { seedIfEmpty } from './seed';
 
@@ -12,23 +13,30 @@ function setup() {
     const res = await app.fetch(new Request(`http://x/api${path}`, { method, body: body === undefined ? undefined : JSON.stringify(body) }));
     return { status: res.status, body: (await res.json()) as any };
   };
+  // The seeded character (1) plays in campaign 1, which owns the notes below.
+  db.exec("INSERT INTO campaigns (id, name) VALUES (1, 'Phandelver'); UPDATE characters SET campaign_id = 1 WHERE id = 1;");
   return { db, call };
 }
 const titles = (r: { body: any[] }) => r.body.map((n) => n.title);
 
 describe('notes', () => {
-  test('CRUD with owner checks', async () => {
-    const { call } = setup();
+  test('CRUD: every note belongs to a campaign', async () => {
+    const { call, db } = setup();
     expect((await call('POST', '/notes', { title: 'x' })).status).toBe(400);
+    expect((await call('POST', '/notes', { title: 'x', campaignId: 9 })).status).toBe(404);
     expect((await call('POST', '/notes', { title: 'x', characterId: 9 })).status).toBe(404);
+    // a character id stands in for its campaign
     const n = (await call('POST', '/notes', { title: 'Sildar', kind: 'npc', characterId: 1, body: 'Met at the inn' })).body;
-    expect(n).toMatchObject({ title: 'Sildar', kind: 'npc', characterId: 1, campaignId: null });
-    expect((await call('PATCH', `/notes/${n.id}`, { characterId: null })).status).toBe(400);
+    expect(n).toMatchObject({ title: 'Sildar', kind: 'npc', campaignId: 1 });
+    expect(n.characterId).toBeUndefined();
+    expect((await call('PATCH', `/notes/${n.id}`, { campaignId: null })).status).toBe(400);
     expect((await call('PATCH', `/notes/${n.id}`, { kind: 'boss' })).status).toBe(400);
-    const camp = (await call('POST', '/campaigns', { name: 'Phandelver' })).body;
-    expect((await call('PATCH', `/notes/${n.id}`, { campaignId: camp.id, characterId: null })).body).toMatchObject({ campaignId: camp.id, characterId: null });
+    const camp = (await call('POST', '/campaigns', { name: 'Storm King' })).body;
+    expect((await call('PATCH', `/notes/${n.id}`, { campaignId: camp.id })).body).toMatchObject({ campaignId: camp.id });
     expect(titles(await call('GET', `/notes?campaign=${camp.id}`))).toEqual(['Sildar']);
-    expect(titles(await call('GET', '/notes?character=1'))).toEqual([]);
+    expect(titles(await call('GET', '/notes?campaign=1'))).toEqual([]);
+    db.exec('UPDATE characters SET campaign_id = NULL');
+    expect((await call('POST', '/notes', { title: 'x', characterId: 1 })).body.error).toContain('campaign');
     expect((await call('DELETE', `/notes/${n.id}`)).status).toBe(200);
     expect((await call('DELETE', `/notes/${n.id}`)).status).toBe(404);
   });
@@ -62,7 +70,7 @@ describe('notes', () => {
     // changing kind drops fields the new kind doesn't have, and bad pick-list values, instead of failing
     const npc = (await call('POST', '/notes', { title: 'Gundren', kind: 'npc', characterId: 1, fields: { status: 'missing', role: 'Dwarf' } })).body;
     expect((await call('PATCH', `/notes/${npc.id}`, { kind: 'quest' })).body.fields).toEqual({});
-    const idx = (await call('GET', '/notes/index?character=1')).body;
+    const idx = (await call('GET', '/notes/index?campaign=1')).body;
     expect(idx.map((r: any) => r.title).sort()).toEqual(['Gundren', 'Neverwinter']);
     expect(idx[0].body).toBeUndefined();
     expect((await call('GET', `/notes/${city.id}`)).body).toMatchObject({ title: 'Neverwinter', tags: ['sword coast', 'city'] });
@@ -85,6 +93,38 @@ describe('notes', () => {
     expect((await call('GET', '/notes?q=explicit')).body[0].body).toBe('Head to [[Waterdeep|the city]].');
     expect(await back()).toEqual(['Auto', 'Explicit', 'Field']);
     expect((await call('GET', `/notes/${a.id}/backlinks`)).body).toEqual([]);
+  });
+
+  test('links, backlinks and renames stay inside a campaign', async () => {
+    const { call } = setup();
+    const other = (await call('POST', '/campaigns', { name: 'Elsewhere' })).body;
+    const city = (await call('POST', '/notes', { title: 'Neverwinter', campaignId: 1 })).body;
+    const there = (await call('POST', '/notes', { title: 'Far', campaignId: other.id, body: 'See [[Neverwinter]].' })).body;
+    expect((await call('GET', `/notes/${city.id}/backlinks`)).body).toEqual([]);
+    await call('PATCH', `/notes/${city.id}`, { title: 'Waterdeep' });
+    expect((await call('GET', `/notes/${there.id}`)).body.body).toBe('See [[Neverwinter]].');
+  });
+
+  test('migration 8 moves character notes to their campaign, giving campaign-less characters one', () => {
+    const db = openDb(':memory:');
+    seedIfEmpty(db);
+    db.exec(`INSERT INTO characters (id, name, sheet_json) VALUES (2, 'Bree', '{}'), (3, 'Cole', '{}');
+      INSERT INTO campaigns (id, name) VALUES (5, 'Coast');
+      UPDATE characters SET campaign_id = 5 WHERE id = 2;
+      INSERT INTO notes (campaign_id, character_id, title) VALUES (NULL, 2, 'in campaign'), (NULL, 3, 'orphan'), (5, NULL, 'already'), (NULL, 3, 'orphan 2');`);
+    db.exec(MIGRATIONS.find((m) => m.n === 8)!.sql);
+    const notes = db.query('SELECT title, campaign_id AS k, character_id AS c FROM notes ORDER BY id').all() as { title: string; k: number; c: null }[];
+    const cole = db.query('SELECT campaign_id AS k FROM characters WHERE id = 3').get() as { k: number };
+    expect(cole.k).toBe(6);
+    expect((db.query('SELECT name FROM campaigns WHERE id = 6').get() as { name: string }).name).toBe("Cole's adventures");
+    expect(notes).toEqual([
+      { title: 'in campaign', k: 5, c: null },
+      { title: 'orphan', k: 6, c: null },
+      { title: 'already', k: 5, c: null },
+      { title: 'orphan 2', k: 6, c: null },
+    ]);
+    // Faelan (no notes) is left out of any campaign
+    expect((db.query('SELECT campaign_id AS k FROM characters WHERE id = 1').get() as { k: null }).k).toBeNull();
   });
 
   test('ftsQuery', () => {

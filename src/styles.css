@@ -518,11 +518,22 @@ label.btn { display: inline-block; }
 @media (max-width: 760px) { .notes-layout { grid-template-columns: 1fr; } }
 .notes-side { position: sticky; top: 12px; max-height: calc(100vh - 24px); display: flex; flex-direction: column; }
 @media (max-width: 760px) { .notes-side { position: static; max-height: none; } }
-.notes-filters { display: grid; gap: 8px; margin-bottom: 12px; }
-.notes-filters .row-form select { flex: 1; min-width: 0; }
-.tag-filter { margin-top: 0; max-height: 5.5rem; overflow: auto; }
-.chip.tag { color: var(--muted); }
-.chip.tag.on { background: var(--accent); border-color: var(--accent); color: var(--card); }
+.notes-filters { display: grid; gap: 10px; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+.kind-tabs { display: flex; flex-wrap: wrap; gap: 4px; }
+.kind-tab {
+  display: inline-flex; align-items: center; gap: 5px; padding: 2px 9px; font-size: .88rem; color: var(--ink);
+  background: transparent; border: 1px solid var(--line); border-radius: 3px;
+}
+.kind-tab:hover { border-color: var(--kind, var(--accent)); }
+.kind-tab.on { background: var(--accent-soft); border-color: var(--accent); color: var(--heading); font-weight: 600; }
+.kind-tab .count { color: var(--muted); font-size: .8rem; font-weight: 400; }
+.tag-filter summary { cursor: pointer; color: var(--muted); font-size: .9rem; }
+.tag-filter summary strong { color: var(--accent); }
+.tag-filter .chips { max-height: 6.5rem; overflow: auto; }
+/* Not .tag: that's the 18px spell marker. */
+.chip.note-tag { color: var(--ink); background: var(--accent-soft); border-color: color-mix(in srgb, var(--accent) 35%, transparent); font-size: .85rem; line-height: 1.4; }
+.chip.note-tag:hover { border-color: var(--accent); }
+.chip.note-tag.on { background: var(--accent); border-color: var(--accent); color: var(--card); }
 .note-groups { overflow: auto; min-height: 0; display: grid; gap: 6px; align-content: start; }
 .note-group-head {
   width: 100%; display: flex; align-items: center; gap: 6px; padding: 4px 6px; background: transparent; border: 0;
@@ -531,56 +542,56 @@ label.btn { display: inline-block; }
 .note-group-head .caret { width: .8em; color: var(--muted); font-size: .8rem; }
 .note-group-head .count { margin-left: auto; color: var(--muted); font: .78rem/1 inherit; font-family: inherit; }
 .note-list { list-style: none; margin: 4px 0 0; padding: 0; display: grid; gap: 2px; }
-.note-row { width: 100%; text-align: left; display: grid; gap: 2px; padding: 6px 10px; border-radius: 3px; border: 1px solid transparent; border-left: 3px solid transparent; background: transparent; color: inherit; }
+.note-row { width: 100%; text-align: left; display: grid; gap: 2px; padding: 7px 10px; border-radius: 3px; border: 1px solid transparent; border-left: 3px solid transparent; background: transparent; color: inherit; }
 .note-row:hover { border-color: var(--line); border-left-color: var(--kind); }
 .note-row.on { border-color: var(--accent); border-left-color: var(--kind); background: var(--accent-soft); }
-.note-row small { color: var(--muted); }
-.note-row.status-completed strong, .note-row.status-failed strong { color: var(--muted); }
-.note-row.status-failed strong { text-decoration: line-through; }
-.note-snippet { color: var(--muted); font-size: .8rem; white-space: pre-wrap; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.note-row strong { font-size: 1.02rem; font-weight: 600; }
+.note-row small { color: var(--muted); font-size: .84rem; }
+/* Every title reads at full strength; a finished quest just gets a mark after its name. */
+.note-row.status-completed strong::after, .note-row.status-failed strong::after { margin-left: .4em; font-size: .85em; font-weight: 400; }
+.note-row.status-completed strong::after { content: '\2713'; color: var(--kind-npc); }
+.note-row.status-failed strong::after { content: '\2717'; color: var(--cap); }
+.note-snippet { color: var(--muted); font-size: .86rem; line-height: 1.4; white-space: pre-wrap; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .plain-link { color: inherit; text-decoration: none; }
 
 .note-panel { min-height: 320px; }
-.note-read { display: grid; gap: 14px; }
-.note-read-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; border-bottom: 2px solid var(--kind); padding-bottom: 8px; }
-.note-read-head h2 { margin: 4px 0 0; font: 600 1.5rem Cinzel, Georgia, serif; color: var(--heading); }
-.note-aka { margin: 2px 0 0; color: var(--muted); font-style: italic; font-size: .9rem; }
-.note-facts { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 0; padding: 8px 12px; background: var(--bg-2); border-radius: 3px; border: 1px solid var(--line); }
-.note-facts .fact { display: grid; gap: 0; }
-.note-facts dt { font-size: .7rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
-.note-facts dd { margin: 0; font-weight: 500; }
+.note-crumbs { font-size: .9rem; margin: -4px 0 10px; }
+.note-crumbs a { color: var(--muted); text-decoration-color: var(--gilt); text-underline-offset: 3px; }
+.note-crumbs a:hover { color: var(--accent); }
+.note-read { display: grid; gap: 16px; }
+.note-read-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; border-bottom: 2px solid var(--kind); padding-bottom: 10px; }
+.note-read-head h2 { margin: 6px 0 0; font: 400 1.9rem/1.15 'IM Fell English SC', Cinzel, Georgia, serif; letter-spacing: .02em; color: var(--heading); }
+.note-aka { margin: 4px 0 0; color: var(--muted); font-style: italic; font-size: 1rem; }
+.note-facts {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px 18px; margin: 0; padding: 10px 14px;
+  background: var(--accent-soft); border-left: 3px solid var(--kind); border-radius: 2px;
+}
+.note-facts .fact { display: grid; gap: 1px; min-width: 0; }
+.note-facts dt { font-size: .74rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+.note-facts dd { margin: 0; font-weight: 600; font-size: 1.02rem; }
 .fact.status-active dd, .fact.status-alive dd { color: var(--kind-npc); }
 .fact.status-failed dd, .fact.status-dead dd { color: var(--cap); }
 .fact.status-completed dd { color: var(--muted); }
-.note-body { line-height: 1.6; max-width: 70ch; }
-.note-body > :first-child { margin-top: 0; }
-.note-body h3, .note-body h4, .note-body h5 { font-family: Cinzel, Georgia, serif; color: var(--heading); margin: 1.1em 0 .3em; }
-.note-body p, .note-body ul, .note-body ol { margin: 0 0 .7em; }
-.note-body blockquote { margin: 0 0 .7em; padding: 2px 12px; border-left: 3px solid var(--gilt); color: var(--muted); font-style: italic; }
-.note-body hr { border: 0; height: 14px; background: var(--rule) center / 100% 14px no-repeat; margin: 1em 0; }
-.note-body code { font-size: .9em; background: var(--bg-2); padding: 0 3px; border-radius: 2px; }
 .note-link { color: var(--accent); text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--accent) 55%, transparent); text-underline-offset: 2px; cursor: pointer; }
 .note-link:hover, .note-link:focus-visible { text-decoration-color: currentColor; }
-.note-link.auto { color: inherit; text-decoration-style: dotted; text-decoration-color: var(--gilt); }
-.note-link.auto:hover { color: var(--accent); }
+/* Explicit [[links]] and auto-linked mentions look the same: a link to a note always reads as one. */
 button.note-link.missing { font: inherit; padding: 0; background: none; border: 0; color: var(--cap); text-decoration: underline dashed; text-underline-offset: 2px; }
 button.linkish { font: inherit; padding: 0; background: none; border: 0; color: var(--accent); text-decoration: underline; cursor: pointer; }
 .note-read-foot { display: grid; gap: 10px; border-top: 1px solid var(--line); padding-top: 10px; }
 .note-read-foot .chips { margin-top: 0; }
-.backlinks h3, .notes-overview h3 { margin: 0 0 4px; font: 400 1rem 'IM Fell English SC', Cinzel, Georgia, serif; color: var(--heading); }
-.backlinks ul, .notes-overview ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 3px; }
-.notes-overview { display: grid; gap: 18px; }
-.notes-overview small { color: var(--muted); }
-.kind-counts { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 0; color: var(--muted); font-size: .9rem; }
+.backlinks h3 { margin: 0 0 4px; font: 400 1.05rem 'IM Fell English SC', Cinzel, Georgia, serif; color: var(--heading); }
+.backlinks h3::before { display: none; }
+.backlinks ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 18px; }
 
-.note-edit { display: grid; gap: 10px; }
-.note-title { font: 600 1.2rem Cinzel, Georgia, serif !important; }
+.note-edit { display: grid; gap: 12px; }
+.note-edit-bar { align-items: center; padding-bottom: 10px; border-bottom: 1px solid var(--line); }
+.note-title { font: 400 1.6rem 'IM Fell English SC', Cinzel, Georgia, serif !important; }
 .note-field-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 8px; }
 .note-field-grid.two { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
 .note-field-grid label { display: grid; gap: 2px; font-size: .75rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
 .note-field-grid input, .note-field-grid select { text-transform: none; letter-spacing: normal; font-size: .95rem; color: var(--ink); min-width: 0; }
 .note-body-edit { position: relative; }
-.note-edit textarea { width: 100%; resize: vertical; white-space: pre-wrap; line-height: 1.5; }
+.note-edit textarea { width: 100%; resize: vertical; white-space: pre-wrap; font-size: 1.04rem !important; line-height: 1.6; padding: 10px 12px !important; }
 .link-suggest {
   position: absolute; left: 8px; right: 8px; bottom: 100%; margin: 0 0 4px; padding: 4px; list-style: none; z-index: 5;
   background: var(--card); border: 1px solid var(--accent); border-radius: 3px; box-shadow: var(--shadow); max-height: 260px; overflow: auto;
@@ -588,7 +599,8 @@ button.linkish { font: inherit; padding: 0; background: none; border: 0; color: 
 .link-suggest button { width: 100%; display: flex; gap: 6px; align-items: center; text-align: left; padding: 4px 8px; border: 0; background: transparent; color: inherit; border-radius: 2px; }
 .link-suggest button.on, .link-suggest button:hover { background: var(--accent-soft); }
 .link-suggest small { color: var(--muted); }
-.save-state { margin: 0; }
+.save-state { font-size: .88rem; color: var(--muted); }
+.save-state.dirty { color: var(--cap); }
 .row-form .spacer { flex: 1; }
 .link-preview {
   position: fixed; z-index: 50; width: 320px; max-width: calc(100vw - 32px); display: grid; gap: 4px; padding: 10px 12px; pointer-events: none;
@@ -596,7 +608,7 @@ button.linkish { font: inherit; padding: 0; background: none; border: 0; color: 
 }
 .link-preview strong { font-family: Cinzel, Georgia, serif; }
 .link-preview small { color: var(--muted); }
-.link-preview p { margin: 0; font-size: .85rem; color: var(--muted); }
+.link-preview p { margin: 0; font-size: .9rem; line-height: 1.45; color: var(--ink); }
 .danger-text { color: var(--cap); border-color: var(--cap); }
 
 /* Lore & story: an "at a glance" banner panel of traits, then the story in one readable column. */
@@ -604,8 +616,6 @@ button.linkish { font: inherit; padding: 0; background: none; border: 0; color: 
 .lore-page .list-head, .lore-page .sheet-nav { max-width: 980px; margin-inline: auto; }
 .lore-story { display: grid; gap: 12px; align-content: start; }
 .lore-story > .btn { justify-self: start; }
-.lore-section p { margin: 0 0 .8em; line-height: 1.6; }
-.lore-section p:last-child { margin-bottom: 0; }
 .card.lore-glance { border-top: 8px solid var(--accent); padding-top: 14px; }
 .lore-glance::after {
   content: ''; position: absolute; inset: 0; pointer-events: none; border-radius: 3px;
@@ -630,11 +640,11 @@ button.linkish { font: inherit; padding: 0; background: none; border: 0; color: 
   .lore-trait + .lore-trait { border-top: 1px solid var(--line); padding-top: 12px; }
 }
 /* Bullets: a gilt lozenge, with the lead-in words set in the accent colour so lists skim by their labels. */
-.lore-list { list-style: none; margin: 0 0 .8em; padding: 0; display: grid; gap: 7px; line-height: 1.5; }
-.lore-list:last-child { margin-bottom: 0; }
-.lore-list li { position: relative; padding-left: 1.3em; }
-.lore-list li::before { content: '\25C6\FE0E'; position: absolute; left: .1em; top: .1em; font-size: .75em; color: var(--gilt); }
-.lore-list strong { color: var(--accent); font-weight: 600; }
+.lore-list, .prose ul { list-style: none; margin: 0 0 .8em; padding: 0; display: grid; gap: 7px; line-height: 1.5; }
+.lore-list:last-child, .prose ul:last-child { margin-bottom: 0; }
+.lore-list li, .prose ul > li { position: relative; padding-left: 1.3em; }
+.lore-list li::before, .prose ul > li::before { content: '\25C6\FE0E'; position: absolute; left: .1em; top: .1em; font-size: .75em; color: var(--gilt); }
+.lore-list strong, .prose li strong { color: var(--accent); font-weight: 600; }
 .lore-section .lore-list { padding: 10px 12px; background: var(--accent-soft); border-left: 3px solid var(--gilt); border-radius: 2px; }
 .lore-page form { display: grid; gap: 10px; }
 .lore-page textarea { width: 100%; resize: vertical; white-space: pre-wrap; line-height: 1.5; }
@@ -698,11 +708,11 @@ button.linkish { font: inherit; padding: 0; background: none; border: 0; color: 
 .card h3::before { content: '\2767\FE0E'; color: var(--accent-2); margin-right: .4em; font-size: .85em; }
 
 /* Text set directly on the wall: engraved, not printed. */
-.list-head h1, .char-group > h2, .sheet > .hint, .char-group > .hint, .sheet-nav a, .topnav a, footer, footer a, .loading {
+.list-head h1, .char-group > h2, .sheet > .hint, .char-group > .hint, .sheet-nav a, .topnav a, footer, footer a, .loading, .notes-shared {
   color: var(--on-stone); text-shadow: 0 1px 0 rgb(255 255 255 / 25%), 0 0 12px var(--torch);
 }
 @media (prefers-color-scheme: dark) {
-  .list-head h1, .char-group > h2, .sheet > .hint, .char-group > .hint, .sheet-nav a, .topnav a, footer, footer a, .loading { text-shadow: 0 1px 2px rgb(0 0 0 / 80%), 0 0 14px rgb(0 0 0 / 60%); }
+  .list-head h1, .char-group > h2, .sheet > .hint, .char-group > .hint, .sheet-nav a, .topnav a, footer, footer a, .loading, .notes-shared { text-shadow: 0 1px 2px rgb(0 0 0 / 80%), 0 0 14px rgb(0 0 0 / 60%); }
 }
 .list-head h1 { font-size: clamp(1.8rem, 4vw, 2.6rem); }
 .char-group > h2 { font-family: 'IM Fell English SC', Cinzel, serif; font-weight: 400; font-size: 1.25rem; letter-spacing: .06em; }
@@ -1378,3 +1388,68 @@ kbd { font-family: inherit; font-size: .8em; padding: 0 5px; border-radius: 3px;
   .map-frame { height: 65vh; }
   .map-side { position: static; }
 }
+
+/* ---------- Reading ----------
+   .prose is the shared reading column (note bodies, lore chapters): larger type, generous leading, a
+   measure that stops short of eye-strain, and the lore page's diamond lists (above, with .lore-list).
+   .card.reading quietens the parchment behind long text so the letters, not the texture, carry contrast. */
+:root { --read-wash: rgb(251 248 241 / 84%); }
+@media (prefers-color-scheme: dark) { :root { --read-wash: rgb(40 30 21 / 74%); } }
+.card.reading { background: linear-gradient(var(--read-wash), var(--read-wash)), var(--card-tex) 0 0 / 512px 512px repeat, var(--card); }
+.prose { font-size: 1.07rem; line-height: 1.65; max-width: 68ch; color: var(--ink); }
+.prose > :first-child { margin-top: 0; }
+.prose > :last-child { margin-bottom: 0; }
+.prose p, .prose ol, .prose blockquote { margin: 0 0 .9em; }
+.prose ol { padding-left: 1.5em; display: grid; gap: 5px; }
+.prose h2 { font: 400 1.4rem 'IM Fell English SC', Cinzel, Georgia, serif; color: var(--heading); margin: 0 0 .5em; }
+.card .prose :is(h3, h4, h5) {
+  font: 400 1.2rem 'IM Fell English SC', Cinzel, Georgia, serif; letter-spacing: .02em; text-transform: none;
+  color: var(--heading); margin: 1.3em 0 .4em;
+}
+.card .prose :is(h4, h5) { font-size: 1.05rem; }
+.card .prose h3::before { display: none; }
+.prose blockquote { padding: 4px 14px; border-left: 3px solid var(--gilt); background: var(--accent-soft); font-style: italic; }
+.prose hr { border: 0; height: 14px; background: var(--rule) center / 100% 14px no-repeat; margin: 1.2em 0; }
+.prose code { font-size: .9em; background: var(--bg-2); padding: 0 4px; border-radius: 2px; }
+
+/* ---------- Notes page: header, campaign dashboard, small screens ---------- */
+.notes-head { align-items: flex-end; }
+.notes-head h1 { line-height: 1.1; }
+.notes-campaign { font-size: .62em; letter-spacing: .04em; }
+.notes-shared { margin: 4px 0 0; font-size: .95rem; font-style: italic; }
+.notes-page small { font-size: .85em; }
+.notes-page .hint { font-size: .92rem; }
+.notes-none { max-width: 640px; }
+.notes-empty .row-form { flex-wrap: wrap; margin-top: 4px; }
+.notes-empty .btn { display: inline-flex; align-items: center; gap: 6px; }
+
+.notes-dash { display: grid; gap: 22px; }
+.notes-dash h2 { font: 400 1.25rem 'IM Fell English SC', Cinzel, Georgia, serif; letter-spacing: .03em; color: var(--heading); margin: 0 0 8px; }
+.dash-quests { padding: 12px 16px; border-left: 3px solid var(--kind); background: var(--accent-soft); border-radius: 2px; }
+.dash-quests ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.dash-quests li { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 12px; font-size: 1.08rem; }
+.dash-facts { color: var(--muted); font-size: .9rem; }
+.dash-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; }
+.dash-card { border: 1px solid var(--line); border-top: 3px solid var(--kind); border-radius: 3px; padding: 8px 10px 10px; background: rgb(255 255 255 / 22%); min-width: 0; }
+@media (prefers-color-scheme: dark) { .dash-card { background: rgb(0 0 0 / 14%); } }
+.dash-card.empty { border-top-color: var(--line); }
+.dash-card.empty .dash-card-title { color: var(--muted); }
+.dash-card header { display: flex; align-items: center; gap: 4px; margin-bottom: 6px; }
+.dash-card-title {
+  flex: 1; min-width: 0; display: flex; align-items: center; gap: 7px; padding: 0; background: none; border: 0; text-align: left;
+  font: 400 1.08rem 'IM Fell English SC', Cinzel, Georgia, serif; letter-spacing: .03em; color: var(--heading);
+}
+.dash-card-title:disabled { opacity: 1; cursor: default; }
+.dash-card-title:not(:disabled):hover { text-decoration: underline; text-decoration-color: var(--gilt); }
+.dash-card .count { margin-left: auto; color: var(--muted); font: .85rem 'EB Garamond', Georgia, serif; }
+.dash-card .icon-btn { font-size: 1.15rem; color: var(--accent); }
+.dash-card ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.dash-card li { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dash-card .hint { margin: 0; }
+button.linkish.more { color: var(--muted); font-size: .9rem; }
+.dash-recent ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 22px; }
+.dash-recent li { display: flex; align-items: baseline; gap: 6px; }
+.dash-recent small { color: var(--muted); }
+
+/* On a phone the index and the note can't sit side by side: an open note takes the screen, the crumbs lead back. */
+@media (max-width: 760px) { .notes-layout.has-note .notes-side { display: none; } }

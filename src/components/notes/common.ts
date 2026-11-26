@@ -1,17 +1,10 @@
-import { NOTE_FIELDS, type Note, type NoteKind, type NoteRef } from '../../shared/types';
-
-/** "k:3" = campaign 3, "c:1" = character 1, "" = everything. */
-export type Owner = string;
-export const ownerOf = (n: Pick<Note, 'campaignId' | 'characterId'>): Owner => (n.campaignId ? `k:${n.campaignId}` : `c:${n.characterId}`);
-export const ownerBody = (o: Owner) =>
-  o.startsWith('k:') ? { campaignId: Number(o.slice(2)), characterId: null } : { campaignId: null, characterId: Number(o.slice(2)) };
+import { NOTE_FIELDS, NOTE_KIND_LABELS, type Note, type NoteKind, type NoteRef } from '../../shared/types';
 
 /** The editable copy of a note. Aliases and tags are edited as comma-separated text. */
 export interface Draft {
   title: string;
   body: string;
   kind: NoteKind;
-  owner: Owner;
   aliases: string;
   tags: string;
   fields: Record<string, string>;
@@ -20,7 +13,6 @@ export const toDraft = (n: Note): Draft => ({
   title: n.title,
   body: n.body,
   kind: n.kind,
-  owner: ownerOf(n),
   aliases: n.aliases.join(', '),
   tags: n.tags.join(', '),
   fields: n.fields,
@@ -35,7 +27,6 @@ export const draftBody = (d: Draft) => ({
   aliases: list(d.aliases),
   tags: list(d.tags),
   fields: kindFields(d),
-  ...ownerBody(d.owner),
 });
 export const sameDraft = (a: Draft, b: Draft) => JSON.stringify(draftBody(a)) === JSON.stringify(draftBody(b));
 
@@ -59,6 +50,16 @@ export function sortForKind(kind: NoteKind, xs: NoteRef[]): NoteRef[] {
 }
 
 /** A short line of the note's most telling fields, for list rows and link previews. */
+/** "NPCs" → "NPC", "Notes" → "note" (lower). */
+export const kindName = (k: NoteKind, lower = false) => {
+  const s = NOTE_KIND_LABELS[k].replace(/s$/, '');
+  return lower && k !== 'npc' ? s.toLowerCase() : s;
+};
+
+/** Plain text of a note body for snippets: links show their label, markdown marks are dropped. */
+export const plainText = (body: string) =>
+  body.replace(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g, (_, t, l) => l ?? t).replace(/[#*_>`]/g, '').replace(/\s+/g, ' ').trim();
+
 export const factLine = (r: Pick<NoteRef, 'kind' | 'fields'>, max = 3) =>
   NOTE_FIELDS[r.kind]
     .filter((f) => r.fields[f.key])

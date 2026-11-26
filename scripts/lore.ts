@@ -26,14 +26,14 @@ export function defaultDbPath(env: NodeJS.ProcessEnv = process.env, platform: No
   return join(appData, 'adventurers-journal', 'dnd.sqlite');
 }
 
-/** What the interview is grounded in: the derived sheet, gear, the character's notes and any existing lore. */
+/** What the interview is grounded in: the derived sheet, gear, their campaign's notes and any existing lore. */
 function brief(db: Db, id: number) {
   const dto = getCharacter(db, id);
   const c = deriveCharacter(db, id);
   const choices = ((Array.isArray(dto.sheet) ? dto.sheet[0] : dto.sheet) as { userChoices?: { type: string; subrace?: string }[] })?.userChoices ?? [];
   const notes = db
-    .query('SELECT kind, title, body FROM notes WHERE character_id = ? ORDER BY updated_at DESC LIMIT 30')
-    .all(id) as { kind: string; title: string; body: string }[];
+    .query('SELECT kind, title, body FROM notes WHERE campaign_id = ? ORDER BY updated_at DESC LIMIT 30')
+    .all(dto.campaignId ?? -1) as { kind: string; title: string; body: string }[];
   return {
     id,
     name: c.name,
