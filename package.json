@@ -14,6 +14,7 @@
     "check": "tsc -p tsconfig.json && tsc -p tsconfig.server.json && bun test && bun build scripts/node-smoke.ts --target=node --format=esm --outdir dist-electron && ELECTRON_RUN_AS_NODE=1 electron dist-electron/node-smoke.js",
     "dist": "bun scripts/dist.ts",
     "install:linux": "bun scripts/install-linux.ts",
+    "install:mac": "bun scripts/install-mac.ts",
     "lore": "bun scripts/lore.ts"
   },
   "devDependencies": {
