@@ -1474,25 +1474,26 @@ button.linkish.more { color: var(--muted); font-size: .9rem; }
 /* On a phone the index and the note can't sit side by side: an open note takes the screen, the crumbs lead back. */
 @media (max-width: 760px) { .notes-layout.has-note .notes-side { display: none; } }
 
-/* Note images: beside the title and facts; people get a round framed portrait, the rest keep their shape. */
+/* Note images: beside the title and facts; people get a round framed portrait, the rest keep their shape.
+   is-portrait, not portrait: .portrait is the character sheet's 148px framed circle and would wrap the figure in a second frame. */
 .note-read.has-image { grid-template-columns: minmax(0, 1fr) auto; column-gap: 18px; }
 .note-read.has-image > * { grid-column: 1 / -1; }
 .note-read.has-image > :is(.note-read-head, .note-facts) { grid-column: 1; }
 .note-read.has-image > .note-image { grid-column: 2; grid-row-start: 1; }
 .note-image { margin: 0; align-self: start; }
 .note-image img { display: block; }
-.note-image.portrait img {
+.note-image.is-portrait img {
   width: 132px; height: 132px; object-fit: cover; border-radius: 50%;
   border: 3px solid var(--card); box-shadow: 0 0 0 2px var(--gilt), 0 0 0 4px var(--kind), 0 4px 12px rgb(0 0 0 / 30%);
 }
-.note-image.picture img { max-width: min(260px, 40vw); max-height: 220px; border-radius: 3px; border: 1px solid var(--line); box-shadow: 0 0 0 3px var(--card), 0 0 0 4px var(--gilt), 0 4px 12px rgb(0 0 0 / 25%); }
+.note-image.is-picture img { max-width: min(260px, 40vw); max-height: 220px; border-radius: 3px; border: 1px solid var(--line); box-shadow: 0 0 0 3px var(--card), 0 0 0 4px var(--gilt), 0 4px 12px rgb(0 0 0 / 25%); }
 @media (max-width: 560px) {
   .note-read.has-image { grid-template-columns: 1fr; }
   .note-read.has-image > .note-image { grid-column: 1; grid-row: auto !important; justify-self: center; }
 }
 .note-image-edit { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .note-image-edit img { width: 56px; height: 56px; object-fit: cover; border: 1px solid var(--line); }
-.note-image-edit img.portrait { border-radius: 50%; }
-.note-image-edit img.picture { border-radius: 3px; }
+.note-image-edit img.is-portrait { border-radius: 50%; }
+.note-image-edit img.is-picture { border-radius: 3px; }
 .note-image-edit label.btn { cursor: pointer; }
 .note-image-edit label.btn.busy { opacity: .6; cursor: progress; }
