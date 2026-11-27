@@ -62,12 +62,13 @@ export const isPortraitKind = (k: NoteKind) => k === 'player' || k === 'npc';
 const SETTLEMENTS = ['city', 'town', 'village'];
 
 /**
- * The stand-in picture for a note without its own (public/fallbacks). Places get a town or a landmark by their type.
- * Players get none: they're real people.
+ * The stand-in picture for a note without its own (public/fallbacks). A city, town or village gets its own
+ * picture; any other place gets a landmark. Players get none: they're real people.
  */
 export const fallbackImage = (r: Pick<NoteRef, 'kind' | 'fields'>): string | null => {
   if (r.kind === 'player') return null;
-  if (r.kind === 'place') return `/fallbacks/place-${SETTLEMENTS.includes(r.fields.type ?? '') ? 'city' : 'landmark'}.png`;
+  const t = r.fields.type ?? '';
+  if (r.kind === 'place') return `/fallbacks/place-${SETTLEMENTS.includes(t) ? t : 'landmark'}.png`;
   return `/fallbacks/${r.kind}.png`;
 };
 
