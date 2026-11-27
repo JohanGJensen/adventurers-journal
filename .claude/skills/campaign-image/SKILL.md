@@ -40,7 +40,8 @@ Job file (write it to the session scratchpad, never the repo):
   (1216×816). Override with `width`/`height` (rounded to multiples of 16).
 - `draft: true` renders at half size for speed. Leave it out for the final.
 - `model`: `klein` (default). `dev` only if `doctor` shows it downloaded and the user asks for a hero render.
-- `seed`: leave it out for a random one. Reuse the draft's seed for the final, so the picture stays the same.
+- `seed`: leave it out for a random one. Reuse the draft's seed for the final: it keeps the same subject,
+  palette and layout, but details change with the size (pose, feet, small props). Check the final too.
 - Output: `~/Pictures/Adventurers Journal/<campaign>/<kind>-<title>-<seed>[-draft].png`, plus a `.json`
   sidecar next to it. `output` sets an exact path instead.
 
