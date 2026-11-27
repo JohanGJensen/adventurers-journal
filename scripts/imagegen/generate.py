@@ -9,6 +9,7 @@
 #   "huggingface_hub>=0.34",
 #   "safetensors",
 #   "pillow",
+#   "torchvision",
 #   "psutil",
 # ]
 # ///
@@ -217,37 +218,56 @@ def render_klein(job: dict, device: str, dtype, gen):
 
 def render_dev(job: dict, device: str, dtype, gen):
     """[dev] is a 4-bit 24B text encoder plus a 4-bit 32B transformer: together more than system RAM,
-    each more than 8 GB of VRAM. Encode the prompt first and free the encoder, then run the transformer
-    with layer-by-layer (leaf-level) offloading, streamed so copies overlap with compute."""
+    each more than 8 GB of VRAM, and bitsandbytes would load 4-bit weights straight onto the GPU.
+    So load both into system RAM (device_map="cpu"): encode the prompt on the CPU and free the
+    encoder, then stream the transformer to the GPU layer by layer (leaf-level group offloading)."""
     import torch
     from diffusers.hooks import apply_group_offloading
 
     cls, repo = pipeline_class("dev"), MODELS["dev"]["repo"]
-    offload = dict(onload_device=device, offload_type="leaf_level", use_stream=True, low_cpu_mem_usage=True)
+    offload = dict(onload_device=device, offload_type="leaf_level", low_cpu_mem_usage=True)
 
-    log("dev: encoding the prompt ...")
-    enc = cls.from_pretrained(repo, transformer=None, vae=None, torch_dtype=dtype)
-    apply_group_offloading(enc.text_encoder, **offload)
+    log("dev: encoding the prompt on the CPU (a few minutes) ...")
+    enc = cls.from_pretrained(repo, transformer=None, vae=None, torch_dtype=dtype, device_map="cpu")
     with torch.no_grad():
-        out = enc.encode_prompt(prompt=job["fullPrompt"], device=device)
+        out = enc.encode_prompt(prompt=job["fullPrompt"], device="cpu")
     prompt_embeds = (out[0] if isinstance(out, tuple) else out).to("cpu")
     del enc, out
     free_vram()
 
-    log("dev: denoising ...")
-    pipe = cls.from_pretrained(repo, text_encoder=None, torch_dtype=dtype)
-    apply_group_offloading(pipe.transformer, **offload)
-    pipe.vae.to(device)
-    if hasattr(pipe.vae, "enable_tiling"):
-        pipe.vae.enable_tiling()
-    return pipe(
-        prompt_embeds=prompt_embeds.to(device),
-        width=job["width"],
-        height=job["height"],
-        num_inference_steps=job["steps"],
-        guidance_scale=job["guidance"],
-        generator=gen,
-    ).images[0]
+    from diffusers import Flux2Transformer2DModel
+
+    # Streamed offloading overlaps copies with compute, but once in the spike it returned an all-black
+    # image. Check the result, and fall back to plain (slower) offloading once before giving up.
+    for use_stream in (True, False):
+        log(f"dev: denoising{'' if use_stream else ' again without streaming'} ...")
+        transformer = Flux2Transformer2DModel.from_pretrained(
+            repo, subfolder="transformer", torch_dtype=dtype, device_map="cpu"
+        )
+        apply_group_offloading(transformer, use_stream=use_stream, **offload)
+        pipe = cls.from_pretrained(repo, text_encoder=None, transformer=transformer, torch_dtype=dtype)
+        pipe.vae.to(device)
+        if hasattr(pipe.vae, "enable_tiling"):
+            pipe.vae.enable_tiling()
+        image = pipe(
+            prompt_embeds=prompt_embeds.to(device),
+            width=job["width"],
+            height=job["height"],
+            num_inference_steps=job["steps"],
+            guidance_scale=job["guidance"],
+            generator=torch.Generator(device="cpu").manual_seed(job["seed"]),
+        ).images[0]
+        if not is_blank(image):
+            return image
+        log("dev: the image came out blank")
+        del pipe, transformer
+        free_vram()
+    raise SystemExit("dev: blank image twice; try klein, or another seed")
+
+
+def is_blank(image) -> bool:
+    lo, hi = image.convert("L").getextrema()
+    return hi - lo < 8
 
 
 def render(job: dict) -> dict:

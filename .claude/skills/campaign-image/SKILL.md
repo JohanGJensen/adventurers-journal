@@ -92,7 +92,12 @@ their campaign). See `/campaign-note` for the rest. Don't use `write` from this 
    with the same seed for a small change.
 
 9. **Final:** render the approved prompt and seed without `draft`. If the user wants a [dev] hero render
-   and `doctor` lists it as downloaded, warn that it takes many minutes, then run it in the background.
+   and `doctor` lists it as downloaded:
+   - Say it takes about 7 minutes and uses about 20 GB of RAM, so other heavy apps should be closed.
+   - Run it in the background with `run_in_background`, and wait for the notification.
+   - [dev] is a different model, so the same seed gives a different picture from the klein draft. Treat it
+     as another take, not an upscale.
+   - If it exits with "blank image twice", offer another seed or the klein final.
 
 10. **Hand over:** give the PNG's full path and how to attach it:
     - a note: open it in Notes → Edit → image;

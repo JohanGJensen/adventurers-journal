@@ -8,7 +8,7 @@ items, lore scenes) on this machine with FLUX.2. You then attach them to notes o
 | Topic | Decision |
 |---|---|
 | Where it runs | Locally on the Linux desktop first (NVIDIA RTX 3070, 8 GB VRAM, 31 GB RAM, CUDA). An MPS backend for the Mac can be added later behind the same job file. No hosted API, no cost per image. |
-| Model | Configurable. **FLUX.2 [klein] 4B** by default, for drafts and finals. **FLUX.2 [dev]** is an opt-in "hero" mode, kept only if the spike shows it runs acceptably on 8 GB. |
+| Model | Configurable. **FLUX.2 [klein] 4B** by default, for drafts and finals (~15 s per image). **FLUX.2 [dev]** is an opt-in "hero" mode (~6.5 min per image). |
 | Output | Image files on disk. The skill never writes to the journal database. You import images by hand. |
 | Style | Painterly realism: realistic light and anatomy with an oil-painting finish, to match the tome look and the painted medallions. |
 
@@ -73,8 +73,12 @@ uv run scripts/imagegen/generate.py job.json
 The style preamble lives in one place so every image in a campaign looks alike. A campaign can override it later.
 Draft preamble:
 
-> Painterly realism, oil on canvas, realistic anatomy and natural lighting, muted earthy palette, fine brushwork,
-> high-fantasy setting. No text, letters, watermarks or frames.
+> Digital painting in a painterly realist style with an oil-paint finish, realistic anatomy and natural lighting,
+> muted earthy palette, fine brushwork, high-fantasy setting. Clean image with no signature, text, letters,
+> watermarks or frames.
+
+The first draft ("Painterly realism, oil on canvas, …") made both models paint a fake artist's signature in a
+bottom corner on most seeds. The wording above brings that down to about 1 seed in 4; the skill checks the corners.
 
 FLUX.2 has no negative prompt, so the preamble states exclusions as plain statements ("no text").
 
@@ -136,18 +140,33 @@ account with its licence accepted. That's fine for personal campaign art; don't 
 **Disk:** klein is about 16 GB in `~/.cache/huggingface`; [dev] as GGUF adds roughly 20 to 35 GB. `doctor` warns if
 there isn't enough free space.
 
+## Spike results (2026-11-27, RTX 3070 8 GB, 31 GB RAM, diffusers 0.43, torch 2.15 + CUDA 13.2)
+
+| Model | How it runs | 1024² time | Peak VRAM | Peak RAM |
+|---|---|---|---|---|
+| klein 4B, 4 steps | bf16 weights stored as FP8 (layerwise casting), model CPU offload | ~8.5 s render, ~15 s with loading | 4.4 GB | ~24 GB |
+| [dev] bnb 4-bit, 28 steps | text encoder on the CPU (~2.5 min), transformer streamed to the GPU per layer (~8 s/step) | ~6.5 min | 2.6 GB | ~19.5 GB |
+
+- **klein** quality is good for portraits and places. A 512² draft takes about 6 s to render.
+- **[dev]** has more detail and better composition, but costs ~25× the time. bitsandbytes loads 4-bit weights
+  straight onto the GPU, which can't hold either part, hence `device_map="cpu"` and leaf-level group offloading.
+- Weights take ~16 GB (klein) plus ~32 GB ([dev]) in `~/.cache/huggingface`.
+- Downloads from the Hugging Face file CDN failed once on a DNS error; `fetch` now retries and resumes.
+- ComfyUI wasn't needed.
+
 ## Phases
 
 | Phase | What | Done when |
 |---|---|---|
-| 0. Spike | Try the backends above with [dev] and klein. Record time per image, peak memory and quality. | One backend passes; the results are written into this plan. |
-| 1. Generator | `generate.py` with `generate`, `doctor` and `fetch`, plus `style.json`. | A klein 512×512, 4-step smoke render works from a job file and writes the sidecar. |
+| 0. Spike | Try the backends above with [dev] and klein. Record time per image, peak memory and quality. | **Done** (2026-11-27): diffusers on CUDA passes for both. See *Spike results*. |
+| 1. Generator | `generate.py` with `generate`, `doctor` and `fetch`, plus `style.json`. | **Done**: klein 512×512, 4-step smoke render from a job file writes the PNG and sidecar; the same seed gives a byte-identical file. |
 | 2. Skill | `.claude/skills/campaign-image/SKILL.md`. | Run end to end on a real campaign: interview → klein draft → klein final → imported in the app by hand. |
 | 3. Later (optional) | Offer `/campaign-image` as a last step of `/campaign-note`. Add an `--attach <noteId>` that sets the note's image through the server's note code, if importing by hand gets tedious. | — |
 
 ## Open questions and risks
 
-- **[dev] on 8 GB VRAM.** Probably too slow; the spike decides whether the hero mode exists at all.
+- **[dev] reliability.** One of four [dev] runs came out all black, probably a race in streamed offloading.
+  `generate.py` now detects a blank image and reruns without streaming once.
 - **Mac support.** Add an MPS device path (and maybe mflux) when it's needed; the job file stays the same.
 - **Backend choice:** decided by the spike.
 - **Consistency:** keeping one NPC recognisable across several images. FLUX.2 supports reference images, which could
