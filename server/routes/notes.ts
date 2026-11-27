@@ -113,6 +113,30 @@ function campaignFor(db: Db, o: Record<string, unknown>): number {
   return bad('A note needs a campaignId');
 }
 
+/**
+ * Validates and saves a new note: `{ title, campaignId (or characterId), body?, kind?, aliases?, tags?, fields? }`.
+ * Shared by POST /api/notes and `scripts/note.ts`.
+ */
+export function createNote(db: Db, b: unknown): Note {
+  if (!isObj(b)) bad('Body must be { title, campaignId (or characterId), body?, kind?, aliases?, tags?, fields? }');
+  const o = b as Record<string, unknown>;
+  const campaignId = campaignFor(db, o);
+  const title = asText(o.title ?? 'Untitled', 'title', 300).trim() || 'Untitled';
+  const kind = o.kind === undefined ? 'note' : asKind(o.kind);
+  const r = db
+    .query('INSERT INTO notes (campaign_id, kind, title, body, aliases, tags, fields_json) VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING *')
+    .get(
+      campaignId,
+      kind,
+      title,
+      asText(o.body ?? '', 'body', 200_000),
+      asNames(o.aliases ?? [], 'aliases', false).join('\n'),
+      asNames(o.tags ?? [], 'tags', true).join('\n'),
+      JSON.stringify(asFields(o.fields ?? {}, kind)),
+    ) as Row;
+  return withImage(r);
+}
+
 /** Points [[old title]] links in the campaign's other notes at the new title. Leaves updated_at alone: the author didn't edit them. */
 function rewriteLinks(db: Db, n: Note, from: string, to: string) {
   const q = ftsQuery(from);
@@ -210,26 +234,7 @@ export const noteRoutes: Route[] = [
   [
     'POST',
     '/api/notes',
-    async ({ db, req }) => {
-      const b = await body(req);
-      if (!isObj(b)) bad('Body must be { title, campaignId (or characterId), body?, kind?, aliases?, tags?, fields? }');
-      const o = b as Record<string, unknown>;
-      const campaignId = campaignFor(db, o);
-      const title = asText(o.title ?? 'Untitled', 'title', 300).trim() || 'Untitled';
-      const kind = o.kind === undefined ? 'note' : asKind(o.kind);
-      const r = db
-        .query('INSERT INTO notes (campaign_id, kind, title, body, aliases, tags, fields_json) VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING *')
-        .get(
-          campaignId,
-          kind,
-          title,
-          asText(o.body ?? '', 'body', 200_000),
-          asNames(o.aliases ?? [], 'aliases', false).join('\n'),
-          asNames(o.tags ?? [], 'tags', true).join('\n'),
-          JSON.stringify(asFields(o.fields ?? {}, kind)),
-        ) as Row;
-      return json(withImage(r), 201);
-    },
+    async ({ db, req }) => json(createNote(db, await body(req)), 201),
   ],
   ['GET', '/api/notes/:id', ({ db, params }) => json(withImage(getRow(db, intParam(params.id, 'note id'))))],
   [

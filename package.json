@@ -15,7 +15,8 @@
     "dist": "bun scripts/dist.ts",
     "install:linux": "bun scripts/install-linux.ts",
     "install:mac": "bun scripts/install-mac.ts",
-    "lore": "bun scripts/lore.ts"
+    "lore": "bun scripts/lore.ts",
+    "note": "bun scripts/note.ts"
   },
   "devDependencies": {
     "@types/bun": "^1.4.4",
