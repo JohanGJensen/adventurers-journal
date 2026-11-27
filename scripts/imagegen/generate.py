@@ -1,7 +1,7 @@
 # /// script
-# requires-python = ">=3.11,<3.14"
+# requires-python = ">=3.11"
 # dependencies = [
-#   "torch>=2.7",
+#   "torch>=2.9",
 #   "diffusers>=0.37",
 #   "transformers>=4.57",
 #   "accelerate>=1.10",
@@ -171,34 +171,83 @@ def fp8_storage(module, compute_dtype):
     )
 
 
-def load_pipeline(model: str, device: str):
-    import torch
+def pipeline_class(model: str):
     import diffusers
 
     spec = MODELS[model]
     cls = getattr(diffusers, spec["pipeline"], None)
     if cls is None:
         raise SystemExit(f"diffusers {diffusers.__version__} has no {spec['pipeline']}; upgrade diffusers")
-    dtype = torch.bfloat16 if device != "cpu" else torch.float32
-    pipe = cls.from_pretrained(spec["repo"], torch_dtype=dtype)
+    return cls
 
-    if device == "cuda":
-        vram = torch.cuda.get_device_properties(0).total_memory / 2**30
-        if model == "klein" and vram < 20:
-            # 4B transformer + 4B text encoder are ~8 GB each in bf16: store both in FP8 and
-            # only keep the component that is running on the GPU.
-            fp8_storage(pipe.transformer, dtype)
-            fp8_storage(pipe.text_encoder, dtype)
-            pipe.enable_model_cpu_offload()
-        elif model == "dev":
-            pipe.enable_model_cpu_offload()
-        else:
-            pipe.to(device)
-        if hasattr(pipe.vae, "enable_tiling"):
-            pipe.vae.enable_tiling()
-    elif device == "mps":
+
+def free_vram():
+    import gc
+
+    import torch
+
+    gc.collect()
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
+
+
+def render_klein(job: dict, device: str, dtype, gen):
+    import torch
+
+    pipe = pipeline_class("klein").from_pretrained(MODELS["klein"]["repo"], torch_dtype=dtype)
+    if device == "cuda" and torch.cuda.get_device_properties(0).total_memory / 2**30 < 20:
+        # 4B transformer + 4B text encoder are ~8 GB each in bf16: store both in FP8 and
+        # only keep the component that is running on the GPU.
+        fp8_storage(pipe.transformer, dtype)
+        fp8_storage(pipe.text_encoder, dtype)
+        pipe.enable_model_cpu_offload()
+    else:
         pipe.to(device)
-    return pipe
+    if hasattr(pipe.vae, "enable_tiling"):
+        pipe.vae.enable_tiling()
+    return pipe(
+        prompt=job["fullPrompt"],
+        width=job["width"],
+        height=job["height"],
+        num_inference_steps=job["steps"],
+        guidance_scale=job["guidance"],
+        generator=gen,
+    ).images[0]
+
+
+def render_dev(job: dict, device: str, dtype, gen):
+    """[dev] is a 4-bit 24B text encoder plus a 4-bit 32B transformer: together more than system RAM,
+    each more than 8 GB of VRAM. Encode the prompt first and free the encoder, then run the transformer
+    with layer-by-layer (leaf-level) offloading, streamed so copies overlap with compute."""
+    import torch
+    from diffusers.hooks import apply_group_offloading
+
+    cls, repo = pipeline_class("dev"), MODELS["dev"]["repo"]
+    offload = dict(onload_device=device, offload_type="leaf_level", use_stream=True, low_cpu_mem_usage=True)
+
+    log("dev: encoding the prompt ...")
+    enc = cls.from_pretrained(repo, transformer=None, vae=None, torch_dtype=dtype)
+    apply_group_offloading(enc.text_encoder, **offload)
+    with torch.no_grad():
+        out = enc.encode_prompt(prompt=job["fullPrompt"], device=device)
+    prompt_embeds = (out[0] if isinstance(out, tuple) else out).to("cpu")
+    del enc, out
+    free_vram()
+
+    log("dev: denoising ...")
+    pipe = cls.from_pretrained(repo, text_encoder=None, torch_dtype=dtype)
+    apply_group_offloading(pipe.transformer, **offload)
+    pipe.vae.to(device)
+    if hasattr(pipe.vae, "enable_tiling"):
+        pipe.vae.enable_tiling()
+    return pipe(
+        prompt_embeds=prompt_embeds.to(device),
+        width=job["width"],
+        height=job["height"],
+        num_inference_steps=job["steps"],
+        guidance_scale=job["guidance"],
+        generator=gen,
+    ).images[0]
 
 
 def render(job: dict) -> dict:
@@ -207,22 +256,11 @@ def render(job: dict) -> dict:
     device = pick_device()
     if device == "cpu":
         raise SystemExit("no GPU found (CUDA or MPS); refusing to render on the CPU")
-    t0 = time.time()
-    pipe = load_pipeline(job["model"], device)
-    t_load = time.time() - t0
     if device == "cuda":
         torch.cuda.reset_peak_memory_stats()
-
     gen = torch.Generator(device="cpu").manual_seed(job["seed"])
     t1 = time.time()
-    image = pipe(
-        prompt=job["fullPrompt"],
-        width=job["width"],
-        height=job["height"],
-        num_inference_steps=job["steps"],
-        guidance_scale=job["guidance"],
-        generator=gen,
-    ).images[0]
+    image = (render_dev if job["model"] == "dev" else render_klein)(job, device, torch.bfloat16, gen)
     t_render = time.time() - t1
 
     out = Path(job["output"])
@@ -237,8 +275,7 @@ def render(job: dict) -> dict:
         "device": device,
         "gpu": torch.cuda.get_device_name(0) if device == "cuda" else device,
         "peakVramGb": round(torch.cuda.max_memory_allocated() / 2**30, 2) if device == "cuda" else None,
-        "loadSeconds": round(t_load, 1),
-        "renderSeconds": round(t_render, 1),
+        "seconds": round(t_render, 1),
         "diffusers": diffusers.__version__,
         "torch": torch.__version__,
         "createdAt": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
@@ -307,7 +344,16 @@ def fetch(model: str):
 
     spec = MODELS[model]
     log(f"downloading {spec['repo']} (~{spec['size_gb']} GB, {spec['licence']}) ...")
-    path = snapshot_download(spec["repo"], allow_patterns=spec["allow"])
+    # Big downloads hit transient DNS/CDN errors; finished files are kept, so retrying resumes.
+    for attempt in range(1, 6):
+        try:
+            path = snapshot_download(spec["repo"], allow_patterns=spec["allow"])
+            break
+        except Exception as e:  # noqa: BLE001
+            if attempt == 5:
+                raise SystemExit(f"download failed after {attempt} attempts: {e}")
+            log(f"attempt {attempt} failed ({str(e)[:160]}); retrying in {15 * attempt}s")
+            time.sleep(15 * attempt)
     log(f"done: {path}")
 
 

@@ -20,7 +20,7 @@ A self-contained `uv run` script (its Python dependencies are inline). Run it fr
 |---|---|
 | `doctor [--json]` | Checks uv, GPU, diffusers, RAM, disk and which models are downloaded. Exit 0 means ready |
 | `fetch klein` / `fetch dev` | Downloads the weights into `~/.cache/huggingface` (klein ≈ 16 GB) |
-| `generate <job.json> [--dry-run]` | Renders a job; prints the sidecar JSON (seed, size, timings, output path) |
+| `generate <job.json> [--dry-run]` | Renders a job; prints the sidecar JSON (seed, size, `seconds`, output path). `--dry-run` prints the resolved job, including the full prompt |
 
 Job file (write it to the session scratchpad, never the repo):
 
@@ -81,11 +81,15 @@ their campaign). See `/campaign-note` for the rest. Don't use `write` from this 
 
 6. **Show the prompt** and the settings (kind, size, model) and ask for approval or changes.
 
-7. **Draft:** run `generate` with `"draft": true`. Show the result by reading the PNG with the Read tool, and
-   report the seed and render time from the output.
+7. **Draft:** render 3 drafts at once (`"draft": true`, no `seed`, one job file each). klein takes about
+   10 to 15 seconds per image on this machine, most of it loading. Show each PNG by reading it with the Read
+   tool, with its seed, and let the user pick.
+   - **Check the corners.** Painterly images sometimes get a fake artist's signature in a bottom corner, in
+     roughly 1 out of 4 seeds. Point it out and prefer a clean seed.
+   - Also check hands, extra limbs and anything the user asked for that's missing.
 
 8. **Iterate** until the user is happy: a new seed (drop `seed`) for a different take, or a tweaked prompt
-   with the same seed for a small change. Offer 2 to 3 seeds at once if the first draft misses.
+   with the same seed for a small change.
 
 9. **Final:** render the approved prompt and seed without `draft`. If the user wants a [dev] hero render
    and `doctor` lists it as downloaded, warn that it takes many minutes, then run it in the background.
