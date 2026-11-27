@@ -7,8 +7,8 @@ items, lore scenes) on this machine with FLUX.2. You then attach them to notes o
 
 | Topic | Decision |
 |---|---|
-| Where it runs | Locally on the Mac (Apple Silicon, 36 GB). No hosted API, no cost per image. |
-| Model | Configurable. **FLUX.2 [dev]** by default for final images, **FLUX.2 [klein]** as a fast draft mode. |
+| Where it runs | Locally on the Linux desktop first (NVIDIA RTX 3070, 8 GB VRAM, 31 GB RAM, CUDA). An MPS backend for the Mac can be added later behind the same job file. No hosted API, no cost per image. |
+| Model | Configurable. **FLUX.2 [klein] 4B** by default, for drafts and finals. **FLUX.2 [dev]** is an opt-in "hero" mode, kept only if the spike shows it runs acceptably on 8 GB. |
 | Output | Image files on disk. The skill never writes to the journal database. You import images by hand. |
 | Style | Painterly realism: realistic light and anatomy with an oil-painting finish, to match the tome look and the painted medallions. |
 
@@ -81,7 +81,7 @@ FLUX.2 has no negative prompt, so the preamble states exclusions as plain statem
 ### `.claude/skills/campaign-image/SKILL.md`
 
 1. **Check the runtime:** run `generate.py doctor`. If it isn't ready, stop and show the fix (install `uv`,
-   `hf auth login`, accept the licence, `fetch`).
+   `fetch`; for [dev] also `hf auth login` and accepting its licence).
 2. **Pick the character** with `note.ts list`. The images belong to that character's campaign.
 3. **Read the campaign** with `note.ts show <id>`.
 4. **Interview briefly** with AskUserQuestion, 1 or 2 rounds:
@@ -92,8 +92,9 @@ FLUX.2 has no negative prompt, so the preamble states exclusions as plain statem
 5. **Build the prompt** from the style preamble, the note's fields (role, race, attitude, location…) and body, and
    the answers. Keep game numbers and rules out. Use they/them unless the note gives pronouns.
 6. **Show the prompt** and settings for approval.
-7. **Draft with klein** (fast). Show the result by reading the PNG.
-8. **Iterate:** new seed, tweak the prompt, or render the approved prompt with [dev] for the final.
+7. **Draft with klein** at a small size (fast). Show the result by reading the PNG.
+8. **Iterate:** new seed, tweak the prompt, then render the approved prompt and seed at full size with klein.
+   Offer a [dev] hero render only when `doctor` says [dev] is available.
 9. **Hand over:** the file path, and how to attach it (open the note → Edit → image, or the portrait upload on the
    sheet).
 
@@ -102,25 +103,37 @@ never get committed.
 
 ## Model and runtime (the risky part)
 
-FLUX.2 [dev] is a 32B model with a large Mistral text encoder. In bf16 it needs far more than 36 GB, so on this Mac it
-only runs with quantized weights (for example a GGUF Q4/Q5 transformer and a 4-bit text encoder), and it will take
-**minutes per image** on Apple's GPU (MPS). FLUX.2 [klein] is much smaller and faster, which makes it the draft model.
+The target is an RTX 3070 with **8 GB of VRAM** (Ampere, so no native FP8 maths) and 31 GB of system RAM.
+
+**FLUX.2 [klein] 4B** (`black-forest-labs/FLUX.2-klein-4B`, diffusers `Flux2KleinPipeline`) is a 4B transformer
+plus a Qwen3-4B text encoder, about 8 GB each in bf16. Neither fits next to the other in 8 GB, and the transformer
+alone barely fits, so the generator has to shrink or move them:
+
+- the text encoder runs once per prompt, so it can sit in system RAM or be offloaded with
+  `enable_model_cpu_offload`;
+- the transformer can be stored in FP8 (`enable_layerwise_casting`, computing in bf16) or quantized to 4-bit.
+
+It is distilled for few steps, so it is the draft *and* default final model.
+
+**FLUX.2 [dev]** is a 32B model with a 24B Mistral text encoder. On 8 GB it only runs as a GGUF Q4 transformer with
+heavy CPU offload, which is likely many minutes per image if it works at all. It stays optional.
 
 The backend is decided by a spike (phase 0), trying these in order:
 
-1. **diffusers on MPS** with a GGUF-quantized transformer: the least moving parts, all in one Python script.
+1. **diffusers on CUDA** with offload and FP8/4-bit storage: the least moving parts, all in one Python script.
 2. **Headless ComfyUI** driven over its local HTTP API: the widest FLUX.2 and GGUF support, but a second app to install
    and run.
-3. **An MLX port (for example mflux)** if it supports FLUX.2: likely the fastest on Apple Silicon.
 
-To pass, a backend must render a 1024×1024 [dev] image in under about 10 minutes without heavy swapping, and render
-klein in under about 1 minute. `generate.py` keeps the same job-file interface whichever backend wins.
+(An MLX port such as mflux only matters for the Mac and is left for a later MPS backend.)
 
-**Licence:** FLUX.2 [dev] weights are open but under a **non-commercial** licence. That's fine for personal campaign
-art; don't sell the images or use them commercially. The 4B FLUX.2 [klein] is Apache-2.0; check the licence of
-whichever klein size we use. Both need a Hugging Face account. [dev] needs its licence accepted on the model page.
+To pass, klein must render 1024×1024 in under about 1 minute. [dev] is kept only if it renders 1024×1024 in under
+about 10 minutes without heavy swapping. `generate.py` keeps the same job-file interface whichever backend wins.
 
-**Disk:** expect roughly 20 to 35 GB of weights in `~/.cache/huggingface` (or ComfyUI's `models/`). `doctor` warns if
+**Licence:** FLUX.2 [klein] **4B** is Apache-2.0 and not gated, so it needs no Hugging Face login. (The 9B klein is
+non-commercial; we use 4B.) FLUX.2 [dev] is under a **non-commercial** licence and gated: it needs a Hugging Face
+account with its licence accepted. That's fine for personal campaign art; don't sell [dev] images.
+
+**Disk:** klein is about 16 GB in `~/.cache/huggingface`; [dev] as GGUF adds roughly 20 to 35 GB. `doctor` warns if
 there isn't enough free space.
 
 ## Phases
@@ -129,13 +142,13 @@ there isn't enough free space.
 |---|---|---|
 | 0. Spike | Try the backends above with [dev] and klein. Record time per image, peak memory and quality. | One backend passes; the results are written into this plan. |
 | 1. Generator | `generate.py` with `generate`, `doctor` and `fetch`, plus `style.json`. | A klein 512×512, 4-step smoke render works from a job file and writes the sidecar. |
-| 2. Skill | `.claude/skills/campaign-image/SKILL.md`. | Run end to end on a real campaign: interview → klein draft → [dev] final → imported in the app by hand. |
+| 2. Skill | `.claude/skills/campaign-image/SKILL.md`. | Run end to end on a real campaign: interview → klein draft → klein final → imported in the app by hand. |
 | 3. Later (optional) | Offer `/campaign-image` as a last step of `/campaign-note`. Add an `--attach <noteId>` that sets the note's image through the server's note code, if importing by hand gets tedious. | — |
 
 ## Open questions and risks
 
-- **Speed and memory of [dev] on 36 GB.** If it's too slow or swaps, make klein (the larger variant) the default and
-  keep [dev] for occasional hero images.
+- **[dev] on 8 GB VRAM.** Probably too slow; the spike decides whether the hero mode exists at all.
+- **Mac support.** Add an MPS device path (and maybe mflux) when it's needed; the job file stays the same.
 - **Backend choice:** decided by the spike.
 - **Consistency:** keeping one NPC recognisable across several images. FLUX.2 supports reference images, which could
   be a later phase.
