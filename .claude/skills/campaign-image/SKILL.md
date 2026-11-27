@@ -78,12 +78,18 @@ their campaign). See `/campaign-note` for the rest. Don't use `write` from this 
    - Leave out game numbers, rules and stat blocks.
    - FLUX.2 has no negative prompt: state exclusions plainly ("no text"), or leave them to the preamble.
    - Pronouns: the note's or the user's. Otherwise they/them; never guess from a name.
+   - **Spell out body and clothing.** klein drifts towards a default look: "androgynous" alone gave nine
+     feminine drafts with open necklines. Concrete wording worked: "angular jaw", "lean, narrow-shouldered
+     build with a completely flat chest", "coat buttoned closed all the way up to a high stiff collar".
 
 6. **Show the prompt** and the settings (kind, size, model) and ask for approval or changes.
 
 7. **Draft:** render 3 drafts at once (`"draft": true`, no `seed`, one job file each). klein takes about
-   10 to 15 seconds per image on this machine, most of it loading. Show each PNG by reading it with the Read
-   tool, with its seed, and let the user pick.
+   10 to 15 seconds per image on this machine, most of it loading.
+   - **The user can't see images you Read.** Paste the drafts side by side, each labelled with a number and
+     its seed, into one contact sheet in the scratchpad (Pillow via `uv run --with pillow`). Open it for them
+     with `xdg-open` (`open` on macOS). Also Read it yourself, so you can comment on it.
+   - Number drafts across rounds (4, 5, 6 for the second round…) so the user can refer back to them.
    - **Check the corners.** Painterly images sometimes get a fake artist's signature in a bottom corner, in
      roughly 1 out of 4 seeds. Point it out and prefer a clean seed.
    - Also check hands, extra limbs and anything the user asked for that's missing.
