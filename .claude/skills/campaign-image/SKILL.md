@@ -79,6 +79,10 @@ their campaign). See `/campaign-note` for the rest. Don't use `write` from this 
    - Leave out game numbers, rules and stat blocks.
    - FLUX.2 has no negative prompt: state exclusions plainly ("no text"), or leave them to the preamble.
    - Pronouns: the note's or the user's. Otherwise they/them; never guess from a name.
+   - **Spell out the pose and keep limbs visible.** "Seated regally" under a long coat and a cloak over the
+     lap gave a leg that vanished into the drapery. This worked: "sits upright, both knees bent at right
+     angles and both booted feet planted flat on the ground", a coat ending above the knees, fitted trousers
+     and boots, and the cloak falling behind the throne. Avoid "long-limbed", which stretches limbs.
    - **Spell out body and clothing.** klein drifts towards a default look: "androgynous" alone gave nine
      feminine drafts with open necklines. Concrete wording worked: "angular jaw", "lean, narrow-shouldered
      build with a completely flat chest", "coat buttoned closed all the way up to a high stiff collar".
