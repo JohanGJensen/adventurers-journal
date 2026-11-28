@@ -7,6 +7,7 @@ import type { Campaign, CharacterDto, CharacterSummary, PlayState } from '../sha
 import { ClassEmblem } from './ClassEmblem';
 import { PortraitUpload } from './PortraitUpload';
 import { Loader } from './Loader';
+import { openPalette } from './CommandPalette';
 import { CandleLight, Embers, Parchment, ParchmentPlaque, Plaque } from './kit';
 
 const initials = (name: string) => name.split(/\s+/).map((w) => w[0]).slice(0, 2).join('');
@@ -108,6 +109,7 @@ export function CharacterList() {
         <div className="k-hall-actions">
           <a className="btn" {...linkTo('/new')}>+ Raise a new hero</a>
           <a className="btn ghost" {...linkTo('/homebrew')}>Homebrew</a>
+          <button className="btn ghost" onClick={openPalette}>Find &amp; roll <kbd>Ctrl K</kbd></button>
         </div>
       </ParchmentPlaque>
 

@@ -7,7 +7,7 @@ import { toast } from '../../lib/toast';
 import { buildLinkIndex } from '../../shared/noteLinks';
 import { NOTE_KINDS, NOTE_KIND_LABELS, type Campaign, type CharacterDto, type CharacterSummary, type Note, type NoteKind, type NoteRef } from '../../shared/types';
 import { Loader } from '../Loader';
-import { draftBody, factLine, isPortraitKind, kindName, parseAt, plainText, sameDraft, sortForKind, toDraft, type Draft } from './common';
+import { draftBody, factLine, fallbackImage, isPortraitKind, kindName, parseAt, plainText, sameDraft, sortForKind, toDraft, type Draft } from './common';
 import { NoteEditor } from './NoteEditor';
 import { NoteSidebar } from './NoteSidebar';
 import { NoteLink, NoteView, type LinkHandlers } from './NoteView';
@@ -26,6 +26,9 @@ const notesHref = (characterId: number, o: { kind?: NoteKind | ''; note?: number
 };
 
 /** A character's Notes tab: the notes of the campaign they play in, shared by everyone in it. */
+/** A kind's stand-in medallion, for the kind tabs (players have none). */
+const kindMedallion = (k: NoteKind) => fallbackImage({ kind: k, fields: {} });
+
 export function Notes({ characterId, query }: { characterId: number; query: URLSearchParams }) {
   const [character, setCharacter] = useState<CharacterDto | { error: string } | null>(null);
   const [campaign, setCampaign] = useState<Campaign | null>(null);
@@ -296,7 +299,7 @@ function NotesBody({ characterId, campaignId, campaignName, sharedWith, query }:
 
   return (
     <>
-      <header className="list-head notes-head">
+      <header className="list-head notes-head k-parch k-gilt k-pplaque">
         <div>
           <h1>
             <a className="plain-link" {...linkTo(href({ kind: '', note: null }))}>Notes</a>
@@ -319,7 +322,7 @@ function NotesBody({ characterId, campaignId, campaignName, sharedWith, query }:
               </button>
               {NOTE_KINDS.filter((k) => counts.get(k) || k === kind).map((k) => (
                 <button key={k} className={`kind-tab kind-${k} ${k === kind ? 'on' : ''}`} aria-pressed={k === kind} onClick={() => setKind(k === kind ? '' : k)}>
-                  <span className="kind-dot" aria-hidden /> {NOTE_KIND_LABELS[k]} <span className="count">{counts.get(k) ?? 0}</span>
+                  {kindMedallion(k) ? <img className="kind-medal" src={kindMedallion(k)!} alt="" /> : <span className="kind-dot" aria-hidden />} {NOTE_KIND_LABELS[k]} <span className="count">{counts.get(k) ?? 0}</span>
                 </button>
               ))}
             </div>
