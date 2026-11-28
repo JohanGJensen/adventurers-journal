@@ -8,8 +8,7 @@ import { useInventory } from './hooks/useInventory';
 import { Banner } from './components/sheet/Banner';
 import { SheetTabs } from './components/sheet/SheetTabs';
 import type { SheetTab } from './lib/router';
-import { AbilityScores } from './components/AbilityScores';
-import { SavesAndSkills } from './components/SavesAndSkills';
+import { StatsTab } from './components/sheet/StatsTab';
 import { SpellList } from './components/SpellList';
 import { Features } from './components/Features';
 import { Equipment } from './components/Equipment';
@@ -82,10 +81,7 @@ export function App({ character, tab, onCharacterChange }: { character: Characte
         />
         <SheetTabs characterId={character.id} tab={tab} hasSpells={hasSpells} />
         {tab === 'stats' && (
-          <div className="k-tab-grid">
-            <AbilityScores c={c} />
-            <SavesAndSkills c={c} />
-          </div>
+          <StatsTab c={c} play={play} inventory={inventory} characterId={character.id} />
         )}
         {tab === 'spells' && (
           <div className="k-tab-single">

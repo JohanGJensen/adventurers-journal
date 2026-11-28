@@ -11,8 +11,9 @@ export function DiceTray() {
   return (
     <div className={`tray ${open ? 'open' : ''}`}>
       {last && !open && !active && (
-        <button className={`toast ${crit(last.natural)}`} onClick={() => setOpen(true)} key={last.id}>
-          <span>{last.label}</span>
+        <button className={`toast k-roll-slip ${crit(last.natural)}`} onClick={() => setOpen(true)} key={last.id} aria-label={`${last.label}: ${last.total}. Open the dice tray`}>
+          {last.natural !== undefined && <span className="k-die" aria-hidden="true">{last.natural}</span>}
+          <span className="k-roll-label">{last.label}</span>
           <strong>{last.total}</strong>
         </button>
       )}

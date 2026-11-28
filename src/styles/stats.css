@@ -1,0 +1,79 @@
+/* ---------- Stats tab: ability coins, skills and senses, actions, today's spells ---------- */
+.k-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr)); gap: 18px; align-items: start; }
+.k-abilities { grid-column: 1 / -1; }
+.k-stack { display: grid; gap: 18px; }
+.k-card { padding: 20px 20px 18px; }
+.k-h2 { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; margin: 0 0 12px; padding-bottom: 12px; background: var(--rule) center bottom / 100% 14px no-repeat; font: 400 22px 'IM Fell English SC', serif; letter-spacing: .03em; color: var(--heading); text-transform: none; }
+.k-h2::before { content: '\2767\FE0E'; color: var(--gilt); font-size: .85em; }
+.k-h2-hint { font: italic 15px 'EB Garamond', serif; letter-spacing: 0; color: var(--muted); }
+.k-h3 { margin: 16px 0 6px; font: 400 15px 'IM Fell English SC', serif; letter-spacing: .05em; color: var(--muted); text-transform: none; }
+.k-hint { margin: 12px 0 0; font: italic 15px 'EB Garamond', serif; color: var(--muted); }
+
+/* Six coins; each has its check and save beneath. */
+.k-coins { --coin: 112px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(132px, 30%), 1fr)); gap: 26px 8px; padding: 14px 4px 2px; }
+@media (min-width: 1440px) { .k-coins { --coin: 128px; grid-template-columns: repeat(6, minmax(0, 1fr)); } }
+.k-ability { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.k-rolls { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+.k-rolls button {
+  display: inline-flex; align-items: baseline; gap: 5px; min-height: 34px; padding: 0 11px; border-radius: 999px;
+  border: 1px solid var(--line); background: var(--bg-2); color: var(--muted); font: 400 13px 'IM Fell English SC', serif; letter-spacing: .05em;
+}
+.k-rolls button b { font: 700 15px Cinzel, serif; color: var(--ink); }
+.k-rolls button:hover { border-color: var(--gilt); background: color-mix(in srgb, var(--gilt) 18%, transparent); }
+.k-rolls button.pr { border-color: var(--accent); background: var(--accent-soft); }
+.k-rolls button.pr b { color: var(--accent); }
+.k-rolls button:focus-visible { outline: 2px solid var(--gilt); outline-offset: 2px; }
+
+/* Rows: skills and actions. */
+.k-rows { list-style: none; margin: 0; padding: 0; display: grid; gap: 1px; }
+.k-row { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 36px; padding: 3px 8px; border: 0; border-radius: 3px; background: none; text-align: left; color: var(--ink); font: 400 17px 'EB Garamond', serif; }
+.k-row:hover { background: var(--accent-soft); }
+.k-row:focus-visible { outline: 2px solid var(--gilt); outline-offset: -2px; }
+.k-row-name { flex: 1; min-width: 0; }
+.k-row-name small { font: 400 13px 'IM Fell English SC', serif; letter-spacing: .04em; color: var(--muted); }
+.k-row-val { font: 600 17px Cinzel, serif; font-variant-numeric: tabular-nums; }
+.k-gem { width: 11px; height: 11px; flex: none; transform: rotate(45deg); border: 1.5px solid var(--gilt); box-sizing: border-box; }
+.k-gem.on { background: linear-gradient(135deg, var(--glow), var(--accent)); box-shadow: 0 0 6px color-mix(in srgb, var(--glow) 70%, transparent); }
+.k-senses { display: grid; gap: 4px; margin: 0; }
+.k-senses div { display: flex; justify-content: space-between; gap: 10px; padding: 3px 8px; }
+.k-senses dt { font: 400 17px 'EB Garamond', serif; }
+.k-senses dd { margin: 0; font: 600 17px Cinzel, serif; }
+
+.k-action { display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 4px 6px; border-bottom: 1px solid var(--line); }
+.k-action:last-child { border-bottom: 0; }
+.k-action strong { font: 600 17px 'EB Garamond', serif; }
+.k-action .k-row-name small { font: italic 14px 'EB Garamond', serif; letter-spacing: 0; }
+.k-action .btn { min-height: 32px; font-family: Cinzel, serif; }
+.k-action-flat { font: 600 15px Cinzel, serif; color: var(--muted); }
+
+/* Today's spells: chips that open the Spells tab. */
+.k-spell-chips { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.k-spell-chip {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 38px; padding: 0 12px 0 8px; border-radius: 999px; text-decoration: none;
+  color: var(--ink); font: 500 16px 'EB Garamond', serif; border: 1px solid color-mix(in srgb, var(--gilt) 55%, transparent);
+  background: radial-gradient(circle at 0 50%, var(--accent-soft), transparent 70%);
+}
+.k-spell-chip:hover { border-color: var(--gilt); box-shadow: 0 0 14px color-mix(in srgb, var(--glow) 45%, transparent); }
+.k-spell-chip .school-icon { width: 20px; height: 20px; color: var(--accent); }
+
+/* The last roll: a parchment slip with the d20 that tumbled in; gold on a natural 20. */
+.toast.k-roll-slip { gap: 12px; padding: 8px 16px 8px 8px; background: linear-gradient(var(--card-wash), var(--card-wash)), var(--card-tex) 0 0 / 512px 512px, var(--card); border-color: color-mix(in srgb, var(--gilt) 60%, transparent); animation: k-unroll .45s var(--ease-spring) both; }
+.k-roll-label { font: 500 16px 'EB Garamond', serif; }
+.k-die {
+  width: 40px; height: 40px; flex: none; display: grid; place-items: center; font: 900 16px Cinzel, serif; color: #f3eee1;
+  background: radial-gradient(circle at 35% 30%, var(--accent-2), color-mix(in srgb, var(--accent) 75%, black));
+  clip-path: polygon(50% 0, 95% 25%, 95% 75%, 50% 100%, 5% 75%, 5% 25%);
+  animation: k-tumble .7s var(--ease-spring) both;
+}
+@media (prefers-color-scheme: dark) { .k-die { background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--accent) 55%, black), color-mix(in srgb, var(--accent) 30%, black)); } }
+.nat20 .k-die { background: radial-gradient(circle at 35% 30%, #f2d27a, var(--gilt)); color: var(--brass-ink); filter: drop-shadow(0 0 10px #ffd36b); }
+.nat1 .k-die { background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--wax) 70%, white), var(--wax)); }
+@keyframes k-tumble { from { transform: rotate(-540deg) scale(.3); } to { transform: none; } }
+@keyframes k-unroll { from { clip-path: inset(0 50% 0 50%); opacity: 0; } to { clip-path: inset(0); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .toast.k-roll-slip, .k-die { animation: none !important; } }
+
+@media (max-width: 599px) {
+  .k-card { padding: 16px 14px 14px; }
+  .k-coins { gap: 20px 4px; }
+  .k-rolls button { padding: 0 8px; }
+}
