@@ -265,6 +265,24 @@ Apply the kit to the remaining surfaces, one commit per area:
 - The `Loader`: its sigil gets rune rings that match the cast effect.
 - Toasts: small parchment slips, each with a wax dot in its kind's colour.
 
+**Theme toggle and the dark wall.** Do these after the surfaces above, once nothing is written straight on the
+stone any more.
+- **Day theme on the dark wall:** the day theme keeps its light parchment and ink but hangs it on the dark stone
+  (`stone-dark.png`), with the night theme's torchlight and vault shading. In `tokens.css` that's `--stone-tex`,
+  `--torch` and `--vault` in the light `:root`. Check that every page still has no text on the wall; anything left
+  gets a plaque.
+- **A theme switch:** Day, Night, or Follow the system (the default). It lives in the sidebar's foot and on the
+  character list, as a three-way segmented control with a sun, a moon and a half-and-half icon.
+  - **Storage:** the choice goes in `localStorage` (`aj.theme`) and is applied before first paint by a tiny inline
+    script in `index.html`, so the page never flashes the wrong theme.
+  - **The CSS:** today the night rules live under `@media (prefers-color-scheme: dark)`. Switch them to
+    `:root[data-theme='night']` plus `@media (prefers-color-scheme: dark) { :root:not([data-theme='day']) … }`.
+    One small helper does the rewrite, applied to every partial: `tokens.css` and every `k-` file with night
+    variants.
+  - **Electron:** set `nativeTheme.themeSource` to match (`'light' | 'dark' | 'system'`), through a small IPC call,
+    so scrollbars and native dialogs follow.
+- **Check:** every page in all three modes. The system mode must still follow the OS switch live.
+
 ---
 
 ## Phase 9: tidy and harden (`chore/redesign-cleanup`)
