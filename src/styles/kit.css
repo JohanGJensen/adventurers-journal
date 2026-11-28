@@ -102,8 +102,8 @@ button.k-coin { cursor: pointer; }
 }
 .k-coin-score b { transform: rotate(-45deg); font: 700 14px Cinzel, serif; color: var(--ink); }
 .k-ribbon {
-  position: absolute; left: -14px; right: -14px; bottom: 8px; z-index: 2; height: 30px; display: grid; place-items: center;
-  font: 400 15px/1 'IM Fell English SC', serif; letter-spacing: .1em; color: #f3eee1; text-shadow: 0 1px 0 rgb(0 0 0 / 40%);
+  position: absolute; left: calc(var(--coin, 132px) * -.09); right: calc(var(--coin, 132px) * -.09); bottom: 8px; z-index: 2; height: calc(var(--coin, 132px) * .23); display: grid; place-items: center;
+  font: 400 clamp(12px, calc(var(--coin, 132px) * .115), 15px)/1 'IM Fell English SC', serif; letter-spacing: .1em; color: #f3eee1; text-shadow: 0 1px 0 rgb(0 0 0 / 40%);
   background: linear-gradient(color-mix(in srgb, var(--wax) 85%, white), color-mix(in srgb, var(--wax) 70%, black));
   clip-path: polygon(0 0, 100% 0, 92% 50%, 100% 100%, 0 100%, 8% 50%);
 }
@@ -116,7 +116,7 @@ button.k-coin { cursor: pointer; }
 }
 button.k-coin:active { transform: scale(.94); }
 /* Phones: smaller coins, so six sit three to a row. */
-@media (max-width: 599px) { .k-coin-wrap { --coin: 96px; } .k-ribbon { font-size: 12px; height: 24px; left: -10px; right: -10px; } .k-coin-score { width: 24px; height: 24px; } .k-coin-score b { font-size: 12px; } }
+@media (max-width: 599px) { .k-coin-wrap { --coin: 86px; } .k-ribbon { letter-spacing: .04em; } .k-coin-score { width: 24px; height: 24px; } .k-coin-score b { font-size: 12px; } }
 @keyframes k-sheen { from { background-position: 130% 0; } to { background-position: -40% 0; } }
 @media (prefers-color-scheme: dark) {
   .k-coin-value { text-shadow: 0 1px 0 rgb(0 0 0 / 50%); }
