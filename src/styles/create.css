@@ -1,0 +1,135 @@
+/* ---------- Character creation wizard (/new) ---------- */
+.create-cta { display: grid; gap: 10px; justify-items: start; border-top: 4px solid var(--gilt); }
+.create-page .list-head { align-items: center; }
+.start-over { margin-left: auto; }
+
+/* Step trail: wax-seal numbers joined by a gilt thread. */
+.create-steps { list-style: none; margin: 0 0 18px; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.create-steps li { display: flex; align-items: center; }
+.create-steps li + li::before { content: ''; width: 14px; height: 1px; background: var(--gilt); opacity: .6; margin-right: 6px; }
+.create-steps button {
+  display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px 3px 3px; border-radius: 999px;
+  border: 1px solid var(--line); background: var(--card); color: var(--ink); font-size: .9rem;
+}
+.create-steps .step-num {
+  width: 22px; height: 22px; display: inline-grid; place-items: center; border-radius: 50%;
+  border: 1px solid var(--gilt); font-size: .78rem; font-weight: 600; color: var(--muted);
+}
+.create-steps .done .step-num { background: var(--accent-soft); color: var(--accent); border-color: var(--accent); }
+.create-steps .now button { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.create-steps .now .step-num { background: var(--accent); color: var(--card); border-color: var(--accent); }
+.create-steps button:disabled { opacity: .5; }
+
+.create-layout { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 16px; align-items: start; }
+.create-main { display: grid; gap: 16px; min-width: 0; }
+.create-summary { position: sticky; top: 16px; display: grid; gap: 12px; }
+@media (max-width: 900px) {
+  .create-layout { grid-template-columns: 1fr; }
+  .create-summary { position: static; order: -1; }
+}
+.summary-head { display: flex; gap: 12px; align-items: center; }
+.summary-head strong { display: block; font-family: 'IM Fell English SC', Cinzel, serif; font-weight: 400; font-size: 1.15rem; color: var(--heading); }
+.summary-head small { display: block; }
+.summary-head .portrait-initials .emblem { width: 28px; height: 28px; }
+.summary-scores, .review-scores { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 4px; text-align: center; }
+.summary-scores > div, .review-scores > div {
+  display: grid; padding: 4px 2px; border: 1px solid var(--line); border-radius: 3px; background: var(--bg-2);
+}
+.summary-scores strong, .review-scores strong { font-size: 1.1rem; line-height: 1.1; }
+.summary-scores span, .review-scores span { font-size: .75rem; color: var(--muted); }
+.review-score.save { border-color: var(--accent); box-shadow: inset 0 -2px 0 var(--accent); }
+.create-error { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 16px; }
+.create-error p { margin: 0; }
+
+.create-foot {
+  position: sticky; bottom: 0; z-index: 2; display: flex; justify-content: flex-end; align-items: center; gap: 8px; flex-wrap: wrap;
+  padding: 10px 14px; border: 1px solid var(--line); border-radius: 3px; background: var(--card); box-shadow: var(--shadow);
+}
+.create-foot .hint { margin: 0 auto 0 0; }
+
+/* Pick cards: classes wear their own colours (each card sets data-class). */
+.pick-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 180px), 1fr)); gap: 10px; }
+.pick-card {
+  display: grid; gap: 2px; justify-items: start; align-content: start; text-align: left; padding: 14px 14px 12px;
+  border-top: 4px solid var(--accent); color: var(--ink);
+}
+.pick-card strong { font-family: 'IM Fell English SC', Cinzel, serif; font-weight: 400; font-size: 1.15rem; color: var(--heading); }
+.pick-card[data-class] strong { color: var(--accent); }
+.pick-card small { font-size: .85rem; }
+.pick-emblem { width: 34px; height: 34px; color: var(--accent-2); margin-bottom: 4px; }
+.pick-tag { margin-top: 6px; font-size: .72rem; padding: 1px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); }
+.pick-traits { margin-top: 4px; font-size: .8rem; color: var(--muted); }
+.pick-card.sel { box-shadow: 0 0 0 2px var(--accent), var(--shadow); background: linear-gradient(var(--accent-soft), var(--accent-soft)), linear-gradient(var(--card-wash), var(--card-wash)), var(--card-tex) 0 0 / 512px 512px repeat, var(--card); }
+.pick-card.sel::before { opacity: .9; border-color: var(--glow); }
+.pick-card:not(.rune-card):hover { border-color: var(--accent-2); }
+.pick-custom { border-top-style: dashed; border-top-color: var(--gilt); }
+.pick-detail { display: grid; gap: 6px; }
+.pick-detail h2 .inline-emblem { vertical-align: -.12em; }
+
+.facts { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; }
+.facts div { display: flex; gap: 6px; align-items: baseline; padding: 3px 10px; border: 1px solid var(--line); border-radius: 999px; background: var(--bg-2); }
+.facts dt { color: var(--muted); font-size: .8rem; }
+.facts dd { margin: 0; font-weight: 600; }
+
+.create-chips { margin: 4px 0 6px; }
+.create-chips .chip.locked { border-style: dashed; }
+.create-chips .chip small { font-size: .75em; }
+.spell-chip { display: inline-flex; padding: 0; overflow: hidden; }
+.spell-chip button { border: 0; background: none; color: inherit; padding: 2px 6px 2px 10px; font-size: .85rem; }
+.spell-chip .chip-info { padding: 2px 8px 2px 4px; opacity: .7; }
+.spell-chip .chip-info:hover { opacity: 1; }
+
+.field { display: grid; gap: 4px; }
+.field > span { font-size: .85rem; color: var(--muted); }
+.field input, .field select {
+  padding: 6px 10px; border-radius: 3px; border: 1px solid var(--line); background: var(--card); color: var(--ink); font: inherit;
+}
+.field input:focus, .field select:focus { outline: 1px solid var(--gilt); border-color: var(--gilt); }
+.field.inline { grid-auto-flow: column; align-items: center; justify-content: start; }
+.custom-bg { gap: 10px; }
+.warn { color: var(--cap); }
+
+.score-table { display: grid; gap: 6px; margin: 10px 0 4px; }
+.score-row {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto 3ch 5.5rem; gap: 10px; align-items: center;
+  padding: 6px 10px; border: 1px solid var(--line); border-radius: 3px; background: var(--bg-2);
+}
+.score-name small { margin-left: 4px; }
+.score-row select { padding: 4px 8px; border-radius: 3px; border: 1px solid var(--line); background: var(--card); color: var(--ink); font: inherit; }
+.stepper { display: inline-flex; align-items: center; gap: 6px; }
+.stepper-val { min-width: 2ch; text-align: center; font-weight: 600; }
+.score-plus { color: var(--accent); font-weight: 600; text-align: right; }
+.score-final { text-align: right; font-size: 1.15rem; font-weight: 600; }
+.score-final small { font-size: .75rem; }
+.bonus-row { margin-top: 8px; }
+
+.equip-choice strong { color: var(--ink); }
+.equip-items { margin: 4px 0 0; padding-left: 18px; color: var(--muted); font-size: .88rem; }
+.spells-card .filters { margin: 0 -16px; }
+.spells-card .browser-body { overflow: visible; padding: 8px 0 0; }
+
+.details-grid { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 20px; align-items: start; }
+@media (max-width: 560px) { .details-grid { grid-template-columns: 1fr; } }
+.portrait-pick { display: grid; gap: 8px; justify-items: center; }
+.portrait-pick .portrait { width: 120px; height: 120px; }
+.portrait-pick .portrait-initials { font-size: 2.2rem; }
+.details-fields { display: grid; gap: 12px; }
+.align-grid .choice span { font-size: .8rem; }
+.review-card { display: grid; gap: 8px; }
+.review-card h3 { margin-bottom: 0; }
+.review-card p { margin: 0; }
+.create-steps .step-name { white-space: nowrap; }
+@media (max-width: 520px) {
+  .create-steps .step-name { display: none; }
+  .create-steps .now .step-name { display: inline; }
+  .create-steps button { padding-right: 3px; }
+  .create-steps .now button { padding-right: 10px; }
+  .summary-scores, .review-scores { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .score-row { grid-template-columns: minmax(0, 1fr) auto; }
+  .score-name small { display: none; }
+  .score-plus { grid-column: 1; text-align: left; }
+  .create-foot { justify-content: stretch; }
+  .create-foot .hint { flex-basis: 100%; }
+  .create-foot .btn { flex: 1; }
+}
+

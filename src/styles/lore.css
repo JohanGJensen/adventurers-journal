@@ -1,0 +1,38 @@
+/* Lore & story: an "at a glance" banner panel of traits, then the story in one readable column. */
+.lore-layout { display: grid; gap: 16px; max-width: 980px; margin: 0 auto; }
+.lore-page .list-head, .lore-page .sheet-nav { max-width: 980px; margin-inline: auto; }
+.lore-story { display: grid; gap: 12px; align-content: start; }
+.lore-story > .btn { justify-self: start; }
+.card.lore-glance { border-top: 8px solid var(--accent); padding-top: 14px; }
+.lore-glance::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none; border-radius: 3px;
+  background: linear-gradient(180deg, var(--accent-soft), transparent 70%);
+}
+.lore-glance > * { position: relative; z-index: 1; }
+.lore-traits { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; }
+.lore-trait { padding: 0 14px; border-left: 1px solid var(--line); min-width: 0; }
+.lore-trait:first-child { padding-left: 0; border-left: 0; }
+.lore-trait:last-child { padding-right: 0; }
+.lore-trait-head { display: flex; justify-content: space-between; align-items: center; gap: 6px; margin-bottom: 6px; }
+.lore-trait-head h3 { margin: 0; color: var(--heading); font-size: 1.05rem; }
+.lore-trait .lore-list { font-size: .92rem; }
+@media (max-width: 900px) {
+  .lore-traits { grid-template-columns: 1fr 1fr; row-gap: 16px; }
+  .lore-trait:nth-child(3) { padding-left: 0; border-left: 0; }
+  .lore-trait:nth-child(2) { padding-right: 0; }
+}
+@media (max-width: 560px) {
+  .lore-traits { grid-template-columns: 1fr; }
+  .lore-trait { padding: 0; border-left: 0; }
+  .lore-trait + .lore-trait { border-top: 1px solid var(--line); padding-top: 12px; }
+}
+/* Bullets: a gilt lozenge, with the lead-in words set in the accent colour so lists skim by their labels. */
+.lore-list, .prose ul { list-style: none; margin: 0 0 .8em; padding: 0; display: grid; gap: 7px; line-height: 1.5; }
+.lore-list:last-child, .prose ul:last-child { margin-bottom: 0; }
+.lore-list li, .prose ul > li { position: relative; padding-left: 1.3em; }
+.lore-list li::before, .prose ul > li::before { content: '\25C6\FE0E'; position: absolute; left: .1em; top: .1em; font-size: .75em; color: var(--gilt); }
+.lore-list strong, .prose li strong { color: var(--accent); font-weight: 600; }
+.lore-section .lore-list { padding: 10px 12px; background: var(--accent-soft); border-left: 3px solid var(--gilt); border-radius: 2px; }
+.lore-page form { display: grid; gap: 10px; }
+.lore-page textarea { width: 100%; resize: vertical; white-space: pre-wrap; line-height: 1.5; }
+

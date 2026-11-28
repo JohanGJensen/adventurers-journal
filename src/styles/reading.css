@@ -1,0 +1,23 @@
+/* ---------- Reading ----------
+   .prose is the shared reading column (note bodies, lore chapters): larger type, generous leading, a
+   measure that stops short of eye-strain, and the lore page's diamond lists (above, with .lore-list).
+   .card.reading quietens the parchment behind long text so the letters, not the texture, carry contrast. */
+:root { --read-wash: rgb(251 248 241 / 84%); }
+@media (prefers-color-scheme: dark) { :root { --read-wash: rgb(40 30 21 / 74%); } }
+.card.reading { background: linear-gradient(var(--read-wash), var(--read-wash)), var(--card-tex) 0 0 / 512px 512px repeat, var(--card); }
+.prose { font-size: 1.07rem; line-height: 1.65; max-width: 68ch; color: var(--ink); }
+.prose > :first-child { margin-top: 0; }
+.prose > :last-child { margin-bottom: 0; }
+.prose p, .prose ol, .prose blockquote { margin: 0 0 .9em; }
+.prose ol { padding-left: 1.5em; display: grid; gap: 5px; }
+.prose h2 { font: 400 1.4rem 'IM Fell English SC', Cinzel, Georgia, serif; color: var(--heading); margin: 0 0 .5em; }
+.card .prose :is(h3, h4, h5) {
+  font: 400 1.2rem 'IM Fell English SC', Cinzel, Georgia, serif; letter-spacing: .02em; text-transform: none;
+  color: var(--heading); margin: 1.3em 0 .4em;
+}
+.card .prose :is(h4, h5) { font-size: 1.05rem; }
+.card .prose h3::before { display: none; }
+.prose blockquote { padding: 4px 14px; border-left: 3px solid var(--gilt); background: var(--accent-soft); font-style: italic; }
+.prose hr { border: 0; height: 14px; background: var(--rule) center / 100% 14px no-repeat; margin: 1.2em 0; }
+.prose code { font-size: .9em; background: var(--bg-2); padding: 0 4px; border-radius: 2px; }
+

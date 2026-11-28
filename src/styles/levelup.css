@@ -1,0 +1,35 @@
+/* Level-up wizard */
+.level-up-btn { margin-left: 10px; vertical-align: middle; }
+.levelup { max-width: 860px; margin: 0 auto; }
+.levelup .browser-body { flex: 1; }
+.levelup-body { display: grid; gap: 12px; align-content: start; }
+.levelup-body h3 { margin: 8px 0 0; }
+.levelup-foot { display: flex; justify-content: flex-end; align-items: center; gap: 8px; padding: 12px 20px; border-top: 1px solid var(--line); background: var(--bg-2); }
+.levelup-foot .hint { margin: 0 auto 0 0; }
+.choice-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px; }
+.choice { display: grid; gap: 4px; padding: 10px 12px; border-radius: 3px; border: 1px solid var(--line); background: var(--card); color: var(--ink); text-align: left; font: inherit; }
+.choice span { color: var(--muted); font-size: .88rem; }
+.choice.sel { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); background: var(--accent-soft); }
+.choice:disabled:not(.sel) { opacity: .5; }
+.choice details summary { cursor: pointer; font-size: .82rem; }
+.choice-head { display: flex; align-items: center; gap: 8px; background: none; border: none; padding: 0; color: var(--ink); text-align: left; font: inherit; }
+.pick-list { display: grid; gap: 6px; }
+.custom-fields { display: grid; gap: 6px; }
+.custom-fields input, .custom-fields textarea, .ability-plus select { padding: 6px 10px; border-radius: 3px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); font: inherit; }
+.ability-plus { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.ability-plus .hint { margin: 0; }
+.ability-pick .row.sel { border-color: var(--accent); background: var(--accent-soft); }
+.ability-pick .row:disabled { opacity: .45; }
+.changes dd strong { color: var(--accent); }
+.review-list { margin: 0; padding-left: 1.2rem; display: grid; gap: 4px; }
+.pre { white-space: pre-line; }
+.land-tag { margin-left: 6px; font-size: .7rem; padding: 1px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); }
+.wild-shape .item-actions { gap: 4px; }
+.dialog {
+  position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 21; width: min(380px, calc(100vw - 32px));
+  display: grid; gap: 10px; justify-items: start; padding: 20px; border-radius: 4px; background: var(--card); border: 1px solid var(--line);
+  box-shadow: 0 20px 60px rgb(0 0 0 / 30%); animation: fade .15s;
+}
+.dialog h2 { color: var(--accent); margin: 0; }
+.dialog p { margin: 0; }
+

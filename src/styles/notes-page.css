@@ -1,0 +1,72 @@
+/* ---------- Notes page: header, campaign dashboard, small screens ---------- */
+.notes-head { align-items: flex-end; }
+.notes-head h1 { line-height: 1.1; }
+.notes-campaign { font-size: .62em; letter-spacing: .04em; }
+.notes-shared { margin: 4px 0 0; font-size: .95rem; font-style: italic; }
+.notes-page small { font-size: .85em; }
+.notes-page .hint { font-size: .92rem; }
+.notes-none { max-width: 640px; }
+.notes-empty .row-form { flex-wrap: wrap; margin-top: 4px; }
+.notes-empty .btn { display: inline-flex; align-items: center; gap: 6px; }
+
+.notes-dash { display: grid; gap: 22px; }
+.notes-dash h2 { font: 400 1.25rem 'IM Fell English SC', Cinzel, Georgia, serif; letter-spacing: .03em; color: var(--heading); margin: 0 0 8px; }
+.dash-quests { padding: 12px 16px; border-left: 3px solid var(--kind); background: var(--accent-soft); border-radius: 2px; }
+.dash-quests ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.dash-quests li { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 12px; font-size: 1.08rem; }
+.dash-facts { color: var(--muted); font-size: .9rem; }
+.dash-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; }
+.dash-card { border: 1px solid var(--line); border-top: 3px solid var(--kind); border-radius: 3px; padding: 8px 10px 10px; background: rgb(255 255 255 / 22%); min-width: 0; }
+@media (prefers-color-scheme: dark) { .dash-card { background: rgb(0 0 0 / 14%); } }
+.dash-card.empty { border-top-color: var(--line); }
+.dash-card.empty .dash-card-title { color: var(--muted); }
+.dash-card header { display: flex; align-items: center; gap: 4px; margin-bottom: 6px; }
+.dash-card-title {
+  flex: 1; min-width: 0; display: flex; align-items: center; gap: 7px; padding: 0; background: none; border: 0; text-align: left;
+  font: 400 1.08rem 'IM Fell English SC', Cinzel, Georgia, serif; letter-spacing: .03em; color: var(--heading);
+}
+.dash-card-title:disabled { opacity: 1; cursor: default; }
+.dash-card-title:not(:disabled):hover { text-decoration: underline; text-decoration-color: var(--gilt); }
+.dash-card .count { margin-left: auto; color: var(--muted); font: .85rem 'EB Garamond', Georgia, serif; }
+.dash-card .icon-btn { font-size: 1.15rem; color: var(--accent); }
+.dash-card ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.dash-card li { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dash-card .hint { margin: 0; }
+button.linkish.more { color: var(--muted); font-size: .9rem; }
+.dash-recent ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 22px; }
+.dash-recent li { display: flex; align-items: baseline; gap: 6px; }
+.dash-recent small { color: var(--muted); }
+
+/* On a phone the index and the note can't sit side by side: an open note takes the screen, the crumbs lead back. */
+@media (max-width: 760px) { .notes-layout.has-note .notes-side { display: none; } }
+
+/* Note images: beside the title and facts; people get a round framed portrait, the rest keep their shape.
+   is-portrait, not portrait: .portrait is the character sheet's 148px framed circle and would wrap the figure in a second frame. */
+.note-read.has-image { grid-template-columns: minmax(0, 1fr) auto; column-gap: 18px; }
+.note-read.has-image > * { grid-column: 1 / -1; }
+.note-read.has-image > :is(.note-read-head, .note-facts) { grid-column: 1; }
+.note-read.has-image > .note-image { grid-column: 2; grid-row-start: 1; }
+.note-image { margin: 0; align-self: start; }
+.note-image img { display: block; }
+.note-image.is-portrait img {
+  width: 132px; height: 132px; object-fit: cover; border-radius: 50%;
+  border: 3px solid var(--card); box-shadow: 0 0 0 2px var(--gilt), 0 0 0 4px var(--kind), 0 4px 12px rgb(0 0 0 / 30%);
+}
+/* A kind's stand-in is a placeholder, not the note's own picture: smaller and quieter. */
+.note-image.is-fallback.is-picture img {
+  width: 140px; height: 140px; max-width: none; max-height: none; object-fit: cover;
+  /* The watercolour circle has no rim of its own: frame it like a portrait, its outer ring in the kind's colour. */
+  border: 3px solid var(--card); border-radius: 50%;
+  box-shadow: 0 0 0 2px var(--gilt), 0 0 0 4px var(--kind), 0 4px 12px rgb(0 0 0 / 30%);
+}
+.note-image.is-picture img { max-width: min(260px, 40vw); max-height: 220px; border-radius: 3px; border: 1px solid var(--line); box-shadow: 0 0 0 3px var(--card), 0 0 0 4px var(--gilt), 0 4px 12px rgb(0 0 0 / 25%); }
+@media (max-width: 560px) {
+  .note-read.has-image { grid-template-columns: 1fr; }
+  .note-read.has-image > .note-image { grid-column: 1; grid-row: auto !important; justify-self: center; }
+}
+.note-image-edit { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.note-image-edit img { width: 56px; height: 56px; object-fit: cover; border: 1px solid var(--line); }
+.note-image-edit img.is-portrait { border-radius: 50%; }
+.note-image-edit img.is-picture { border-radius: 3px; }
+.note-image-edit label.btn { cursor: pointer; }
+.note-image-edit label.btn.busy { opacity: .6; cursor: progress; }
