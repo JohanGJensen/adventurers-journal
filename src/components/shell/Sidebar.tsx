@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { linkTo } from '../../lib/router';
+import { openPalette } from '../CommandPalette';
 import type { CharacterSummary } from '../../shared/types';
 import { useCharacterFacts, useCharacters } from './shellData';
 
@@ -21,6 +22,7 @@ const ICONS = {
   homebrew: 'M14 4l6 6-9 9H5v-6z',
   all: 'M15 6l-6 6 6 6',
   menu: 'M4 7h16M4 12h16M4 17h16',
+  find: 'M11 5a6 6 0 1 0 0 12a6 6 0 1 0 0-12M20 20l-4.5-4.5',
   rail: 'M6 6l6 6-6 6M13 6l6 6-6 6',
 };
 
@@ -134,6 +136,11 @@ export function Sidebar({ characterId, current }: { characterId: number; current
         <NavLink to={`${base}/log`} icon={ICONS.log} current={current === 'log'}>History</NavLink>
 
         <div className="k-side-fill" />
+        <button type="button" className="k-side-link k-side-find" onClick={openPalette} title="Find & roll (Ctrl K)">
+          <Icon d={ICONS.find} />
+          <span className="k-side-label">Find &amp; roll</span>
+          <kbd className="k-side-label">Ctrl K</kbd>
+        </button>
         <NavLink to="/homebrew" icon={ICONS.homebrew}>Homebrew</NavLink>
         <NavLink to="/" icon={ICONS.all}>All characters</NavLink>
 

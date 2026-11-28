@@ -128,83 +128,86 @@ export function NoteView({ note, index, backlinks, h, onTag, onEdit }: ViewProps
   const facts = NOTE_FIELDS[note.kind].filter((f) => note.fields[f.key]);
   const image = note.image ?? fallbackImage(note);
   return (
-    <article className={`note-read kind-${note.kind} ${image ? 'has-image' : ''}`}>
-      {image && (
-        // Beside the title (and the facts, when there are any). Without an image of its own the note shows its kind's stand-in.
-        <figure
-          // A stand-in keeps is-picture (it's not an uploaded portrait); its round frame comes from .is-fallback.
-          className={`note-image ${note.image && isPortraitKind(note.kind) ? 'is-portrait' : 'is-picture'} ${note.image ? '' : 'is-fallback'}`}
-          style={{ gridRowEnd: facts.length ? 'span 2' : 'span 1' }}
-        >
-          <img src={image} alt={note.image ? note.title : ''} />
-        </figure>
-      )}
-      <header className="note-read-head">
-        <div>
-          <span className={`kind-badge kind-${note.kind}`}>{kindName(note.kind)}</span>
-          <h2>{note.title}</h2>
-          {note.aliases.length > 0 && <p className="note-aka">Also known as {note.aliases.join(', ')}</p>}
-        </div>
-        <button className="btn ghost small" onClick={onEdit} title="Edit (Ctrl+E)">Edit</button>
-      </header>
-
-      {facts.length > 0 && (
-        <dl className="note-facts">
-          {facts.map((f) => {
-            const v = note.fields[f.key];
-            const target = f.ref ? resolveName(index, v) : undefined;
-            return (
-              <div key={f.key} className={`fact fact-${f.key} ${f.key === 'status' ? `status-${v.replace(' ', '-')}` : ''}`}>
-                <dt>{f.label}</dt>
-                <dd>
-                  {target ? (
-                    <NoteLink id={target.id} h={h}>{v}</NoteLink>
-                  ) : f.ref && !f.loose ? (
-                    <MissingLink title={v} kind={f.ref} h={h}>{v}</MissingLink>
-                  ) : (
-                    v
-                  )}
-                </dd>
-              </div>
-            );
-          })}
-        </dl>
-      )}
-
-      {note.body.trim() ? (
-        <NoteBody text={note.body} index={index} h={h} />
-      ) : (
-        <p className="hint">
-          Nothing written yet. <button className="linkish" onClick={onEdit}>Start writing</button>
-        </p>
-      )}
-
-      <footer className="note-read-foot">
-        {note.tags.length > 0 && (
-          <div className="chips">
-            {note.tags.map((t) => (
-              <button key={t} className="chip note-tag" onClick={() => onTag(t)} title={`Show notes tagged “${t}”`}>#{t}</button>
-            ))}
-          </div>
+    <div className="k-note-spread">
+      <article className={`note-read kind-${note.kind} ${image ? 'has-image' : ''}`}>
+        {image && (
+          // Beside the title (and the facts, when there are any). Without an image of its own the note shows its kind's stand-in.
+          <figure
+            // A stand-in keeps is-picture (it's not an uploaded portrait); its round frame comes from .is-fallback.
+            className={`note-image ${note.image && isPortraitKind(note.kind) ? 'is-portrait' : 'is-picture'} ${note.image ? '' : 'is-fallback'}`}
+            style={{ gridRowEnd: facts.length ? 'span 2' : 'span 1' }}
+          >
+            <img src={image} alt={note.image ? note.title : ''} />
+          </figure>
         )}
-        <section className="backlinks">
-          <h3>Mentioned in</h3>
-          {backlinks === null ? (
-            <p className="hint">…</p>
-          ) : backlinks.length ? (
-            <ul>
-              {backlinks.map((b) => (
-                <li key={b.id}>
-                  <span className={`kind-dot kind-${b.kind}`} aria-hidden /> <NoteLink id={b.id} h={h}>{b.title}</NoteLink>
-                </li>
+        <header className="note-read-head">
+          <div>
+            <span className={`kind-badge kind-${note.kind}`}>{kindName(note.kind)}</span>
+            <h2>{note.title}</h2>
+            {note.aliases.length > 0 && <p className="note-aka">Also known as {note.aliases.join(', ')}</p>}
+          </div>
+          <button className="btn ghost small" onClick={onEdit} title="Edit (Ctrl+E)">Edit</button>
+        </header>
+
+        {facts.length > 0 && (
+          <dl className="note-facts">
+            {facts.map((f) => {
+              const v = note.fields[f.key];
+              const target = f.ref ? resolveName(index, v) : undefined;
+              return (
+                <div key={f.key} className={`fact fact-${f.key} ${f.key === 'status' ? `status-${v.replace(' ', '-')}` : ''}`}>
+                  <dt>{f.label}</dt>
+                  <dd>
+                    {target ? (
+                      <NoteLink id={target.id} h={h}>{v}</NoteLink>
+                    ) : f.ref && !f.loose ? (
+                      <MissingLink title={v} kind={f.ref} h={h}>{v}</MissingLink>
+                    ) : (
+                      v
+                    )}
+                  </dd>
+                </div>
+              );
+            })}
+          </dl>
+        )}
+
+        {note.body.trim() ? (
+          <NoteBody text={note.body} index={index} h={h} />
+        ) : (
+          <p className="hint">
+            Nothing written yet. <button className="linkish" onClick={onEdit}>Start writing</button>
+          </p>
+        )}
+
+        <footer className="note-read-foot">
+          {note.tags.length > 0 && (
+            <div className="chips">
+              {note.tags.map((t) => (
+                <button key={t} className="chip note-tag" onClick={() => onTag(t)} title={`Show notes tagged “${t}”`}>#{t}</button>
               ))}
-            </ul>
-          ) : (
-            <p className="hint">No other note mentions this one yet.</p>
+            </div>
           )}
-        </section>
-        <p className="hint">Updated {parseAt(note.updatedAt).toLocaleString()}</p>
-      </footer>
-    </article>
+          <p className="hint">Updated {parseAt(note.updatedAt).toLocaleString()}</p>
+        </footer>
+      </article>
+      {/* Beside the page on wide screens, under it otherwise. */}
+      <aside className="k-mentions backlinks" aria-labelledby="k-mentions-h">
+        <h3 id="k-mentions-h">Mentioned in</h3>
+        {backlinks === null ? (
+          <p className="hint">…</p>
+        ) : backlinks.length ? (
+          <ul>
+            {backlinks.map((b) => (
+              <li key={b.id}>
+                <span className={`kind-dot kind-${b.kind}`} aria-hidden /> <NoteLink id={b.id} h={h}>{b.title}</NoteLink>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="hint">No other note mentions this one yet.</p>
+        )}
+      </aside>
+    </div>
   );
 }

@@ -9,6 +9,7 @@ import { LegacyNotesRedirect, Notes } from './components/notes/NotesPage';
 import { HomebrewLibrary } from './components/HomebrewLibrary';
 import { HomebrewEditor } from './components/HomebrewEditor';
 import { Toasts } from './components/Toast';
+import { CommandPalette } from './components/CommandPalette';
 import { api } from './lib/client';
 import { linkTo, useRoute, type SheetTab } from './lib/router';
 import type { CharacterDto, CharacterSummary } from './shared/types';
@@ -137,6 +138,7 @@ export function Root() {
         </Centered>
       )}
       <Toasts />
+      {boot.state === 'ready' && <CommandPalette />}
     </>
   );
 }

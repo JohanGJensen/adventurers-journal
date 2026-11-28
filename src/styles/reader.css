@@ -1,0 +1,60 @@
+/* ---------- Notes as a reader, and the Ctrl+K palette ---------- */
+
+/* The title hangs on a parchment plaque, not on the wall. */
+.notes-head.k-pplaque { margin-bottom: 18px; padding: 14px 20px; border-top-color: var(--accent); }
+.notes-head.k-pplaque h1, .notes-head.k-pplaque h1 a { color: var(--heading); text-shadow: none; }
+.notes-head.k-pplaque .notes-campaign, .notes-head.k-pplaque .notes-shared { color: var(--muted); text-shadow: none; }
+
+/* Index and page get the gilt hairline and corner. */
+.notes-side, .note-panel { position: relative; }
+.notes-side::before, .note-panel::before { content: ''; position: absolute; inset: 5px; border: 1px solid var(--gilt); border-radius: 2px; opacity: .4; pointer-events: none; }
+.kind-tab { display: inline-flex; align-items: center; gap: 6px; }
+.kind-medal { width: 22px; height: 22px; flex: none; border-radius: 50%; box-shadow: 0 0 0 1px var(--gilt); }
+
+/* The note as an open page: facts over a gilt rule, an illuminated initial, and what mentions it beside it. */
+.k-note-spread { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; }
+@media (min-width: 1280px) { .k-note-spread { grid-template-columns: minmax(0, 1fr) 220px; align-items: start; } }
+.note-read .note-facts { padding-bottom: 14px; background: var(--rule) center bottom / 100% 14px no-repeat; }
+.note-read .note-body > p:first-child::first-letter {
+  float: left; margin: 4px 8px 0 0; padding: 5px 7px 1px;
+  font: 400 3.2em/.9 'IM Fell English SC', serif; color: var(--gilt-hi); text-shadow: 0 1px 0 var(--brass-ink);
+  background: radial-gradient(circle at 40% 35%, color-mix(in srgb, var(--accent) 85%, white), color-mix(in srgb, var(--accent) 70%, black));
+  border: 2px solid var(--gilt); border-radius: 3px; box-shadow: inset 0 0 8px rgb(0 0 0 / 40%);
+}
+@media (prefers-color-scheme: dark) {
+  .note-read .note-body > p:first-child::first-letter { background: radial-gradient(circle at 40% 35%, color-mix(in srgb, var(--accent) 50%, black), color-mix(in srgb, var(--accent) 28%, black)); }
+}
+.k-mentions { padding: 12px 14px; border: 1px solid var(--line); border-radius: 3px; background: var(--bg-2); }
+.k-mentions h3 { margin: 0 0 8px; font: 400 16px 'IM Fell English SC', serif; letter-spacing: .05em; color: var(--muted); text-transform: none; }
+.k-mentions ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+@media (min-width: 1280px) { .k-mentions { position: sticky; top: 16px; } }
+
+/* Find & roll in the sidebar. */
+.k-side-find { width: 100%; border: 0; background: none; text-align: left; font-family: inherit; cursor: pointer; }
+.k-side-find kbd { margin-left: auto; }
+kbd { font: 600 13px 'EB Garamond', serif; padding: 0 6px; border-radius: 3px; background: var(--bg); border: 1px solid var(--line); box-shadow: 0 1px 0 var(--line); color: var(--ink); }
+
+/* The palette. */
+.k-palette-scrim { position: fixed; inset: 0; z-index: 200; display: flex; justify-content: center; align-items: flex-start; padding: 10vh 16px 16px; background: radial-gradient(circle at 50% 30%, rgb(30 20 8 / 45%), rgb(20 12 4 / 72%)); animation: k-fade var(--dur-fast) ease both; }
+@keyframes k-fade { from { opacity: 0; } }
+.k-palette { width: min(660px, 100%); max-height: 76vh; display: flex; flex-direction: column; overflow: hidden; border-top: 8px solid var(--accent); box-shadow: 0 24px 60px rgb(10 6 2 / 60%), inset 0 0 26px rgb(120 70 20 / 16%); }
+.k-palette-input { display: flex; align-items: center; gap: 12px; padding: 4px 20px 2px; color: var(--muted); background: var(--rule) center bottom / 100% 14px no-repeat; }
+.k-palette-input input { flex: 1; min-width: 0; min-height: 60px; border: 0; background: none; outline: none; color: var(--ink); font: 400 22px 'IM Fell English SC', serif; letter-spacing: .03em; }
+.k-palette-list { list-style: none; margin: 0; padding: 6px 0; overflow-y: auto; }
+.k-palette-group { padding: 10px 20px 4px; font: 400 14px 'IM Fell English SC', serif; letter-spacing: .06em; color: var(--muted); }
+.k-hit { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 48px; padding: 0 20px; border: 0; background: none; text-align: left; color: var(--ink); font: 500 17px 'EB Garamond', serif; cursor: pointer; }
+.k-hit.on { background: var(--accent-soft); box-shadow: inset 4px 0 0 var(--accent); }
+.k-hit img { width: 30px; height: 30px; flex: none; border-radius: 50%; object-fit: cover; object-position: 50% 20%; box-shadow: 0 0 0 1.5px var(--gilt); }
+.k-hit-ic { width: 30px; height: 30px; flex: none; border-radius: 50%; border: 1.5px solid var(--gilt); background: radial-gradient(circle at 35% 30%, var(--accent-2), var(--accent) 70%); }
+.k-hit-ic.g-Spells { background: radial-gradient(circle at 35% 30%, #6f9be0, #24508f 70%); }
+.k-hit-ic.g-Goto { background: radial-gradient(circle at 35% 30%, #f2d27a, var(--gilt) 70%); }
+.k-hit-label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.k-hit-label small { font-style: italic; color: var(--muted); font-size: 15px; }
+.k-hit strong { font: 600 18px Cinzel, serif; }
+.k-palette-empty { padding: 14px 20px; font: italic 16px 'EB Garamond', serif; color: var(--muted); }
+.k-palette-foot { display: flex; flex-wrap: wrap; gap: 8px 16px; padding: 10px 20px 12px; border-top: 1px solid var(--line); background: var(--bg-2); font: italic 15px 'EB Garamond', serif; color: var(--muted); }
+.k-palette-roll { display: inline-flex; align-items: center; gap: 10px; font: normal 17px 'EB Garamond', serif; color: var(--ink); }
+.k-palette-roll strong { font: 900 24px Cinzel, serif; }
+.k-palette-roll .k-die { width: 32px; height: 32px; font-size: 13px; }
+@media (prefers-reduced-motion: reduce) { .k-palette-scrim { animation: none; } }
+@media (max-width: 599px) { .k-palette-scrim { padding-top: 12px; } .k-palette-foot span:not(.k-palette-roll):nth-child(n + 2) { display: none; } }
