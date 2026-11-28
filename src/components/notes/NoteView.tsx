@@ -132,7 +132,7 @@ export function NoteView({ note, index, backlinks, h, onTag, onEdit }: ViewProps
       {image && (
         // Beside the title (and the facts, when there are any). Without an image of its own the note shows its kind's stand-in.
         <figure
-          // A stand-in is a medallion with its own rim, so it never gets the portrait's round crop and rings.
+          // A stand-in keeps is-picture (it's not an uploaded portrait); its round frame comes from .is-fallback.
           className={`note-image ${note.image && isPortraitKind(note.kind) ? 'is-portrait' : 'is-picture'} ${note.image ? '' : 'is-fallback'}`}
           style={{ gridRowEnd: facts.length ? 'span 2' : 'span 1' }}
         >
