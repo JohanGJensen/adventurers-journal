@@ -1,5 +1,4 @@
 /* ---------- Character creation wizard (/new) ---------- */
-.create-cta { display: grid; gap: 10px; justify-items: start; border-top: 4px solid var(--gilt); }
 .create-page .list-head { align-items: center; }
 .start-over { margin-left: auto; }
 

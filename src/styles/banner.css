@@ -122,9 +122,6 @@ button.k-chip:hover { border-color: var(--gilt); }
   .k-ribbon-tab { flex: none; font-size: 16px; padding-inline: 14px; }
 }
 
-.k-tab-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(360px, 100%), 1fr)); gap: 18px; align-items: start; }
-.k-tab-single { display: grid; gap: 18px; }
-
 /* Phone: name and portrait stack; vitals fold to the essentials, two to a row. */
 @media (max-width: 599px) {
   .k-banner { padding: 18px 14px 14px; }

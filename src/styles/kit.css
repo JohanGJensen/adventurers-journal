@@ -192,3 +192,6 @@ button.k-coin:active { transform: scale(.94); }
   :is([class^='k-'], [class*=' k-']), :is([class^='k-'], [class*=' k-'])::before, :is([class^='k-'], [class*=' k-'])::after { animation: none !important; transition: none !important; }
   .k-embers { display: none; }
 }
+
+/* Keyboard focus on the kit's controls: a gilt ring, the same everywhere. */
+:is(.k-coin, button.k-seal, .k-seal-toggle, .k-step, .k-x, .k-chip, .k-rolls button, .k-seg button):focus-visible { outline: 2px solid var(--gilt); outline-offset: 2px; }
