@@ -4,3 +4,4 @@ data/
 *.tsbuildinfo
 dist-electron
 release
+__pycache__/

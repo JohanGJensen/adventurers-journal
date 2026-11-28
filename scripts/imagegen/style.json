@@ -1,0 +1,37 @@
+{
+  "preamble": "Digital painting in a painterly realist style with an oil-paint finish, realistic anatomy and natural lighting, muted earthy palette, fine brushwork, high-fantasy setting. Clean image with no signature, text, letters, watermarks or frames.",
+  "sizes": {
+    "square": [
+      1024,
+      1024
+    ],
+    "landscape": [
+      1216,
+      816
+    ],
+    "portrait": [
+      816,
+      1216
+    ]
+  },
+  "kinds": {
+    "npc": "square",
+    "player": "square",
+    "item": "square",
+    "faction": "square",
+    "place": "landscape",
+    "lore": "landscape",
+    "quest": "landscape"
+  },
+  "draftScale": 0.5,
+  "models": {
+    "klein": {
+      "steps": 4,
+      "guidance": 1.0
+    },
+    "dev": {
+      "steps": 28,
+      "guidance": 4.0
+    }
+  }
+}
