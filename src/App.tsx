@@ -10,9 +10,8 @@ import { SheetTabs } from './components/sheet/SheetTabs';
 import type { SheetTab } from './lib/router';
 import { StatsTab } from './components/sheet/StatsTab';
 import { SpellsTab } from './components/spells/SpellsTab';
-import { Features } from './components/Features';
-import { Equipment } from './components/Equipment';
-import { ToolKit } from './components/ToolKit';
+import { FeaturesTab } from './components/gear/FeaturesTab';
+import { InventoryTab } from './components/gear/InventoryTab';
 import { DetailDrawer, type Selection } from './components/DetailDrawer';
 import { DiceTray } from './components/DiceTray';
 import { DiceStage } from './components/DiceStage';
@@ -93,15 +92,10 @@ export function App({ character, tab, onCharacterChange }: { character: Characte
           </div>
         )}
         {tab === 'inventory' && (
-          <div className="k-tab-grid">
-            <Equipment inventory={inventory} onOpen={(name) => setSelection({ kind: 'equipment', name })} />
-            <ToolKit c={c} />
-          </div>
+          <InventoryTab c={c} inventory={inventory} onOpen={(name) => setSelection({ kind: 'equipment', name })} />
         )}
         {tab === 'features' && (
-          <div className="k-tab-single">
-            <Features c={c} variant={play.state.variant} />
-          </div>
+          <FeaturesTab c={c} play={play} />
         )}
         <footer>Spell &amp; item data: <a href="https://www.dnd5eapi.co" target="_blank" rel="noreferrer">dnd5eapi.co</a> (SRD 5.2 / 5.1, CC-BY-4.0)</footer>
       </main>

@@ -1,0 +1,64 @@
+/* ---------- Inventory and Features tabs ---------- */
+.k-gear { display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, 360px); gap: 18px; align-items: start; }
+@media (max-width: 999px) { .k-gear { grid-template-columns: 1fr; } }
+.k-gear-main, .k-gear-side { display: grid; gap: 18px; min-width: 0; }
+.k-reset-inv { justify-self: start; }
+
+.k-ac-line { display: flex; align-items: center; gap: 12px; margin: 0 0 12px; font: 16px 'EB Garamond', serif; color: var(--muted); }
+.k-ac-line strong { color: var(--ink); font: 700 17px Cinzel, serif; }
+.k-ac-mini { flex: none; width: 40px; height: 46px; display: grid; place-items: center; border-radius: 4px 4px 50% 50% / 4px 4px 40% 40%; background: radial-gradient(circle at 40% 25%, color-mix(in srgb, var(--accent) 80%, white), color-mix(in srgb, var(--accent) 75%, black)); box-shadow: 0 0 0 2px var(--gilt), 0 3px 6px rgb(0 0 0 / 30%); color: #f3eee1; font: 900 17px Cinzel, serif; }
+
+.k-items { list-style: none; margin: 0; padding: 0; display: grid; }
+.k-item { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; min-height: 48px; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+.k-item:last-child { border-bottom: 0; }
+.k-item.empty { opacity: .6; }
+.k-item-name { flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; }
+.k-item-name .link { align-self: flex-start; font: 500 17px 'EB Garamond', serif; text-align: left; }
+.k-item-name small { font: italic 14px 'EB Garamond', serif; color: var(--muted); }
+.k-item-input { min-height: 32px; padding: 0 8px; border: 1px solid var(--gilt); border-radius: 3px; background: var(--bg); color: var(--ink); font: 17px 'EB Garamond', serif; }
+.k-qty { display: inline-flex; align-items: center; gap: 6px; }
+.k-qty-n { min-width: 26px; text-align: center; font: 600 16px Cinzel, serif; font-variant-numeric: tabular-nums; }
+.k-step { width: 30px; height: 30px; padding: 0; border-radius: 3px; border: 1px solid var(--line); background: var(--bg-2); color: var(--ink); font: 600 16px 'EB Garamond', serif; }
+.k-step:hover:not(:disabled) { border-color: var(--gilt); }
+.k-step:disabled { opacity: .4; }
+.k-item-acts { display: inline-flex; align-items: center; gap: 4px; }
+.k-add-item { display: flex; gap: 8px; margin-top: 12px; }
+.k-add-item input { flex: 1; min-height: 36px; padding: 0 10px; border: 1px solid var(--line); border-radius: 3px; background: var(--bg); color: var(--ink); font: 16px 'EB Garamond', serif; }
+
+/* The purse: five metal discs, each with its count stamped in. */
+.k-purse { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; justify-items: center; }
+.k-disc { --m1: #e0a070; --m2: #a0582a; --m3: #6b3416; position: relative; display: grid; place-items: center; width: 52px; height: 52px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, var(--m1), var(--m2) 60%, var(--m3)); box-shadow: inset 0 -3px 5px rgb(0 0 0 / 30%), inset 0 2px 2px rgb(255 255 255 / 40%), 0 3px 6px rgb(0 0 0 / 30%); }
+.k-disc::before { content: ''; position: absolute; inset: 5px; border-radius: 50%; border: 1px dashed rgb(255 255 255 / 35%); pointer-events: none; }
+.k-disc input { width: 42px; padding: 0; border: 0; background: none; text-align: center; color: #2a1a08; font: 700 16px Cinzel, serif; -moz-appearance: textfield; text-shadow: 0 1px 0 rgb(255 255 255 / 45%); }
+.k-disc input::-webkit-inner-spin-button, .k-disc input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+.k-disc input:focus { outline: 2px solid var(--gilt-hi); outline-offset: 4px; border-radius: 3px; }
+.k-disc small { position: absolute; bottom: -18px; font: 400 13px 'IM Fell English SC', serif; letter-spacing: .08em; color: var(--muted); text-transform: uppercase; }
+.k-purse { padding-bottom: 18px; }
+.k-disc-sp { --m1: #f2f2ee; --m2: #b8bab6; --m3: #6f716c; }
+.k-disc-ep { --m1: #f4ecc0; --m2: #c4b46a; --m3: #6f6326; }
+.k-disc-gp { --m1: #ffe58a; --m2: #d6a630; --m3: #7a5410; }
+.k-disc-pp { --m1: #ffffff; --m2: #c8d3dc; --m3: #6c7a86; }
+
+/* Tools sit in the side column; make the older card match the kit's parchment. */
+.k-gear-side .tool-kit { margin: 0; }
+
+/* Features: grouped by source; each opens to its text under an illuminated initial. */
+.k-features { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(420px, 100%), 1fr)); gap: 18px; align-items: start; }
+.k-features > .k-hint { grid-column: 1 / -1; }
+.k-feature { border-bottom: 1px solid var(--line); }
+.k-feature:last-of-type { border-bottom: 0; }
+.k-feature summary { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; min-height: 44px; padding: 10px 6px; cursor: pointer; list-style: none; }
+.k-feature summary::-webkit-details-marker { display: none; }
+.k-feature summary::before { content: ''; width: 8px; height: 8px; flex: none; align-self: center; border-right: 2px solid var(--gilt); border-bottom: 2px solid var(--gilt); transform: rotate(-45deg); transition: transform var(--dur-fast); }
+.k-feature[open] summary::before { transform: rotate(45deg); }
+.k-feature summary:focus-visible { outline: 2px solid var(--gilt); outline-offset: -2px; border-radius: 3px; }
+.k-feature-name { font: 600 18px 'EB Garamond', serif; }
+.k-feature summary small { margin-left: auto; font: italic 14px 'EB Garamond', serif; color: var(--muted); }
+.k-feature-uses { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 0 6px 10px 24px; }
+.k-feature-uses small { font: italic 14px 'EB Garamond', serif; color: var(--muted); }
+.k-feature-text { margin: 0 6px 14px 24px; font: 400 16.5px/1.5 'EB Garamond', serif; white-space: pre-line; }
+.k-feature-text::first-letter { font-size: 2.6em; }
+
+@media (max-width: 599px) {
+  .k-item-acts { width: 100%; justify-content: flex-end; }
+}
