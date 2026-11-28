@@ -7,11 +7,12 @@
 .loader-sigil { width: 120px; height: 120px; overflow: visible; }
 .loader-inline .loader-sigil { width: 36px; height: 36px; }
 .loader-label { font-style: italic; color: var(--muted); }
-.loader-page .loader-label { font-size: 1.1rem; color: var(--on-stone); text-shadow: 0 1px 0 rgb(255 255 255 / 25%), 0 0 12px var(--torch); }
-@media (prefers-color-scheme: dark) { .loader-page .loader-label { text-shadow: 0 1px 2px rgb(0 0 0 / 80%), 0 0 14px rgb(0 0 0 / 60%); } }
+/* The label hangs on a parchment slip (surfaces.css), not on the wall. */
+.loader-page .loader-label { font-size: 1.1rem; }
 .loader-label::after { content: ''; display: inline-block; width: 1.2em; text-align: left; animation: loader-dots 1.6s steps(1) infinite; }
 .loader-page .loader-sigil { filter: drop-shadow(0 0 10px color-mix(in srgb, var(--glow) 35%, transparent)); }
 
+.sigil-counter { transform-box: view-box; transform-origin: 50% 50%; animation: sigil-turn 16s linear infinite reverse; }
 .sigil-runes { transform-box: view-box; transform-origin: 50% 50%; animation: sigil-turn 24s linear infinite; }
 .sigil-draw { stroke-dasharray: 1; stroke-dashoffset: 1; animation: sigil-draw 3.6s ease-in-out infinite; }
 .sigil-draw.d2 { animation-delay: .25s; }
@@ -33,7 +34,7 @@
 @keyframes loader-dots { 0% { content: ''; } 25% { content: '.'; } 50% { content: '..'; } 75% { content: '...'; } }
 
 @media (prefers-reduced-motion: reduce) {
-  .sigil-runes, .sigil-draw, .sigil-core, .loader-label::after { animation: none; }
+  .sigil-counter, .sigil-runes, .sigil-draw, .sigil-core, .loader-label::after { animation: none; }
   .sigil-draw { stroke-dashoffset: 0; }
   .loader-sigil { animation: sigil-calm 2.4s ease-in-out infinite alternate; }
   .loader-label::after { content: '…'; }

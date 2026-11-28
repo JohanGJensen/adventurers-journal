@@ -21,17 +21,26 @@
 .card h3 { font-family: 'IM Fell English SC', Cinzel, serif; font-size: .95rem; text-transform: none; letter-spacing: .04em; font-weight: 400; color: var(--muted); }
 .card h3::before { content: '\2767\FE0E'; color: var(--accent-2); margin-right: .4em; font-size: .85em; }
 
-/* Text set directly on the wall: engraved, not printed. */
-.list-head h1, .char-group > h2, .sheet > .hint, .char-group > .hint, .sheet-nav a, .topnav a, footer, footer a, .loading, .notes-shared {
-  color: var(--on-stone); text-shadow: 0 1px 0 rgb(255 255 255 / 25%), 0 0 12px var(--torch);
+/* Nothing is written straight on the wall: page titles hang on parchment plaques, and the footer, the plain nav
+   rows and loading or error messages are small parchment slips. */
+.list-head, .sheet-nav, .topnav, footer:not([class]), .loading > p, .loading > a, .loader-page .loader-label, .log-filters {
+  position: relative; color: var(--ink); text-shadow: none;
+  background: linear-gradient(var(--card-wash), var(--card-wash)), var(--card-tex) 0 0 / 512px 512px repeat, var(--card);
+  border: 1px solid rgb(90 60 25 / 45%); border-radius: 3px; box-shadow: var(--shadow);
 }
+.list-head { padding: 14px 20px; border-top: 4px solid var(--accent); margin-bottom: 18px; }
+.list-head::before { content: ''; position: absolute; inset: 5px; border: 1px solid var(--gilt); border-radius: 2px; opacity: .4; pointer-events: none; }
+.list-head h1 { position: relative; color: var(--heading); text-shadow: none; font: 400 clamp(1.8rem, 4vw, 2.4rem)/1.15 'IM Fell English SC', Cinzel, serif; letter-spacing: .03em; }
+.sheet-nav, .topnav { display: inline-flex; flex-wrap: wrap; gap: 16px; padding: 8px 14px; }
+.sheet-nav a, .topnav a { color: var(--accent); text-decoration-color: var(--gilt); text-underline-offset: 3px; text-shadow: none; }
+footer:not([class]) { display: table; margin: 24px auto 0; padding: 4px 14px; font-size: .85rem; color: var(--muted); }
+footer:not([class]) a { color: var(--accent); text-shadow: none; }
+.loading > p, .loading > a, .loader-page .loader-label { padding: 8px 16px; }
+.loading > a { display: inline-block; margin-top: 8px; color: var(--accent); }
+.log-filters { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 10px; }
 @media (prefers-color-scheme: dark) {
-  .list-head h1, .char-group > h2, .sheet > .hint, .char-group > .hint, .sheet-nav a, .topnav a, footer, footer a, .loading, .notes-shared { text-shadow: 0 1px 2px rgb(0 0 0 / 80%), 0 0 14px rgb(0 0 0 / 60%); }
+  .list-head, .sheet-nav, .topnav, footer:not([class]), .loading > p, .loading > a, .loader-page .loader-label, .log-filters { border-color: rgb(236 210 160 / 20%); }
 }
-.list-head h1 { font-size: clamp(1.8rem, 4vw, 2.6rem); }
-.char-group > h2 { font-family: 'IM Fell English SC', Cinzel, serif; font-weight: 400; font-size: 1.25rem; letter-spacing: .06em; }
-.sheet > .hint, .char-group > .hint, footer { color: var(--on-stone-muted); }
-.sheet-nav a, .topnav a { text-decoration-color: var(--gilt); text-underline-offset: 3px; }
 
 /* Header: a banner in the class colours across the top of a parchment panel. */
 .hero {

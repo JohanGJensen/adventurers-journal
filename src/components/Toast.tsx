@@ -7,7 +7,8 @@ export function Toasts() {
   return (
     <div className="toasts" role="status" aria-live="polite">
       {items.map((t) => (
-        <button key={t.id} className={`toast ${t.tone}`} onClick={() => dismissToast(t.id)}>
+        <button key={t.id} className={`toast k-slip ${t.tone}`} onClick={() => dismissToast(t.id)}>
+          <span className="k-slip-wax" aria-hidden="true" />
           {t.text}
         </button>
       ))}

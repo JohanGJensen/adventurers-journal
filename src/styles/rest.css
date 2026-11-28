@@ -1,0 +1,38 @@
+/* ---------- The remaining pages, and the theme switch ---------- */
+
+/* Lore: each section's story opens with an illuminated initial; the glance panel wears the class colour. */
+.lore-section .prose > p:first-child::first-letter {
+  float: left; margin: 4px 8px 0 0; padding: 5px 7px 1px;
+  font: 400 3.2em/.9 'IM Fell English SC', serif; color: var(--gilt-hi); text-shadow: 0 1px 0 var(--brass-ink);
+  background: radial-gradient(circle at 40% 35%, color-mix(in srgb, var(--accent) 85%, white), color-mix(in srgb, var(--accent) 70%, black));
+  border: 2px solid var(--gilt); border-radius: 3px; box-shadow: inset 0 0 8px rgb(0 0 0 / 40%);
+}
+@media (prefers-color-scheme: dark) {
+  .lore-section .prose > p:first-child::first-letter { background: radial-gradient(circle at 40% 35%, color-mix(in srgb, var(--accent) 50%, black), color-mix(in srgb, var(--accent) 28%, black)); }
+}
+.lore-glance { border-top: 4px solid var(--accent); }
+
+/* History: each entry's mark sits in a small wax seal. */
+.log-icon {
+  display: inline-grid; place-items: center; width: 26px; height: 26px; flex: none; border-radius: 50%; font-size: 13px; line-height: 1;
+  background: radial-gradient(circle at 38% 32%, color-mix(in srgb, var(--accent) 30%, var(--card)), color-mix(in srgb, var(--accent) 18%, var(--card)));
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--gilt) 60%, transparent), inset 0 -1px 2px rgb(0 0 0 / 20%);
+}
+
+/* The theme switch: a sun, a moon and a half-and-half disc. */
+.k-theme { display: inline-flex; align-self: flex-start; gap: 2px; padding: 3px; margin: 6px 8px; border: 1px solid var(--line); border-radius: 999px; background: var(--bg-2); }
+.k-theme button { display: grid; place-items: center; width: 34px; height: 30px; padding: 0; border: 0; border-radius: 999px; background: none; color: var(--muted); }
+.k-theme button:hover { color: var(--ink); }
+.k-theme button[aria-checked='true'] { background: var(--accent); color: #f3eee1; }
+.k-theme button:focus-visible { outline: 2px solid var(--gilt); outline-offset: 1px; }
+@media (prefers-color-scheme: dark) { .k-theme button[aria-checked='true'] { background: color-mix(in srgb, var(--accent) 45%, black); color: var(--gilt-hi); } }
+.k-hall-actions .k-theme { margin: 0 0 0 auto; align-self: center; }
+/* On the sidebar's icon rail the switch stands upright. */
+@media (min-width: 600px) and (max-width: 999px) { .k-shell .k-side:not(.expanded) .k-theme { flex-direction: column; margin: 6px auto; } }
+@media (min-width: 1000px) { .k-shell.compact .k-side:not(.expanded) .k-theme { flex-direction: column; margin: 6px auto; } }
+
+/* Homebrew: the explanation sits in the title plaque, and the library is one parchment shelf. */
+.homebrew-page .list-head .hint { position: relative; margin: 10px 0 0; color: var(--muted); }
+.homebrew-shelf { display: grid; gap: 4px; }
+.homebrew-class + .homebrew-class { border-top: 1px solid var(--line); padding-top: 4px; }
+.homebrew-class > h3 { margin-top: 10px; }

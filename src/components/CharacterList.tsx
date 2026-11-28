@@ -8,7 +8,7 @@ import { ClassEmblem } from './ClassEmblem';
 import { PortraitUpload } from './PortraitUpload';
 import { Loader } from './Loader';
 import { openPalette } from './CommandPalette';
-import { CandleLight, Embers, Parchment, ParchmentPlaque, Plaque } from './kit';
+import { CandleLight, Embers, Parchment, ParchmentPlaque, Plaque, ThemeSwitch } from './kit';
 
 const initials = (name: string) => name.split(/\s+/).map((w) => w[0]).slice(0, 2).join('');
 const ROMAN = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII', 'XIII', 'XIV', 'XV', 'XVI', 'XVII', 'XVIII', 'XIX', 'XX'];
@@ -110,6 +110,7 @@ export function CharacterList() {
           <a className="btn" {...linkTo('/new')}>+ Raise a new hero</a>
           <a className="btn ghost" {...linkTo('/homebrew')}>Homebrew</a>
           <button className="btn ghost" onClick={openPalette}>Find &amp; roll <kbd>Ctrl K</kbd></button>
+          <ThemeSwitch />
         </div>
       </ParchmentPlaque>
 

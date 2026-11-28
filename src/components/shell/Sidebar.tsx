@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { linkTo } from '../../lib/router';
 import { openPalette } from '../CommandPalette';
+import { ThemeSwitch } from '../kit';
 import type { CharacterSummary } from '../../shared/types';
 import { useCharacterFacts, useCharacters } from './shellData';
 
@@ -141,6 +142,7 @@ export function Sidebar({ characterId, current }: { characterId: number; current
           <span className="k-side-label">Find &amp; roll</span>
           <kbd className="k-side-label">Ctrl K</kbd>
         </button>
+        <ThemeSwitch />
         <NavLink to="/homebrew" icon={ICONS.homebrew}>Homebrew</NavLink>
         <NavLink to="/" icon={ICONS.all}>All characters</NavLink>
 
