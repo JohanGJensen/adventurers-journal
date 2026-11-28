@@ -1,0 +1,66 @@
+/* ---------- The Hall of Heroes: each hero hangs in an arched gilt frame under their campaign's brass plaque ---------- */
+.k-hall { position: relative; display: grid; gap: 30px; max-width: 1180px; }
+.k-hall > :not(.k-embers) { position: relative; z-index: 1; }
+.k-hall-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+.k-hall-group { padding: 0 22px 26px; }
+.k-hall-group > .k-plaque-wrap { margin-top: -30px; }
+.k-hall-group-acts { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.k-frames { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 34px 24px; padding-top: 22px; }
+
+.k-hero { position: relative; isolation: isolate; display: flex; flex-direction: column; align-items: center; text-align: center; color: var(--ink); text-decoration: none; }
+.k-frame {
+  position: relative; display: block; width: 190px; height: 236px; padding: 13px; box-sizing: border-box; border-radius: 95px 95px 8px 8px;
+  background: linear-gradient(135deg, #f2d27a, #b8892f 30%, #7a5410 55%, #c89a3c 75%, #6e4a12);
+  box-shadow: inset 0 0 0 2px #6e4a12, inset 0 0 0 5px var(--gilt-hi), 0 14px 26px rgb(20 12 4 / 50%);
+  transition: transform var(--dur-med) var(--ease-spring), box-shadow var(--dur-med);
+}
+.k-frame::after { content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; mix-blend-mode: overlay; background: linear-gradient(115deg, transparent 35%, rgb(255 255 255 / 55%) 48%, transparent 60%) 130% 0 / 260% 100%; }
+@media (hover: hover) {
+  .k-hero:hover .k-frame, .k-hero:focus-within .k-frame { transform: translateY(-6px) rotate(-.6deg); box-shadow: inset 0 0 0 2px #6e4a12, inset 0 0 0 5px #ffe08a, 0 0 40px 6px color-mix(in srgb, var(--glow) 55%, transparent), 0 20px 34px rgb(20 12 4 / 55%); }
+  .k-hero:hover .k-frame::after { animation: k-sheen 1.2s ease-out; }
+}
+.k-canvas { position: relative; display: grid; place-items: center; width: 100%; height: 100%; overflow: hidden; border-radius: 82px 82px 4px 4px; background: radial-gradient(circle at 50% 35%, var(--accent-2), #1c1208 85%); box-shadow: inset 0 0 0 2px #3a2405, inset 0 0 30px rgb(0 0 0 / 55%); }
+.k-canvas .portrait-upload, .k-canvas .portrait-upload-label { width: 100%; height: 100%; border-radius: 0; }
+.k-canvas .portrait-upload-overlay { border-radius: 0; }
+.k-canvas img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 15%; filter: sepia(.12); }
+.k-canvas-ini { display: grid; place-items: center; width: 100%; height: 100%; font: 400 60px 'IM Fell English SC', serif; color: #f3e3c0; text-shadow: 0 0 20px var(--glow), 0 3px 0 #1c1208; }
+.k-canvas .k-candle { background: radial-gradient(circle at 50% 110%, rgb(255 180 90 / 45%), transparent 60%); }
+
+/* The class pennant hangs from the bottom of the frame with the level in Roman numerals. */
+.k-hero-pennant {
+  position: relative; z-index: -1; margin-top: -8px; width: 120px; padding: 10px 0 24px; display: flex; flex-direction: column; align-items: center; gap: 2px;
+  color: #f3eee1; clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 78%, 0 100%);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 65%, black), var(--accent) 45%, color-mix(in srgb, var(--accent) 65%, black));
+}
+.k-hero-pennant .emblem { width: 22px; height: 22px; color: var(--gilt-hi); }
+.k-hero-pennant b { font: 700 18px/1 Cinzel, serif; }
+@media (prefers-color-scheme: dark) { .k-hero-pennant { background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 30%, black), color-mix(in srgb, var(--accent) 55%, black) 45%, color-mix(in srgb, var(--accent) 30%, black)); } }
+.k-hero-name { margin-top: 6px; font: 400 24px/1.1 'IM Fell English SC', serif; letter-spacing: .03em; color: var(--accent); text-decoration: none; }
+a.k-hero-name:hover { text-decoration: underline; text-decoration-color: var(--gilt); }
+.k-hero-sub { font: italic 16px 'EB Garamond', serif; color: var(--muted); }
+.k-hpbar { display: block; width: 160px; height: 6px; margin-top: 8px; border-radius: 99px; overflow: hidden; background: rgb(112 78 36 / 22%); box-shadow: inset 0 1px 2px rgb(0 0 0 / 30%); }
+.k-hpbar i { display: block; height: 100%; background: linear-gradient(90deg, var(--glow), var(--accent)); }
+.k-hpbar i.mid { background: linear-gradient(90deg, var(--gilt-hi), var(--gilt)); }
+.k-hpbar i.low { background: linear-gradient(90deg, color-mix(in srgb, var(--wax) 70%, white), var(--wax)); }
+.k-hero-vit { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin-top: 8px; }
+.k-hero-vit strong { font: 600 15px Cinzel, serif; }
+.k-hero-menu { position: absolute; top: 0; right: 0; }
+.k-hero-menu > .btn { min-width: 40px; min-height: 36px; font-size: 18px; background: var(--card); }
+.k-menu a, .k-menu .k-menu-field { display: flex; align-items: center; min-height: 40px; padding: 0 12px; border-radius: 3px; text-decoration: none; color: var(--ink); font: 500 16px 'EB Garamond', serif; }
+.k-menu a:hover { background: var(--bg-2); }
+.k-menu .k-menu-field { gap: 8px; justify-content: space-between; }
+.k-menu select { min-height: 32px; max-width: 140px; }
+
+/* The empty frame: add a hero to this campaign. */
+.k-hero.empty .k-frame { background: none; box-shadow: none; border: 2px dashed rgb(112 78 36 / 55%); }
+.k-hero.empty .k-canvas { background: var(--bg-2); box-shadow: none; }
+.k-hero.empty .k-hero-name { margin-top: 26px; font-size: 20px; color: var(--muted); }
+.k-wax { width: 72px; height: 72px; border-radius: 50%; display: grid; place-items: center; background: radial-gradient(circle at 38% 32%, color-mix(in srgb, var(--wax) 70%, white), var(--wax) 55%, color-mix(in srgb, var(--wax) 60%, black)); color: #f8e2c8; font: 400 40px 'IM Fell English SC', serif; box-shadow: inset 0 -3px 5px rgb(0 0 0 / 35%), 0 4px 8px rgb(0 0 0 / 35%); transform: rotate(-10deg); transition: transform var(--dur-med) var(--ease-spring); }
+.k-hero.empty:hover .k-wax, .k-hero.empty:focus-visible .k-wax { transform: rotate(8deg) scale(1.12); }
+.k-hero.empty:focus-visible { outline: 2px solid var(--gilt); outline-offset: 6px; border-radius: 8px; }
+
+.k-hall-tools { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr)); gap: 18px; }
+.k-row-form { display: flex; flex-wrap: wrap; gap: 8px; }
+.k-row-form input, .k-row-form select { flex: 1 1 160px; min-height: 38px; padding: 0 10px; border: 1px solid var(--line); border-radius: 3px; background: var(--bg); color: var(--ink); font: 16px 'EB Garamond', serif; }
+@media (prefers-reduced-motion: reduce) { .k-frame, .k-wax { transition: none !important; } .k-frame::after { animation: none !important; } }
+@media (max-width: 599px) { .k-hall-group { padding: 0 12px 20px; } .k-frames { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 26px 10px; } .k-frame { width: 150px; height: 188px; } }

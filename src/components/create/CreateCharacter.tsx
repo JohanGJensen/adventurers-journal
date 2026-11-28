@@ -89,7 +89,8 @@ export function CreateCharacter() {
   const [saved] = useState(loadSaved);
   const [d, setD] = useState<CreateDraft>(saved.draft);
   const [step, setStep] = useState<Step>(saved.step);
-  const [campaignId, setCampaignId] = useState<number | ''>(saved.campaignId);
+  // /new?campaign=3 (an empty frame in the hall) starts the hero in that campaign.
+  const [campaignId, setCampaignId] = useState<number | ''>(() => Number(new URLSearchParams(location.search).get('campaign')) || saved.campaignId);
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [attempt, setAttempt] = useState(0);
   const [saving, setSaving] = useState(false);
