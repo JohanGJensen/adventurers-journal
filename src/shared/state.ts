@@ -30,6 +30,7 @@ export const freshPlayState = (c: StateBasis): PlayState => ({
   wildShapeUsed: 0,
   variant: null,
   resourcesUsed: {},
+  inspiration: false,
 });
 
 /** Sizes `slotsUsed` to the current slot table (it changes when the level does), clamping each entry. */

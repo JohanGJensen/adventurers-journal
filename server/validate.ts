@@ -31,7 +31,8 @@ export function asPlayState(v: unknown): PlayState {
     isStrArr(v.prepared) &&
     (v.wildShapeUsed === undefined || isInt(v.wildShapeUsed)) &&
     (v.variant === undefined || v.variant === null || typeof v.variant === 'string') &&
-    (v.resourcesUsed === undefined || (isObj(v.resourcesUsed) && Object.values(v.resourcesUsed).every((n) => isInt(n))));
+    (v.resourcesUsed === undefined || (isObj(v.resourcesUsed) && Object.values(v.resourcesUsed).every((n) => isInt(n)))) &&
+    (v.inspiration === undefined || typeof v.inspiration === 'boolean');
   if (!ok) bad('state is not a valid PlayState');
   return v as unknown as PlayState;
 }

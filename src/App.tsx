@@ -5,10 +5,11 @@ import type { CharacterDto } from './shared/types';
 import { DiceProvider } from './lib/dice';
 import { usePlayState } from './hooks/usePlayState';
 import { useInventory } from './hooks/useInventory';
-import { Header } from './components/Header';
+import { Banner } from './components/sheet/Banner';
+import { SheetTabs } from './components/sheet/SheetTabs';
+import type { SheetTab } from './lib/router';
 import { AbilityScores } from './components/AbilityScores';
 import { SavesAndSkills } from './components/SavesAndSkills';
-import { CombatStats } from './components/CombatStats';
 import { SpellList } from './components/SpellList';
 import { Features } from './components/Features';
 import { Equipment } from './components/Equipment';
@@ -23,9 +24,10 @@ import { toast } from './lib/toast';
 import type { PlayState } from './shared/types';
 import { Loader } from './components/Loader';
 
-export function App({ character, onCharacterChange }: { character: CharacterDto; onCharacterChange: (c: CharacterDto) => void }) {
+export function App({ character, tab, onCharacterChange }: { character: CharacterDto; tab: SheetTab; onCharacterChange: (c: CharacterDto) => void }) {
   const c = useMemo(() => buildCharacter(character.sheet, character.extras, character.levels, character.homebrew), [character]);
   const play = usePlayState(c, character.id);
+  const hasSpells = c.spellAbility !== null || c.spells.length > 0 || c.bonusSpells.length > 0;
   const inventory = useInventory(c, character.id);
   const [selection, setSelection] = useState<Selection | null>(null);
   const [browserOpen, setBrowserOpen] = useState(false);
@@ -69,33 +71,42 @@ export function App({ character, onCharacterChange }: { character: CharacterDto;
     <DiceProvider characterId={character.id}>
       {!(play.ready && inventory.ready) ? <Loader size="page" label={`Opening ${c.name}’s journal`} /> : (
       <main className="sheet">
-        <Header c={c} onLevelUp={() => setLevelUpOpen(true)} characterId={character.id} onPortraitSaved={onCharacterChange} />
-        <div className="grid">
-          <div className="col">
+        <Banner
+          c={c}
+          play={play}
+          inventory={inventory}
+          characterId={character.id}
+          onPortraitSaved={onCharacterChange}
+          onLevelUp={() => setLevelUpOpen(true)}
+          onUndoLevel={c.levels.length > 0 ? undoLevel : undefined}
+        />
+        <SheetTabs characterId={character.id} tab={tab} hasSpells={hasSpells} />
+        {tab === 'stats' && (
+          <div className="k-tab-grid">
             <AbilityScores c={c} />
             <SavesAndSkills c={c} />
           </div>
-          <div className="col">
-            <CombatStats c={c} play={play} inventory={inventory} />
-            <SpellList c={c} play={play} onOpen={openSpell} onBrowse={() => setBrowserOpen(true)} />
-          </div>
-          <div className="col">
-            <Features c={c} variant={play.state.variant} />
-            <ToolKit c={c} />
-            <Equipment inventory={inventory} onOpen={(name) => setSelection({ kind: 'equipment', name })} />
-            <button
-              className="btn ghost reset"
-              onClick={() => confirm('Reset all play state (HP, slots, conditions)?') && play.reset()}
-            >
-              Reset play state
-            </button>
-            {c.levels.length > 0 && (
-              <button className="btn ghost reset" onClick={undoLevel}>
-                Undo level {c.level}
-              </button>
+        )}
+        {tab === 'spells' && (
+          <div className="k-tab-single">
+            {hasSpells ? (
+              <SpellList c={c} play={play} onOpen={openSpell} onBrowse={() => setBrowserOpen(true)} />
+            ) : (
+              <section className="card"><p className="hint">{c.name} has no spells.</p></section>
             )}
           </div>
-        </div>
+        )}
+        {tab === 'inventory' && (
+          <div className="k-tab-grid">
+            <Equipment inventory={inventory} onOpen={(name) => setSelection({ kind: 'equipment', name })} />
+            <ToolKit c={c} />
+          </div>
+        )}
+        {tab === 'features' && (
+          <div className="k-tab-single">
+            <Features c={c} variant={play.state.variant} />
+          </div>
+        )}
         <footer>Spell &amp; item data: <a href="https://www.dnd5eapi.co" target="_blank" rel="noreferrer">dnd5eapi.co</a> (SRD 5.2 / 5.1, CC-BY-4.0)</footer>
       </main>
       )}

@@ -20,6 +20,8 @@ export interface PlayState {
   variant: string | null;
   /** uses spent of the character's limited resources, by resource key */
   resourcesUsed: Record<string, number>;
+  /** Heroic Inspiration: held or not (kept across rests until spent) */
+  inspiration: boolean;
 }
 
 export const COINS = ['cp', 'sp', 'ep', 'gp', 'pp'] as const;

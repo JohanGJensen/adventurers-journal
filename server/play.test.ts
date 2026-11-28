@@ -52,6 +52,18 @@ describe('play state', () => {
     expect((await call('GET', '/characters/99/play')).status).toBe(404);
   });
 
+  test('Heroic Inspiration: starts unset, saves as a boolean, and an older save without it reads as unset', async () => {
+    const { db, call } = setup();
+    const { state } = (await call('GET', '/characters/1/play')).body;
+    expect(state.inspiration).toBe(false);
+    expect((await call('PUT', '/characters/1/play', { state: { ...state, inspiration: 'yes' }, version: 0 })).status).toBe(400);
+    expect((await call('PUT', '/characters/1/play', { state: { ...state, inspiration: true }, version: 0 })).status).toBe(200);
+    expect((await call('GET', '/characters/1/play')).body.state.inspiration).toBe(true);
+    const { inspiration: _, ...older } = state;
+    db.query('UPDATE play_state SET state_json = ? WHERE character_id = 1').run(JSON.stringify(older));
+    expect((await call('GET', '/characters/1/play')).body.state.inspiration).toBe(false);
+  });
+
   test('reset writes fresh state', async () => {
     const { call } = setup();
     const { state } = (await call('GET', '/characters/1/play')).body;

@@ -10,7 +10,7 @@ import { HomebrewLibrary } from './components/HomebrewLibrary';
 import { HomebrewEditor } from './components/HomebrewEditor';
 import { Toasts } from './components/Toast';
 import { api } from './lib/client';
-import { linkTo, useRoute } from './lib/router';
+import { linkTo, useRoute, type SheetTab } from './lib/router';
 import type { CharacterDto, CharacterSummary } from './shared/types';
 import { Loader } from './components/Loader';
 import { KitPage } from './components/kit/KitPage';
@@ -25,7 +25,7 @@ type Boot =
 const Centered = ({ children }: { children: ReactNode }) => <div className="loading">{children}</div>;
 
 /** Loads one character, then renders the sheet. */
-function CharacterPage({ id }: { id: number }) {
+function CharacterPage({ id, tab }: { id: number; tab: SheetTab }) {
   const [c, setC] = useState<CharacterDto | null | { error: string }>(null);
   useEffect(() => {
     let live = true;
@@ -47,7 +47,7 @@ function CharacterPage({ id }: { id: number }) {
     setC(dto);
     refreshShell(); // a new portrait or level shows in the sidebar too
   };
-  return <App key={c.id} character={c} onCharacterChange={change} />;
+  return <App key={c.id} character={c} tab={tab} onCharacterChange={change} />;
 }
 
 function Routes() {
@@ -59,8 +59,8 @@ function Routes() {
       return <CreateCharacter />;
     case 'sheet':
       return (
-        <Shell characterId={route.id} current="sheet">
-          <CharacterPage id={route.id} />
+        <Shell characterId={route.id} current={route.tab === 'spells' || route.tab === 'inventory' ? route.tab : 'sheet'}>
+          <CharacterPage id={route.id} tab={route.tab} />
         </Shell>
       );
     case 'log':
