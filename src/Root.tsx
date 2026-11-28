@@ -14,6 +14,8 @@ import { linkTo, useRoute } from './lib/router';
 import type { CharacterDto, CharacterSummary } from './shared/types';
 import { Loader } from './components/Loader';
 import { KitPage } from './components/kit/KitPage';
+import { Shell } from './components/shell/Shell';
+import { refreshShell } from './components/shell/shellData';
 
 type Boot =
   | { state: 'loading' }
@@ -41,7 +43,11 @@ function CharacterPage({ id }: { id: number }) {
         <a {...linkTo('/')}>All characters</a>
       </Centered>
     );
-  return <App key={c.id} character={c} onCharacterChange={setC} />;
+  const change = (dto: CharacterDto) => {
+    setC(dto);
+    refreshShell(); // a new portrait or level shows in the sidebar too
+  };
+  return <App key={c.id} character={c} onCharacterChange={change} />;
 }
 
 function Routes() {
@@ -52,15 +58,35 @@ function Routes() {
     case 'create':
       return <CreateCharacter />;
     case 'sheet':
-      return <CharacterPage id={route.id} />;
+      return (
+        <Shell characterId={route.id} current="sheet">
+          <CharacterPage id={route.id} />
+        </Shell>
+      );
     case 'log':
-      return <HistoryLog key={route.id} characterId={route.id} />;
+      return (
+        <Shell characterId={route.id} current="log">
+          <HistoryLog key={route.id} characterId={route.id} />
+        </Shell>
+      );
     case 'map':
-      return <MapPage key={route.id} characterId={route.id} />;
+      return (
+        <Shell characterId={route.id} current="map">
+          <MapPage key={route.id} characterId={route.id} />
+        </Shell>
+      );
     case 'lore':
-      return <LorePage key={route.id} characterId={route.id} />;
+      return (
+        <Shell characterId={route.id} current="lore">
+          <LorePage key={route.id} characterId={route.id} />
+        </Shell>
+      );
     case 'notes':
-      return <Notes key={route.id} characterId={route.id} query={route.query} />;
+      return (
+        <Shell characterId={route.id} current="notes" compact>
+          <Notes key={route.id} characterId={route.id} query={route.query} />
+        </Shell>
+      );
     case 'legacyNotes':
       return <LegacyNotesRedirect query={route.query} />;
     case 'homebrew':

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { buildCharacter } from './lib/character';
-import { linkTo, navigate } from './lib/router';
+import { navigate } from './lib/router';
 import type { CharacterDto } from './shared/types';
 import { DiceProvider } from './lib/dice';
 import { usePlayState } from './hooks/usePlayState';
@@ -13,7 +13,6 @@ import { SpellList } from './components/SpellList';
 import { Features } from './components/Features';
 import { Equipment } from './components/Equipment';
 import { ToolKit } from './components/ToolKit';
-import { hasTool } from './data/tools';
 import { DetailDrawer, type Selection } from './components/DetailDrawer';
 import { DiceTray } from './components/DiceTray';
 import { DiceStage } from './components/DiceStage';
@@ -70,13 +69,6 @@ export function App({ character, onCharacterChange }: { character: CharacterDto;
     <DiceProvider characterId={character.id}>
       {!(play.ready && inventory.ready) ? <Loader size="page" label={`Opening ${c.name}’s journal`} /> : (
       <main className="sheet">
-        <nav className="sheet-nav">
-          <a {...linkTo('/')}>← All characters</a>
-          <a {...linkTo(`/c/${character.id}/lore`)}>Lore</a>
-          <a {...linkTo(`/c/${character.id}/log`)}>History</a>
-          {character.campaignId && <a {...linkTo(`/c/${character.id}/notes`)}>Notes</a>}
-          {hasTool(c.tools, "Cartographer's Tools") && <a {...linkTo(`/c/${character.id}/map`)}>Journey map</a>}
-        </nav>
         <Header c={c} onLevelUp={() => setLevelUpOpen(true)} characterId={character.id} onPortraitSaved={onCharacterChange} />
         <div className="grid">
           <div className="col">

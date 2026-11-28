@@ -77,6 +77,9 @@ function createWindow() {
   const win = new BrowserWindow({
     width: 1280,
     height: 900,
+    // The phone layout is the smallest the app ever gets.
+    minWidth: 400,
+    minHeight: 560,
     title: NAME,
     icon: ICON,
     autoHideMenuBar: true,

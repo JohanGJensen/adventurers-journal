@@ -609,11 +609,6 @@ function JourneyMap({ c, characterId, campaignId }: { c: Character; characterId:
 
   return (
     <main className="sheet map-page">
-      <nav className="sheet-nav">
-        <a {...linkTo(`/c/${characterId}`)}>← {c.name}</a>
-        <a {...linkTo(`/c/${characterId}/lore`)}>Lore</a>
-        {campaignId && <a {...linkTo(`/c/${characterId}/notes`)}>Notes</a>}
-      </nav>
       <div className="map-layout">
         <div className={`map-frame tome ${cursor}`}>
           <svg
