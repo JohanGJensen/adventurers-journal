@@ -9,7 +9,7 @@ import { Banner } from './components/sheet/Banner';
 import { SheetTabs } from './components/sheet/SheetTabs';
 import type { SheetTab } from './lib/router';
 import { StatsTab } from './components/sheet/StatsTab';
-import { SpellList } from './components/SpellList';
+import { SpellsTab } from './components/spells/SpellsTab';
 import { Features } from './components/Features';
 import { Equipment } from './components/Equipment';
 import { ToolKit } from './components/ToolKit';
@@ -84,9 +84,9 @@ export function App({ character, tab, onCharacterChange }: { character: Characte
           <StatsTab c={c} play={play} inventory={inventory} characterId={character.id} />
         )}
         {tab === 'spells' && (
-          <div className="k-tab-single">
+          <div>
             {hasSpells ? (
-              <SpellList c={c} play={play} onOpen={openSpell} onBrowse={() => setBrowserOpen(true)} />
+              <SpellsTab c={c} play={play} characterId={character.id} onOpen={openSpell} onBrowse={() => setBrowserOpen(true)} />
             ) : (
               <section className="card"><p className="hint">{c.name} has no spells.</p></section>
             )}
