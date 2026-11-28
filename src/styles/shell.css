@@ -1,0 +1,84 @@
+/* ---------- Shell: the parchment sidebar beside every character page ----------
+   Laptop and wide: the full sheet. Tablet (and the Notes reader): an icon rail that can widen. Phone: a slim bar
+   at the top, and the sheet slides out over the page. */
+.k-shell { position: relative; display: flex; align-items: flex-start; min-height: 100vh; }
+.k-shell-main { position: relative; z-index: 1; flex: 1 1 auto; min-width: 0; }
+.k-side { position: sticky; top: 0; z-index: 5; flex: 0 0 248px; height: 100vh; transition: flex-basis var(--dur-fast); }
+.k-side-panel { height: 100%; box-sizing: border-box; display: flex; flex-direction: column; gap: 2px; padding: 16px 10px 12px; border-radius: 0; border-width: 0 1px 0 0; overflow-y: auto; }
+.k-side-title { padding: 2px 0 14px; margin-bottom: 8px; text-align: center; font: 400 21px 'IM Fell English SC', serif; letter-spacing: .05em; color: var(--heading); background: var(--rule) center bottom / 100% 14px no-repeat; }
+.k-side-group { padding: 16px 12px 2px; font: 400 15px 'IM Fell English SC', serif; letter-spacing: .07em; color: var(--muted); }
+.k-side-link {
+  display: flex; align-items: center; gap: 12px; min-height: 42px; padding: 0 12px; border-radius: 3px;
+  color: var(--ink); text-decoration: none; font: 500 17px 'EB Garamond', serif;
+}
+.k-side-link:hover { background: var(--bg-2); }
+.k-side-link:focus-visible, .k-side-me:focus-visible, .k-side-expand:focus-visible { outline: 2px solid var(--gilt); outline-offset: 1px; }
+.k-side-link.on { background: var(--accent-soft); box-shadow: inset 4px 0 0 var(--accent); font-weight: 600; }
+.k-side-icon { width: 18px; height: 18px; flex: none; color: var(--gilt-lo); }
+.k-side-link.on .k-side-icon { color: var(--accent); }
+.k-side-fill { flex: 1; min-height: 24px; }
+.k-side-avatar { flex: none; border-radius: 50%; object-fit: cover; object-position: 50% 20%; box-shadow: 0 0 0 2px var(--gilt), 0 0 0 4px var(--accent); }
+.k-side-avatar.initials { display: grid; place-items: center; background: radial-gradient(circle at 35% 30%, var(--accent-2), var(--accent) 70%); color: #f3eee1; font: 400 14px 'IM Fell English SC', serif; }
+.k-side-others .k-side-avatar { box-shadow: 0 0 0 1.5px var(--gilt); }
+.k-side-switch { position: relative; }
+.k-side-me {
+  display: flex; align-items: center; gap: 12px; width: 100%; padding: 8px 10px; border-radius: 3px; text-align: left;
+  border: 1px solid var(--line); background: var(--bg-2); color: var(--ink); font-family: inherit;
+}
+.k-side-who { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.k-side-who strong { font: 600 16px 'EB Garamond', serif; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.k-side-who small { font: italic 14px 'EB Garamond', serif; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.k-side-caret { flex: none; color: var(--gilt-lo); }
+.k-side-others { position: absolute; left: 0; right: 0; top: calc(100% + 6px); z-index: 10; margin: 0; padding: 6px; list-style: none; }
+.k-side-expand { display: none; place-items: center; width: 100%; min-height: 40px; margin-top: 6px; border: 0; border-radius: 3px; background: none; color: var(--gilt-lo); }
+.k-side-expand:hover { background: var(--bg-2); }
+.k-side-expand svg { transition: transform var(--dur-fast); }
+.k-side-bar, .k-side-backdrop { display: none; }
+
+/* Tablet: the icon rail. */
+@media (min-width: 600px) and (max-width: 999px) {
+.k-shell .k-side:not(.expanded) { flex-basis: 68px; }
+.k-shell .k-side:not(.expanded) .k-side-label, .k-shell .k-side:not(.expanded) .k-side-title { display: none; }
+.k-shell .k-side:not(.expanded) .k-side-group { height: 1px; padding: 0; margin: 12px 8px 6px; overflow: hidden; color: transparent; background: var(--line); }
+.k-shell .k-side:not(.expanded) .k-side-panel { padding-inline: 6px; }
+.k-shell .k-side:not(.expanded) .k-side-link, .k-shell .k-side:not(.expanded) .k-side-me { justify-content: center; padding: 0; }
+.k-shell .k-side:not(.expanded) .k-side-me { border-color: transparent; background: none; }
+.k-shell .k-side:not(.expanded) .k-side-link.on { box-shadow: inset 3px 0 0 var(--accent); }
+.k-shell .k-side:not(.expanded) .k-side-others { left: 100%; top: 0; width: 220px; }
+.k-shell .k-side:not(.expanded) .k-side-others .k-side-label { display: inline; }
+.k-shell .k-side:not(.expanded) .k-side-others .k-side-link { justify-content: flex-start; padding: 0 10px; }
+.k-shell .k-side-expand { display: grid; }
+.k-shell .k-side.expanded .k-side-expand svg { transform: rotate(180deg); }
+}
+/* Laptop and wide, on a page that asks for room (the Notes reader): the rail too. */
+@media (min-width: 1000px) {
+.k-shell.compact .k-side:not(.expanded) { flex-basis: 68px; }
+.k-shell.compact .k-side:not(.expanded) .k-side-label, .k-shell.compact .k-side:not(.expanded) .k-side-title { display: none; }
+.k-shell.compact .k-side:not(.expanded) .k-side-group { height: 1px; padding: 0; margin: 12px 8px 6px; overflow: hidden; color: transparent; background: var(--line); }
+.k-shell.compact .k-side:not(.expanded) .k-side-panel { padding-inline: 6px; }
+.k-shell.compact .k-side:not(.expanded) .k-side-link, .k-shell.compact .k-side:not(.expanded) .k-side-me { justify-content: center; padding: 0; }
+.k-shell.compact .k-side:not(.expanded) .k-side-me { border-color: transparent; background: none; }
+.k-shell.compact .k-side:not(.expanded) .k-side-link.on { box-shadow: inset 3px 0 0 var(--accent); }
+.k-shell.compact .k-side:not(.expanded) .k-side-others { left: 100%; top: 0; width: 220px; }
+.k-shell.compact .k-side:not(.expanded) .k-side-others .k-side-label { display: inline; }
+.k-shell.compact .k-side:not(.expanded) .k-side-others .k-side-link { justify-content: flex-start; padding: 0 10px; }
+.k-shell.compact .k-side-expand { display: grid; }
+.k-shell.compact .k-side.expanded .k-side-expand svg { transform: rotate(180deg); }
+}
+
+/* Phone: a slim bar on top; the sheet slides out over the page. */
+@media (max-width: 599px) {
+  .k-shell { flex-direction: column; align-items: stretch; }
+  .k-side { position: sticky; top: 0; z-index: 30; flex: none; height: auto; }
+  .k-side-bar { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 0; border-width: 0 0 1px; }
+  .k-side-bar-name { flex: 1; min-width: 0; font: 400 19px 'IM Fell English SC', serif; color: var(--heading); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .k-side-menu { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; }
+  .k-side-panel {
+    position: fixed; top: 0; bottom: 0; left: 0; z-index: 50; width: min(300px, 86vw); height: auto;
+    border-width: 0 1px 0 0; transform: translateX(-105%); visibility: hidden;
+    transition: transform var(--dur-med) var(--ease-spring), visibility 0s linear var(--dur-med);
+  }
+  .k-side.open .k-side-panel { transform: none; visibility: visible; transition: transform var(--dur-med) var(--ease-spring); box-shadow: 8px 0 30px rgb(0 0 0 / 45%); }
+  .k-side-backdrop { display: block; position: fixed; inset: 0; z-index: 40; background: rgb(20 12 4 / 55%); }
+}
+@media (prefers-reduced-motion: reduce) { .k-side, .k-side-panel, .k-side-expand svg { transition: none !important; } }

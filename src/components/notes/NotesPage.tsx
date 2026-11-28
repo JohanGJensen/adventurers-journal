@@ -55,20 +55,10 @@ export function Notes({ characterId, query }: { characterId: number; query: URLS
       </div>
     );
 
-  const nav = (
-    <nav className="sheet-nav">
-      <a {...linkTo('/')}>← All characters</a>
-      <a {...linkTo(`/c/${characterId}`)}>Sheet</a>
-      <a {...linkTo(`/c/${characterId}/lore`)}>Lore</a>
-      <a {...linkTo(`/c/${characterId}/log`)}>History</a>
-    </nav>
-  );
-
   if (!campaignId)
     return (
       <main className="sheet notes-page" data-class={classKey}>
-        {nav}
-        <section className="card notes-none prose">
+          <section className="card notes-none prose">
           <h2>No campaign, no notes</h2>
           <p>
             Notes belong to a campaign, and every character in it shares them. {character.name} isn’t in a campaign yet: add them to one
@@ -81,7 +71,6 @@ export function Notes({ characterId, query }: { characterId: number; query: URLS
   const together = members.filter((m) => m.campaignId === campaignId);
   return (
     <main className="sheet notes-page" data-class={classKey}>
-      {nav}
       <NotesBody
         key={campaignId}
         characterId={characterId}

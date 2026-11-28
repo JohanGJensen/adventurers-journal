@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
 import { buildCharacter } from '../lib/character';
 import { api } from '../lib/client';
-import { linkTo } from '../lib/router';
 import { toast } from '../lib/toast';
 import { TRAIT_KINDS, type CharacterDto, type Lore, type LoreSection, type TraitKind } from '../shared/types';
 import { Loader } from './Loader';
@@ -201,12 +200,6 @@ export function LorePage({ characterId }: { characterId: number }) {
 
   return (
     <main className="sheet lore-page" data-class={classKey}>
-      <nav className="sheet-nav">
-        <a {...linkTo('/')}>← All characters</a>
-        <a {...linkTo(`/c/${characterId}`)}>Sheet</a>
-        <a {...linkTo(`/c/${characterId}/log`)}>History</a>
-        {character?.campaignId && <a {...linkTo(`/c/${characterId}/notes`)}>Notes</a>}
-      </nav>
       <header className="list-head">
         <h1>Lore & Story{character ? ` · ${character.name}` : ''}</h1>
       </header>

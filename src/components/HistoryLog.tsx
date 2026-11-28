@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
 import { api } from '../lib/client';
-import { linkTo } from '../lib/router';
 import { toast } from '../lib/toast';
 import type { CharacterDto, EventRow, EventType } from '../shared/types';
 
@@ -76,12 +75,6 @@ export function HistoryLog({ characterId }: { characterId: number }) {
 
   return (
     <main className="sheet log-page">
-      <nav className="sheet-nav">
-        <a {...linkTo('/')}>← All characters</a>
-        <a {...linkTo(`/c/${characterId}`)}>Sheet</a>
-        <a {...linkTo(`/c/${characterId}/lore`)}>Lore</a>
-        {character?.campaignId && <a {...linkTo(`/c/${characterId}/notes`)}>Notes</a>}
-      </nav>
       <header className="list-head">
         <h1>History{character ? ` · ${character.name}` : ''}</h1>
       </header>
