@@ -44,6 +44,8 @@ export type Route =
   | { name: 'legacyNotes'; query: URLSearchParams }
   | { name: 'homebrew' }
   | { name: 'homebrewEdit'; id: number | 'new'; query: URLSearchParams }
+  /** Dev builds only: the redesign kit, every piece in every state. */
+  | { name: 'kit' }
   | { name: 'missing' };
 
 export function parseRoute(path: string): Route {
@@ -62,6 +64,7 @@ export function parseRoute(path: string): Route {
   if (m) return { name: 'notes', id: Number(m[1]), query: new URLSearchParams(search) };
   if (/^\/notes\/?$/.test(pathname)) return { name: 'legacyNotes', query: new URLSearchParams(search) };
   if (/^\/homebrew\/?$/.test(pathname)) return { name: 'homebrew' };
+  if (/^\/kit\/?$/.test(pathname)) return { name: 'kit' };
   m = /^\/homebrew\/(new|\d+)\/?$/.exec(pathname);
   if (m) return { name: 'homebrewEdit', id: m[1] === 'new' ? 'new' : Number(m[1]), query: new URLSearchParams(search) };
   return { name: 'missing' };
