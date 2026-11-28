@@ -1,0 +1,127 @@
+/* ---------- Spells tab: casting header, the deck of cards, the list, and the cast effect ---------- */
+.k-spells { display: grid; gap: 18px; }
+.k-casting-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: stretch; }
+.k-box-btn { cursor: pointer; font-family: inherit; color: inherit; text-align: left; }
+.k-box-btn:hover { border-color: var(--gilt); }
+.k-casting-tools { flex: 1 1 320px; display: grid; gap: 10px; align-content: center; }
+.k-seg { display: inline-flex; justify-self: start; border: 1px solid var(--line); border-radius: 999px; padding: 3px; background: var(--bg-2); }
+.k-seg button { min-height: 34px; padding: 0 16px; border: 0; border-radius: 999px; background: none; color: var(--muted); font: 400 16px 'IM Fell English SC', serif; letter-spacing: .04em; }
+.k-seg button[aria-pressed='true'] { background: var(--accent); color: #f3eee1; }
+.k-filters { display: flex; flex-wrap: wrap; gap: 8px; }
+.k-seal-toggle { display: inline-flex; align-items: center; gap: 8px; min-height: 38px; padding: 0 14px 0 5px; border-radius: 999px; border: 1px solid var(--line); background: var(--bg-2); color: var(--ink); font: 500 15px 'EB Garamond', serif; }
+.k-seal-toggle .k-seal { filter: grayscale(1) brightness(1.2); opacity: .55; transition: filter var(--dur-fast), opacity var(--dur-fast), transform var(--dur-med) var(--ease-spring); }
+.k-seal-toggle.on { border-color: var(--gilt); background: color-mix(in srgb, var(--gilt) 14%, transparent); }
+.k-seal-toggle.on .k-seal { filter: none; opacity: 1; transform: rotate(-12deg); }
+.k-search { display: flex; gap: 8px; flex-wrap: wrap; }
+.k-search input { flex: 1 1 200px; min-height: 36px; box-sizing: border-box; padding: 0 10px; border: 1px solid var(--line); border-radius: 3px; background: var(--bg); color: var(--ink); font: 16px 'EB Garamond', serif; }
+
+/* The list. */
+.k-spell-list { display: grid; gap: 18px; grid-template-columns: repeat(auto-fit, minmax(min(420px, 100%), 1fr)); align-items: start; }
+.k-spell-list > .k-hint { grid-column: 1 / -1; }
+.k-h2-num { font: 700 .95em Cinzel, serif; }
+.k-slot-head { margin-left: auto; display: inline-flex; align-items: center; gap: 8px; }
+.k-spell-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; min-height: 40px; padding: 4px 8px; border-radius: 3px; }
+.k-spell-row:nth-child(odd) { background: var(--bg-2); }
+.k-spell-row.active { box-shadow: inset 3px 0 0 var(--wax-blue), 0 0 0 1px color-mix(in srgb, var(--wax-blue) 40%, transparent); }
+.k-spell-row .school-icon { width: 20px; height: 20px; flex: none; color: var(--accent); }
+.k-spell-row .link { font: 500 17px 'EB Garamond', serif; }
+.k-spell-row .k-row-name small { font: italic 14px 'EB Garamond', serif; letter-spacing: 0; }
+.k-spell-acts { margin-left: auto; display: inline-flex; gap: 6px; }
+
+/* The deck: a parchment table with the hand fanned across it, details beside. */
+.k-deck { display: grid; grid-template-columns: minmax(0, 1fr) minmax(260px, 340px); gap: 18px; align-items: start; }
+@media (max-width: 999px) { .k-deck { grid-template-columns: 1fr; } }
+.k-table { position: relative; overflow: hidden; padding: 16px 18px 18px; min-height: 440px; }
+.k-table-hint { position: relative; margin: 0; }
+.k-ink-circle { position: absolute; left: 50%; top: 42%; width: min(340px, 70%); aspect-ratio: 1; transform: translate(-50%, -50%); color: var(--gilt-lo); opacity: .28; pointer-events: none; animation: k-spin 90s linear infinite; }
+@keyframes k-spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
+.k-hand { position: relative; }
+.k-hand.fan { height: 380px; margin-top: 30px; }
+.k-hand.row { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 34px 6px 14px; margin: 0 -6px; }
+
+.k-card-spell {
+  --cw: 150px;
+  position: relative; box-sizing: border-box; width: var(--cw); height: calc(var(--cw) * 1.55); padding: 0; border: 0; border-radius: 10px; text-align: center;
+  color: #2e2214; font-family: 'EB Garamond', serif; cursor: pointer;
+  background:
+    radial-gradient(circle at 50% 36%, color-mix(in srgb, var(--c) 40%, transparent), transparent 55%),
+    linear-gradient(rgb(248 244 234 / 62%), rgb(248 244 234 / 62%)), url(/textures/parchment-light.png) 0 0 / 512px 512px, #f3eee1;
+  box-shadow: 0 0 0 2px var(--gilt), 0 0 0 4px var(--gilt-lo), 0 12px 24px rgb(20 12 4 / 45%);
+  transition: transform .35s var(--ease-spring), box-shadow .35s, filter .35s;
+}
+.k-hand.fan .k-card-spell { position: absolute; left: calc(50% + var(--x)); bottom: 44px; margin-left: calc(var(--cw) / -2); transform-origin: 50% 100%; transform: translateY(var(--y)) rotate(var(--rot)); z-index: var(--z); }
+.k-hand.row .k-card-spell { flex: none; scroll-snap-align: center; }
+.k-card-spell::before { content: ''; position: absolute; inset: 6px; border: 1px solid var(--gilt); border-radius: 6px; pointer-events: none; }
+.k-card-spell::after {
+  content: ''; position: absolute; inset: 0; border-radius: 10px; pointer-events: none; opacity: 0; mix-blend-mode: overlay;
+  background: linear-gradient(115deg, transparent 30%, rgb(255 255 255 / 70%) 45%, color-mix(in srgb, var(--c) 70%, white) 50%, transparent 62%) 120% 0 / 260% 100%;
+}
+.k-card-spell.picked, .k-card-spell:focus-visible {
+  z-index: 60; outline: none;
+  box-shadow: 0 0 0 2px var(--gilt-hi), 0 0 0 4px var(--gilt-lo), 0 0 26px 6px color-mix(in srgb, var(--c) 85%, transparent), 0 0 90px 24px color-mix(in srgb, var(--c) 40%, transparent), 0 26px 40px rgb(20 12 4 / 50%);
+}
+.k-hand.fan .k-card-spell.picked, .k-hand.fan .k-card-spell:focus-visible { transform: translateY(calc(var(--y) - 60px)) rotate(0deg) scale(1.1); }
+.k-hand.row .k-card-spell.picked { transform: translateY(-20px); }
+.k-card-spell.picked { animation: k-aura 1.8s ease-in-out infinite; }
+@keyframes k-aura { 50% { box-shadow: 0 0 0 2px var(--gilt-hi), 0 0 0 4px var(--gilt-lo), 0 0 40px 12px color-mix(in srgb, var(--c) 95%, transparent), 0 0 130px 40px color-mix(in srgb, var(--c) 50%, transparent), 0 26px 40px rgb(20 12 4 / 50%); } }
+@media (hover: hover) {
+  .k-hand.fan .k-card-spell:hover { z-index: 70; transform: translateY(calc(var(--y) - 70px)) rotate(0deg) scale(1.12); box-shadow: 0 0 0 2px var(--gilt-hi), 0 0 0 4px var(--gilt-lo), 0 0 26px 6px color-mix(in srgb, var(--c) 85%, transparent), 0 0 90px 24px color-mix(in srgb, var(--c) 40%, transparent), 0 26px 40px rgb(20 12 4 / 50%); }
+  .k-card-spell:hover::after { opacity: 1; animation: k-foil 1.4s ease-in-out infinite; }
+  .k-card-spell:hover .k-card-sigil { transform: scale(1.18) rotate(-6deg); }
+}
+@keyframes k-foil { from { background-position: 120% 0; } to { background-position: -60% 0; } }
+.k-card-spell.conc { box-shadow: 0 0 0 2px var(--gilt), 0 0 0 4px var(--wax-blue), 0 12px 24px rgb(20 12 4 / 45%); }
+.k-card-spell.spent { filter: grayscale(.9) brightness(.85) contrast(.9); }
+.k-crack { display: none; position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 3; }
+.k-card-spell.spent .k-crack { display: block; }
+
+.k-card-lv { position: absolute; top: 8px; left: 50%; z-index: 2; transform: translateX(-50%); min-width: 34px; height: 22px; padding: 0 6px; display: grid; place-items: center; box-sizing: border-box; font: 700 12px Cinzel, serif; color: var(--brass-ink); background: linear-gradient(135deg, #f2d27a, #c89a3c 50%, #8a6418); clip-path: polygon(12% 0, 88% 0, 100% 50%, 88% 100%, 12% 100%, 0 50%); }
+.k-card-art { position: relative; display: block; margin: 34px 12px 0; height: calc(var(--cw) * .66); border-radius: 60px 60px 6px 6px; overflow: hidden; background: radial-gradient(circle at 50% 55%, color-mix(in srgb, var(--c) 85%, white) 0, var(--c) 18%, var(--d) 62%, #120b04 100%); box-shadow: inset 0 0 0 1px var(--gilt), inset 0 0 22px rgb(0 0 0 / 60%); }
+.k-card-art::before { content: ''; position: absolute; inset: 0; opacity: .8; animation: k-twinkle 2.6s ease-in-out infinite alternate; background-image: radial-gradient(1.5px 1.5px at 20% 30%, #fff, transparent), radial-gradient(1px 1px at 70% 20%, #fff, transparent), radial-gradient(1.5px 1.5px at 80% 70%, #fff, transparent), radial-gradient(1px 1px at 30% 80%, #fff, transparent); }
+@keyframes k-twinkle { to { opacity: .25; transform: translateY(-4px); } }
+.k-card-sigil { position: absolute; left: 50%; top: 54%; width: 52px; height: 52px; margin: -26px 0 0 -26px; color: #fffaf0; filter: drop-shadow(0 0 6px var(--c)) drop-shadow(0 0 14px var(--c)); transition: transform .4s; }
+.k-card-name { display: block; margin: 10px 8px 0; font: 400 17px/1.1 'IM Fell English SC', serif; letter-spacing: .02em; color: #2e2214; }
+.k-card-meta { display: block; margin: 3px 10px 0; font: italic 13px/1.2 'EB Garamond', serif; color: #5c4528; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.k-card-seals { position: absolute; left: 0; right: 0; bottom: 10px; display: flex; justify-content: center; align-items: center; gap: 5px; }
+.k-card-seals .k-seal { font-size: 10px; }
+.k-card-src { font: italic 12px 'EB Garamond', serif; color: #5c4528; }
+
+.k-deck-detail .k-detail-dot { width: 14px; height: 14px; border-radius: 50%; background: radial-gradient(circle, #fff, var(--c) 50%, transparent 72%); box-shadow: 0 0 10px var(--c); }
+.k-deck-detail .k-h2::before { display: none; }
+.k-detail-sub { margin: -6px 0 10px; font: italic 15px 'EB Garamond', serif; color: var(--muted); }
+.k-detail-facts { display: grid; gap: 4px; margin: 0 0 12px; }
+.k-detail-facts div { display: flex; gap: 10px; }
+.k-detail-facts dt { min-width: 100px; font: 400 13px 'IM Fell English SC', serif; letter-spacing: .05em; color: var(--muted); align-self: center; }
+.k-detail-facts dd { margin: 0; font: 16px 'EB Garamond', serif; }
+.k-detail-cast { display: flex; flex-wrap: wrap; gap: 8px; }
+
+/* The cast: over the table, with the page edges glowing in the spell's colour. */
+.k-cast { position: absolute; inset: 0; z-index: 80; pointer-events: none; }
+.k-cast-dim { position: absolute; inset: 0; background: radial-gradient(circle at 50% 44%, color-mix(in srgb, var(--c) 30%, transparent), rgb(20 12 4 / 55%) 70%); animation: k-dim 2.9s ease both; }
+@keyframes k-dim { 0% { opacity: 0; } 15% { opacity: 1; } 75% { opacity: 1; } 100% { opacity: 0; } }
+.k-cast-ring { position: absolute; left: 50%; top: 44%; color: var(--c); filter: drop-shadow(0 0 8px var(--c)) drop-shadow(0 0 22px var(--c)); }
+.k-cast-ring.a { width: min(420px, 80vw); aspect-ratio: 1; animation: k-ringA 2.9s cubic-bezier(.2, .8, .3, 1) both; }
+.k-cast-ring.b { width: min(300px, 58vw); aspect-ratio: 1; animation: k-ringB 2.9s cubic-bezier(.2, .8, .3, 1) both; }
+@keyframes k-ringA { 0% { transform: translate(-50%, -50%) scale(.2) rotate(0); opacity: 0; } 20% { opacity: 1; } 35% { transform: translate(-50%, -50%) scale(1) rotate(120deg); } 80% { opacity: 1; } 100% { transform: translate(-50%, -50%) scale(1.25) rotate(300deg); opacity: 0; } }
+@keyframes k-ringB { 0% { transform: translate(-50%, -50%) scale(.2) rotate(0); opacity: 0; } 25% { opacity: 1; } 40% { transform: translate(-50%, -50%) scale(1) rotate(-160deg); } 80% { opacity: 1; } 100% { transform: translate(-50%, -50%) scale(.7) rotate(-420deg); opacity: 0; } }
+.k-cast-pillar { position: absolute; left: 50%; top: -10%; width: min(180px, 30vw); height: 120%; transform-origin: 50% 44%; translate: -50% 0; filter: blur(6px); mix-blend-mode: screen; background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--c) 60%, transparent) 30%, #fff 50%, color-mix(in srgb, var(--c) 60%, transparent) 70%, transparent); animation: k-pillar 2.9s ease both; }
+@keyframes k-pillar { 0%, 22% { transform: scaleX(0) scaleY(.2); opacity: 0; } 34% { transform: scaleX(1.4) scaleY(1); opacity: 1; } 55% { transform: scaleX(.7); opacity: .9; } 100% { transform: scaleX(.1); opacity: 0; } }
+.k-cast-shock { position: absolute; left: 50%; top: 44%; width: 60px; height: 60px; margin: -30px 0 0 -30px; border-radius: 50%; border: 4px solid #fff; box-shadow: 0 0 30px 10px var(--c), inset 0 0 30px 6px var(--c); animation: k-shock 2.9s ease-out both; }
+@keyframes k-shock { 0%, 30% { transform: scale(0); opacity: 0; } 32% { opacity: 1; } 70% { transform: scale(14); opacity: 0; } 100% { opacity: 0; } }
+.k-cast-ghost { position: absolute; left: 50%; top: 44%; width: 150px; height: 232px; margin: -116px 0 0 -75px; border-radius: 10px; background: radial-gradient(circle at 50% 40%, #fff, var(--c) 40%, var(--d)); box-shadow: 0 0 0 2px var(--gilt-hi), 0 0 60px 20px var(--c); animation: k-fly 2.9s cubic-bezier(.3, 1.2, .4, 1) both; }
+.k-cast-ghost .k-card-sigil { width: 80px; height: 80px; margin: -40px 0 0 -40px; top: 50%; filter: drop-shadow(0 0 10px #fff); }
+@keyframes k-fly { 0% { transform: translateY(260px) scale(.6) rotate(-8deg); opacity: .9; } 22% { transform: none; opacity: 1; } 30% { transform: scale(1.25); filter: brightness(1.6); } 36% { transform: scale(1.6); filter: brightness(3) blur(3px); opacity: .9; } 48% { transform: scale(2.2); filter: brightness(4) blur(12px); opacity: 0; } 100% { opacity: 0; } }
+.k-cast-spark { position: absolute; left: 50%; top: 44%; width: var(--s); height: var(--s); margin: calc(var(--s) / -2) 0 0 calc(var(--s) / -2); border-radius: 50%; opacity: 0; background: radial-gradient(circle, #fff, var(--c) 60%, transparent); box-shadow: 0 0 8px 2px var(--c); animation: k-spark 1.9s cubic-bezier(.1, .8, .3, 1) both; animation-delay: calc(.85s + var(--t)); }
+@keyframes k-spark { 0% { transform: rotate(var(--a)) translateX(0) scale(1); opacity: 1; } 70% { opacity: 1; } 100% { transform: rotate(var(--a)) translateX(var(--dist)) translateY(60px) scale(.2); opacity: 0; } }
+.k-cast-word { position: absolute; left: 0; right: 0; top: 10%; text-align: center; font: 400 clamp(30px, 5vw, 52px) 'IM Fell English SC', serif; letter-spacing: .08em; color: #fffaf0; text-shadow: 0 0 12px var(--c), 0 0 32px var(--c), 0 2px 0 #3a2405; animation: k-word 2.9s ease both; }
+@keyframes k-word { 0%, 30% { opacity: 0; transform: translateY(16px) scale(.9); letter-spacing: .4em; } 45% { opacity: 1; transform: none; letter-spacing: .08em; } 80% { opacity: 1; } 100% { opacity: 0; transform: translateY(-10px); } }
+.k-cast-edge { position: fixed; inset: 0; z-index: 90; pointer-events: none; box-shadow: inset 0 0 160px 30px var(--c); animation: k-dim 2.9s ease both; }
+
+@media (prefers-color-scheme: dark) {
+  .k-seg button[aria-pressed='true'] { background: color-mix(in srgb, var(--accent) 45%, black); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .k-cast { display: none; }
+  .k-ink-circle, .k-card-art::before, .k-card-spell, .k-card-spell::after { animation: none !important; transition: none !important; }
+}
+@media (max-width: 599px) { .k-table { min-height: 0; } .k-card-spell { --cw: 136px; } }
