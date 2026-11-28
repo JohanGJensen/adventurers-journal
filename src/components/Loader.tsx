@@ -21,6 +21,8 @@ export function Loader({ label, size = 'inline' }: { label: string; size?: 'page
   return (
     <div className={`loader loader-${size}`} role="status" aria-live="polite">
       <svg className="loader-sigil" viewBox="0 0 100 100" aria-hidden="true" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
+        {/* An outer ring turning the other way, like the rings of a spell being cast. */}
+        <circle className="sigil-counter" cx="50" cy="50" r="52" strokeWidth=".8" strokeDasharray="6 4 1 4" opacity=".45" />
         <g className="sigil-runes" strokeWidth="1.2">
           <circle cx="50" cy="50" r="47" strokeWidth=".6" strokeDasharray="1.5 3" opacity=".6" />
           {RUNES.map((d, i) => (

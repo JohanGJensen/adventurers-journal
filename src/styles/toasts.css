@@ -11,3 +11,15 @@
   font: 700 3rem Cinzel, Georgia, serif;
 }
 
+
+/* Toasts are small parchment slips, sealed with a dot of wax in their kind's colour. */
+.toast.k-slip {
+  display: flex; align-items: center; gap: 10px; color: var(--ink); font: 500 16px 'EB Garamond', serif; cursor: pointer;
+  background: linear-gradient(var(--card-wash), var(--card-wash)), var(--card-tex) 0 0 / 512px 512px, var(--card);
+  border-color: color-mix(in srgb, var(--gilt) 60%, transparent); animation: k-slip-in .35s var(--ease-spring) both;
+}
+.k-slip-wax { width: 16px; height: 16px; flex: none; border-radius: 50%; background: radial-gradient(circle at 38% 32%, color-mix(in srgb, var(--accent) 70%, white), var(--accent) 60%, color-mix(in srgb, var(--accent) 60%, black)); box-shadow: inset 0 -1px 2px rgb(0 0 0 / 35%); }
+.toast.k-slip.error { color: var(--cap); border-color: var(--cap); }
+.toast.k-slip.error .k-slip-wax { background: radial-gradient(circle at 38% 32%, color-mix(in srgb, var(--wax) 70%, white), var(--wax) 60%, color-mix(in srgb, var(--wax) 60%, black)); }
+@keyframes k-slip-in { from { transform: translateY(12px); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .toast.k-slip { animation: none; } }

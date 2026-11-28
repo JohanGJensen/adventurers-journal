@@ -4,12 +4,13 @@
    The page is a stone hall (stone-*.png from scripts/gen-textures.ts); cards are parchment sheets hung on it.
    Class flavour comes from the --class-* tokens below (set per [data-class]); everything else reads --accent*. */
 :root {
-  --stone-tex: url(/textures/stone-light.png);
+  /* The day theme hangs its light parchment on the dark wall too (the night stone, torchlight and vault). */
+  --stone-tex: url(/textures/stone-dark.png);
   --card-tex: url(/textures/parchment-light.png);
   --card-wash: rgb(248 244 234 / 55%);
   --rule: url(/textures/rule.svg);
-  --torch: rgb(255 214 150 / 50%);
-  --vault: rgb(40 28 12 / 26%);
+  --torch: rgb(255 170 80 / 26%);
+  --vault: rgb(0 0 0 / 50%);
   --bg: #f9f6ee;
   --bg-2: rgb(130 90 35 / 9%);
   --card: #f3eee1;
@@ -18,8 +19,8 @@
   --line: rgb(112 78 36 / 30%);
   --gilt: #a47a2c;
   --iron: #3b3833;
-  --on-stone: #231a10;
-  --on-stone-muted: #4a3f30;
+  --on-stone: #efe3c4;
+  --on-stone-muted: #cdbf9f;
   --cap: #a8322a;
   --crit: #e8b53a;
   --crit-hot: #fff3c4;

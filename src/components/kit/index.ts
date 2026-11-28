@@ -7,3 +7,4 @@ export { Vial } from './Vial';
 export { Pips } from './Pips';
 export { Embers } from './Embers';
 export { CandleLight } from './CandleLight';
+export { ThemeSwitch } from './ThemeSwitch';

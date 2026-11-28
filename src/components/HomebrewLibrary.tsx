@@ -86,20 +86,22 @@ export function HomebrewLibrary() {
             }}
           />
         </div>
+        <p className="hint">
+          Subclasses you make here can be picked at the subclass level by any character of that class. Changes apply to
+          characters who already have the subclass.
+        </p>
       </header>
-      <p className="hint">
-        Subclasses you make here can be picked at the subclass level by any character of that class. Changes apply to
-        characters who already have the subclass.
-      </p>
 
       {list === null ? (
         <Loader label="Searching the library" />
       ) : (
-        classes.map((k) => {
+        // One parchment shelf for the whole library: nothing is written straight on the wall.
+        <section className="card homebrew-shelf" aria-label="Your subclasses">
+        {classes.map((k) => {
           const items = list.filter((h) => h.classKey === k);
           return (
-            <section key={k} className="char-group">
-              <h2>{titleCase(k)} subclasses</h2>
+            <section key={k} className="homebrew-class">
+              <h3>{titleCase(k)} subclasses</h3>
               {items.length === 0 ? (
                 <p className="muted">None yet.</p>
               ) : (
@@ -138,7 +140,8 @@ export function HomebrewLibrary() {
               )}
             </section>
           );
-        })
+        })}
+        </section>
       )}
     </main>
   );
