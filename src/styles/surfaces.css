@@ -1,0 +1,137 @@
+/* ---------- Castle surfaces: parchment hung on stone ---------- */
+/* Parchment sheets: textured paper, a hairline gilt rule inside the edge, square-ish corners. */
+.card, .hero, .tray-panel, .toast, .dialog:not(.tome), .browser:not(.tome), .drawer:not(.tome) {
+  /* a wash of plain paper over the texture keeps the mottling quiet behind text */
+  background: linear-gradient(var(--card-wash), var(--card-wash)), var(--card-tex) 0 0 / 512px 512px repeat, var(--card);
+}
+.hint { font-size: .86rem; }
+.card { position: relative; border-radius: 3px; border-color: rgb(90 60 25 / 45%); }
+.card::before {
+  content: ''; position: absolute; inset: 4px; pointer-events: none;
+  border: 1px solid var(--gilt); border-radius: 2px; opacity: .35;
+}
+.card h2, .hero h1, .list-head h1 { font-family: 'IM Fell English SC', Cinzel, Georgia, serif; font-weight: 400; letter-spacing: .03em; }
+.card > h2, .card > .card-head h2 {
+  font-size: 1.3rem; color: var(--heading); padding-bottom: 12px; margin-bottom: .7rem;
+  background: var(--rule) center bottom / 100% 14px no-repeat;
+}
+.card-head { align-items: center; }
+.card > .card-head { background: var(--rule) center bottom / 100% 14px no-repeat; margin-bottom: .7rem; }
+.card > .card-head h2 { background: none; margin-bottom: 0; }
+.card h3 { font-family: 'IM Fell English SC', Cinzel, serif; font-size: .95rem; text-transform: none; letter-spacing: .04em; font-weight: 400; color: var(--muted); }
+.card h3::before { content: '\2767\FE0E'; color: var(--accent-2); margin-right: .4em; font-size: .85em; }
+
+/* Text set directly on the wall: engraved, not printed. */
+.list-head h1, .char-group > h2, .sheet > .hint, .char-group > .hint, .sheet-nav a, .topnav a, footer, footer a, .loading, .notes-shared {
+  color: var(--on-stone); text-shadow: 0 1px 0 rgb(255 255 255 / 25%), 0 0 12px var(--torch);
+}
+@media (prefers-color-scheme: dark) {
+  .list-head h1, .char-group > h2, .sheet > .hint, .char-group > .hint, .sheet-nav a, .topnav a, footer, footer a, .loading, .notes-shared { text-shadow: 0 1px 2px rgb(0 0 0 / 80%), 0 0 14px rgb(0 0 0 / 60%); }
+}
+.list-head h1 { font-size: clamp(1.8rem, 4vw, 2.6rem); }
+.char-group > h2 { font-family: 'IM Fell English SC', Cinzel, serif; font-weight: 400; font-size: 1.25rem; letter-spacing: .06em; }
+.sheet > .hint, .char-group > .hint, footer { color: var(--on-stone-muted); }
+.sheet-nav a, .topnav a { text-decoration-color: var(--gilt); text-underline-offset: 3px; }
+
+/* Header: a banner in the class colours across the top of a parchment panel. */
+.hero {
+  position: relative; padding: 22px 24px 20px; border-radius: 3px;
+  border: 1px solid rgb(90 60 25 / 45%); border-top: 8px solid var(--accent);
+  box-shadow: var(--shadow), inset 0 1px 0 rgb(255 255 255 / 25%);
+}
+.hero::before {
+  content: ''; position: absolute; left: 0; right: 0; top: 0; height: 3px; pointer-events: none;
+  background: repeating-linear-gradient(90deg, var(--gilt) 0 10px, transparent 10px 16px); opacity: .7;
+}
+.hero h1 { color: var(--heading); font-size: clamp(2rem, 4.4vw, 3rem); }
+.subtitle { color: var(--muted); font-style: italic; }
+.tags div { border-radius: 3px; background: var(--bg-2); border-color: var(--line); }
+.portrait-frame { position: relative; flex: none; }
+.portrait { border: 4px solid var(--card); box-shadow: 0 0 0 2px var(--gilt), 0 0 0 5px var(--accent), 0 6px 18px rgb(0 0 0 / 35%); }
+.emblem-badge {
+  position: absolute; right: -4px; bottom: 2px; width: 46px; height: 46px; display: grid; place-items: center;
+  border-radius: 50%; color: var(--card); border: 2px solid var(--gilt);
+  background: radial-gradient(circle at 35% 30%, var(--accent-2), var(--accent) 70%);
+  box-shadow: 0 2px 6px rgb(0 0 0 / 40%), inset 0 1px 0 rgb(255 255 255 / 30%);
+}
+.emblem-badge .emblem { width: 28px; height: 28px; }
+@media (max-width: 680px) { .hero { padding: 18px 16px; } }
+
+/* Abilities as small heater shields */
+.ability { border-radius: 4px 4px 50% 50% / 4px 4px 28% 28%; padding: 10px 4px 16px; background: var(--bg-2); border-color: var(--line); box-shadow: inset 0 2px 0 rgb(255 255 255 / 18%); }
+.ability-mod { color: var(--heading); }
+.ability-score { background: var(--bg); }
+.stat, .coin { border-radius: 3px; background: var(--bg-2); }
+.stat-val { color: var(--heading); }
+
+/* Iron-banded HP bar */
+.bar { height: 12px; border-radius: 2px; border: 1px solid var(--iron); background: rgb(0 0 0 / 22%); box-shadow: inset 0 1px 3px rgb(0 0 0 / 40%); position: relative; }
+.bar::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(90deg, transparent 0 calc(10% - 2px), rgb(30 25 20 / 55%) calc(10% - 2px) 10%); }
+.bar-fill { background: linear-gradient(180deg, rgb(255 255 255 / 25%), transparent 50%), linear-gradient(90deg, var(--accent), var(--glow)); }
+
+/* Buttons: wax-dark accent with a bevel; ghost buttons are inked outlines. */
+.btn { border-radius: 3px; font-weight: 600; letter-spacing: .02em; box-shadow: inset 0 1px 0 rgb(255 255 255 / 22%), inset 0 -2px 0 rgb(0 0 0 / 22%), 0 1px 0 rgb(0 0 0 / 20%); }
+.btn.ghost { box-shadow: none; background: rgb(255 250 235 / 18%); }
+.row, .spell, .note-row, .choice, .icon-btn { border-radius: 3px; }
+.chip { border-radius: 3px; }
+.death, .concentration { border-radius: 3px; border: 1px solid var(--line); }
+.tray-toggle { border: 2px solid var(--gilt); box-shadow: 0 4px 14px rgb(0 0 0 / 40%), inset 0 1px 0 rgb(255 255 255 / 30%); background: radial-gradient(circle at 35% 30%, var(--accent-2), var(--accent) 70%); }
+.tray-panel, .toast { border-radius: 4px; }
+
+/* Character list: each card wears its class colours and emblem. */
+.char-card { border-top: 4px solid var(--accent); }
+.char-link strong { color: var(--heading); font-family: 'IM Fell English SC', Cinzel, serif; font-weight: 400; font-size: 1.2rem; display: flex; align-items: center; gap: 6px; }
+.mini-portrait { border: 2px solid var(--accent); box-shadow: 0 0 0 1px var(--gilt); }
+.emblem { width: 1em; height: 1em; flex: none; }
+.inline-emblem { width: 1.1em; height: 1.1em; color: var(--accent-2); }
+
+/* Rune circuit: on hover a spark of the class's glow runs round the card edge, the gilt rule
+   lights up and the card lifts. The arc is ::after (::before is the .card gilt rule), masked to a 2px ring. */
+@property --rune-angle { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+.rune-card { transition: transform .25s ease, box-shadow .3s ease; }
+.rune-card::before { transition: opacity .3s, border-color .3s, box-shadow .3s; }
+.rune-card::after {
+  content: ''; position: absolute; inset: -1px; top: -4px; z-index: 1; pointer-events: none;
+  padding: 2px; border-radius: 4px; opacity: 0; transition: opacity .35s;
+  background: conic-gradient(from var(--rune-angle),
+    transparent 0 62%, color-mix(in srgb, var(--glow) 40%, transparent) 74%,
+    var(--glow) 84%, rgb(255 255 255 / 85%) 87%, var(--glow) 90%, transparent 97%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+}
+.rune-card .mini-portrait, .rune-card :is(.inline-emblem, .pick-emblem) { transition: box-shadow .3s, filter .3s; }
+.rune-card:is(:hover, :focus-within) {
+  transform: translateY(-3px);
+  animation: rune-breathe 2.4s ease-in-out infinite alternate;
+}
+.rune-card:is(:hover, :focus-within)::before {
+  opacity: .9; border-color: var(--glow);
+  box-shadow: 0 0 6px color-mix(in srgb, var(--glow) 60%, transparent), inset 0 0 6px color-mix(in srgb, var(--glow) 35%, transparent);
+}
+.rune-card:is(:hover, :focus-within)::after { opacity: 1; animation: rune-spin 2.4s linear infinite; }
+.rune-card:is(:hover, :focus-within) .mini-portrait { box-shadow: 0 0 0 1px var(--gilt), 0 0 12px 2px var(--glow); }
+.rune-card:is(:hover, :focus-within) :is(.inline-emblem, .pick-emblem) {
+  filter: drop-shadow(0 0 3px var(--glow));
+  animation: emblem-shimmer .9s ease-out;
+}
+@keyframes rune-spin { to { --rune-angle: 360deg; } }
+@keyframes rune-breathe {
+  from { box-shadow: var(--shadow), 0 10px 22px rgb(20 12 2 / 22%), 0 0 10px 0 color-mix(in srgb, var(--glow) 35%, transparent); }
+  to   { box-shadow: var(--shadow), 0 10px 22px rgb(20 12 2 / 22%), 0 0 18px 2px color-mix(in srgb, var(--glow) 55%, transparent); }
+}
+@keyframes emblem-shimmer {
+  0%   { filter: drop-shadow(0 0 0 var(--glow)); }
+  40%  { filter: drop-shadow(0 0 6px var(--glow)) brightness(1.5); }
+  100% { filter: drop-shadow(0 0 3px var(--glow)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rune-card:is(:hover, :focus-within) { transform: none; animation: none; box-shadow: var(--shadow), 0 0 14px 1px color-mix(in srgb, var(--glow) 45%, transparent); }
+  .rune-card:is(:hover, :focus-within)::after { animation: none; background: color-mix(in srgb, var(--glow) 70%, transparent); }
+  .rune-card:is(:hover, :focus-within) :is(.inline-emblem, .pick-emblem) { animation: none; }
+}
+
+/* Spell school glyphs */
+.school-icon { width: 18px; height: 18px; flex: none; color: var(--accent); opacity: .9; }
+.drawer-school { width: .9em; height: .9em; vertical-align: -.08em; margin-right: .3em; color: var(--class-accent, var(--rubric)); }
+

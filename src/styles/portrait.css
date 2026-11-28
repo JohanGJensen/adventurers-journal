@@ -1,0 +1,46 @@
+/* ---------- Portrait upload (sheet header, list cards) ---------- */
+.visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.portrait-upload { position: relative; flex: none; }
+.portrait-upload-label { position: relative; display: block; cursor: pointer; border-radius: 50%; }
+/* Block, not inline: an inline image leaves room under the baseline, and the round overlay turns into an oval. */
+.portrait-upload-label > :not(.portrait-upload-overlay, input) { display: block; }
+.portrait-upload-overlay {
+  position: absolute; inset: 0; border-radius: 50%; display: grid; place-content: center; justify-items: center; gap: 4px;
+  background: radial-gradient(circle, rgb(20 12 4 / 55%), rgb(20 12 4 / 72%)); color: #f7e6c6;
+  font: italic .95rem 'EB Garamond', serif; text-align: center; opacity: 0; transition: opacity .2s;
+}
+.portrait-upload-icon { width: 28px; height: 28px; filter: drop-shadow(0 0 4px var(--glow)); }
+.portrait-upload.compact .portrait-upload-icon { width: 20px; height: 20px; }
+.portrait-upload-label:hover .portrait-upload-overlay,
+.portrait-upload-label:focus-within .portrait-upload-overlay,
+.portrait-upload.busy .portrait-upload-overlay { opacity: 1; }
+.portrait-upload-label:focus-within { outline: 2px solid var(--gilt); outline-offset: 3px; }
+.portrait-upload.busy .portrait-upload-overlay { animation: sigil-calm 1s ease-in-out infinite alternate; }
+.portrait-remove {
+  position: absolute; top: 2px; right: 2px; z-index: 2; width: 24px; height: 24px; display: grid; place-items: center; padding: 0;
+  border-radius: 50%; border: 1px solid var(--gilt); background: var(--card); color: var(--ink); font-size: 1rem; line-height: 1;
+  opacity: 0; transition: opacity .2s; box-shadow: var(--shadow);
+}
+.portrait-upload.compact .portrait-remove { top: -4px; right: -4px; width: 20px; height: 20px; font-size: .85rem; }
+.portrait-upload:is(:hover, :focus-within) .portrait-remove { opacity: 1; }
+@media (hover: none) { .portrait-remove { opacity: 1; } }
+.char-head { display: flex; gap: 12px; align-items: center; }
+
+/* Portrait framing dialog: the picture moves under a round window the size of the stored square. */
+.dialog.portrait-cropper { width: min(360px, calc(100vw - 32px)); justify-items: center; text-align: center; }
+@media (max-width: 420px) { .dialog.tome.portrait-cropper { padding: 24px 20px 20px; } }
+.portrait-crop {
+  position: relative; overflow: hidden; flex: none; touch-action: none; cursor: grab; user-select: none;
+  border-radius: 3px; background: var(--bg-2); outline-offset: 3px;
+}
+.portrait-crop:active { cursor: grabbing; }
+.portrait-crop:focus-visible { outline: 2px solid var(--gilt); }
+.portrait-crop img { position: absolute; left: 0; top: 0; max-width: none; transform-origin: 0 0; pointer-events: none; }
+.portrait-crop::after {
+  content: ''; position: absolute; inset: 0; border-radius: 50%; pointer-events: none;
+  box-shadow: 0 0 0 2px var(--gilt), 0 0 0 999px rgb(20 12 4 / 60%);
+}
+.portrait-zoom { display: flex; align-items: center; gap: 10px; width: 100%; max-width: 260px; }
+.portrait-zoom input { flex: 1; accent-color: var(--accent); }
+.char-head .char-link { flex: 1; min-width: 0; }
+

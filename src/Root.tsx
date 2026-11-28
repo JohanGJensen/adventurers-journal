@@ -13,6 +13,7 @@ import { api } from './lib/client';
 import { linkTo, useRoute } from './lib/router';
 import type { CharacterDto, CharacterSummary } from './shared/types';
 import { Loader } from './components/Loader';
+import { KitPage } from './components/kit/KitPage';
 
 type Boot =
   | { state: 'loading' }
@@ -66,6 +67,9 @@ function Routes() {
       return <HomebrewLibrary />;
     case 'homebrewEdit':
       return <HomebrewEditor key={String(route.id)} id={route.id} query={route.query} />;
+    case 'kit':
+      if (import.meta.env.DEV) return <KitPage />;
+    // falls through: no kit page in a built app
     default:
       return (
         <Centered>

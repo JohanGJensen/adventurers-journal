@@ -1,0 +1,128 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=IM+Fell+English+SC&display=swap');
+
+/* ---------- Castle base ----------
+   The page is a stone hall (stone-*.png from scripts/gen-textures.ts); cards are parchment sheets hung on it.
+   Class flavour comes from the --class-* tokens below (set per [data-class]); everything else reads --accent*. */
+:root {
+  --stone-tex: url(/textures/stone-light.png);
+  --card-tex: url(/textures/parchment-light.png);
+  --card-wash: rgb(248 244 234 / 55%);
+  --rule: url(/textures/rule.svg);
+  --torch: rgb(255 214 150 / 50%);
+  --vault: rgb(40 28 12 / 26%);
+  --bg: #f9f6ee;
+  --bg-2: rgb(130 90 35 / 9%);
+  --card: #f3eee1;
+  --ink: #2e2214;
+  --muted: #6d5434;
+  --line: rgb(112 78 36 / 30%);
+  --gilt: #a47a2c;
+  --iron: #3b3833;
+  --on-stone: #231a10;
+  --on-stone-muted: #4a3f30;
+  --cap: #a8322a;
+  --crit: #e8b53a;
+  --crit-hot: #fff3c4;
+  --fumble: #c4352b;
+  --shadow: 0 1px 0 rgb(60 40 10 / 25%), 0 6px 18px rgb(30 20 5 / 28%), inset 0 0 26px rgb(120 70 20 / 16%);
+  /* neutral castle palette: gilt and oak */
+  --class-accent: #6e4a12;
+  --class-accent-2: #8c6420;
+  --class-soft: rgb(164 122 44 / 16%);
+  --class-glow: #d9a93c;
+  color-scheme: light;
+}
+:root, [data-class] {
+  --heading: var(--class-accent);
+  --accent: var(--class-accent);
+  --accent-2: var(--class-accent-2);
+  --accent-soft: var(--class-soft);
+  --glow: var(--class-glow);
+}
+
+@media (prefers-color-scheme: dark) {
+  /* Night in the hall: dark stone, torchlight, umber vellum. */
+  :root {
+    --stone-tex: url(/textures/stone-dark.png);
+    --card-tex: url(/textures/parchment-dark.png);
+    --card-wash: rgb(51 38 26 / 25%);
+    --rule: url(/textures/rule-dark.svg);
+    --torch: rgb(255 150 60 / 20%);
+    --vault: rgb(0 0 0 / 55%);
+    --bg: #2a2016;
+    --bg-2: rgb(255 215 160 / 6%);
+    --card: #33261a;
+    --ink: #f0e0bd;
+    --muted: #c0a780;
+    --line: rgb(236 210 160 / 18%);
+    --gilt: #e0b456;
+    --iron: #8a847a;
+    --on-stone: #efe3c4;
+    --on-stone-muted: #cdbf9f;
+    --cap: #e0675c;
+    --crit: #f2c14e;
+    --fumble: #ef5a4f;
+    --shadow: 0 1px 0 rgb(0 0 0 / 50%), 0 8px 24px rgb(0 0 0 / 55%), inset 0 0 30px rgb(0 0 0 / 40%);
+    --class-accent: #e0b456;
+    --class-accent-2: #f0cc78;
+    --class-soft: rgb(224 180 86 / 14%);
+    --class-glow: #f2c14e;
+    color-scheme: dark;
+  }
+}
+
+/* ---------- Class palettes: light (on parchment) then dark (on vellum) ---------- */
+[data-class="druid"]     { --class-accent: #3d5c1f; --class-accent-2: #5a7f2c; --class-soft: rgb(79 107 44 / 14%);  --class-glow: #a6d64a; }
+[data-class="ranger"]    { --class-accent: #4c5718; --class-accent-2: #6b7a26; --class-soft: rgb(90 100 30 / 14%);  --class-glow: #c8d45a; }
+[data-class="wizard"]    { --class-accent: #24508f; --class-accent-2: #3a6cb5; --class-soft: rgb(36 80 143 / 12%);  --class-glow: #6fa0ff; }
+[data-class="sorcerer"]  { --class-accent: #9c2a1c; --class-accent-2: #c2442a; --class-soft: rgb(156 42 28 / 12%);  --class-glow: #ff8a3a; }
+[data-class="warlock"]   { --class-accent: #5e2a74; --class-accent-2: #7d3c99; --class-soft: rgb(94 42 116 / 12%);  --class-glow: #c06cf0; }
+[data-class="cleric"]    { --class-accent: #7a4a06; --class-accent-2: #a0660e; --class-soft: rgb(160 102 14 / 14%); --class-glow: #ffd659; }
+[data-class="paladin"]   { --class-accent: #6a540c; --class-accent-2: #8f7318; --class-soft: rgb(143 115 24 / 14%); --class-glow: #ffe07a; }
+[data-class="fighter"]   { --class-accent: #3c4c5e; --class-accent-2: #566a80; --class-soft: rgb(60 76 94 / 12%);   --class-glow: #c8d6e4; }
+[data-class="rogue"]     { --class-accent: #4a3a52; --class-accent-2: #66506f; --class-soft: rgb(74 58 82 / 12%);   --class-glow: #a98fd0; }
+[data-class="barbarian"] { --class-accent: #7b3a18; --class-accent-2: #a04f24; --class-soft: rgb(123 58 24 / 12%);  --class-glow: #f08a4a; }
+[data-class="bard"]      { --class-accent: #8a2650; --class-accent-2: #b03a6a; --class-soft: rgb(138 38 80 / 12%);  --class-glow: #ff8ac0; }
+[data-class="monk"]      { --class-accent: #1a5a5a; --class-accent-2: #267878; --class-soft: rgb(29 99 99 / 12%);   --class-glow: #6fe1d6; }
+@media (prefers-color-scheme: dark) {
+  [data-class="druid"]     { --class-accent: #9cc25a; --class-accent-2: #b8dd6e; --class-soft: rgb(156 194 90 / 14%);  --class-glow: #a6d64a; }
+  [data-class="ranger"]    { --class-accent: #c2cc6a; --class-accent-2: #d6df84; --class-soft: rgb(194 204 106 / 13%); --class-glow: #d4e06a; }
+  [data-class="wizard"]    { --class-accent: #8fb6f0; --class-accent-2: #acc9f6; --class-soft: rgb(143 182 240 / 13%); --class-glow: #6fa0ff; }
+  [data-class="sorcerer"]  { --class-accent: #ff8a6a; --class-accent-2: #ffa688; --class-soft: rgb(255 138 106 / 13%); --class-glow: #ff8a3a; }
+  [data-class="warlock"]   { --class-accent: #cf9ef0; --class-accent-2: #dfb8f6; --class-soft: rgb(207 158 240 / 13%); --class-glow: #c06cf0; }
+  [data-class="cleric"]    { --class-accent: #f3b04a; --class-accent-2: #f7c46e; --class-soft: rgb(243 176 74 / 13%);  --class-glow: #ffd659; }
+  [data-class="paladin"]   { --class-accent: #f0cf6a; --class-accent-2: #f6de90; --class-soft: rgb(240 207 106 / 13%); --class-glow: #ffe07a; }
+  [data-class="fighter"]   { --class-accent: #a9bfd6; --class-accent-2: #c3d3e4; --class-soft: rgb(169 191 214 / 13%); --class-glow: #c8d6e4; }
+  [data-class="rogue"]     { --class-accent: #c4adcc; --class-accent-2: #d6c4dc; --class-soft: rgb(196 173 204 / 13%); --class-glow: #a98fd0; }
+  [data-class="barbarian"] { --class-accent: #e39a68; --class-accent-2: #edb48c; --class-soft: rgb(227 154 104 / 13%); --class-glow: #f08a4a; }
+  [data-class="bard"]      { --class-accent: #f08ab8; --class-accent-2: #f6a8cc; --class-soft: rgb(240 138 184 / 13%); --class-glow: #ff8ac0; }
+  [data-class="monk"]      { --class-accent: #6fd1c9; --class-accent-2: #92ded8; --class-soft: rgb(111 209 201 / 13%); --class-glow: #6fe1d6; }
+}
+
+
+/* ---------- Redesign tokens (the "pushed further" kit, src/styles/kit.css) ----------
+   Screen ranges, used as literal widths in @media (no custom media without PostCSS):
+     phone < 600px · tablet 600–1000px · laptop 1000–1440px (the default Electron window) · wide > 1440px */
+:root {
+  --gilt-hi: #e0b456;
+  --gilt-lo: #6e4a12;
+  --wax: #a8322a;
+  --wax-blue: #24508f;
+  --ember: #ffb35c;
+  --candle: rgb(255 200 110 / 34%);
+  --brass-ink: #3a2405;
+  --ease-spring: cubic-bezier(.2, 1.3, .4, 1);
+  --dur-fast: .2s;
+  --dur-med: .45s;
+  --dur-slow: .9s;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --gilt-hi: #f2c96a;
+    --gilt-lo: #8a6418;
+    --wax: #c2443a;
+    --wax-blue: #3f6fb5;
+    --ember: #ffa24a;
+    --candle: rgb(255 170 80 / 30%);
+  }
+}

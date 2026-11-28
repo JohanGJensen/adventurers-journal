@@ -1,0 +1,24 @@
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  /* torchlight from the upper corners, a darker vault toward the floor, then the wall */
+  background:
+    radial-gradient(900px 520px at 8% -6%, var(--torch), transparent 70%),
+    radial-gradient(900px 520px at 92% -6%, var(--torch), transparent 70%),
+    linear-gradient(transparent 30%, var(--vault)),
+    var(--stone-tex) 0 0 / 384px 384px repeat;
+  background-attachment: fixed;
+  color: var(--ink);
+  font: 16.5px/1.5 'EB Garamond', Georgia, 'Times New Roman', serif;
+  min-height: 100vh;
+}
+button { font: inherit; color: inherit; cursor: pointer; }
+button:disabled { cursor: not-allowed; opacity: .45; }
+h1, h2, h3 { font-family: Cinzel, Georgia, serif; margin: 0; }
+h2 { font-size: 1rem; letter-spacing: .06em; color: var(--heading); margin-bottom: .6rem; }
+h3 { font-size: .8rem; letter-spacing: .08em; color: var(--muted); margin: 1rem 0 .4rem; text-transform: uppercase; }
+small { color: var(--muted); font-size: .75em; }
+a { color: var(--accent); }
+
+.sheet { max-width: 1240px; margin: 0 auto; padding: 24px 16px 96px; }
+
