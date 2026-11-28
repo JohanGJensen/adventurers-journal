@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { linkTo } from '../../lib/router';
 import type { CharacterSummary } from '../../shared/types';
-import { useCharacters, useHasMap } from './shellData';
+import { useCharacterFacts, useCharacters } from './shellData';
 
-export type ShellPage = 'sheet' | 'lore' | 'log' | 'map' | 'notes';
+export type ShellPage = 'sheet' | 'spells' | 'inventory' | 'lore' | 'log' | 'map' | 'notes';
 
 const Icon = ({ d }: { d: string }) => (
   <svg className="k-side-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -12,6 +12,8 @@ const Icon = ({ d }: { d: string }) => (
 );
 const ICONS = {
   sheet: 'M6 3h11a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6zM9 8h6M9 12h6M9 16h4',
+  spells: 'M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z',
+  inventory: 'M5 8h14l-1 12H6zM9 8V6a3 3 0 0 1 6 0v2',
   notes: 'M4 5a2 2 0 0 1 2-2h12v18H6a2 2 0 0 1-2-2zM4 17a2 2 0 0 1 2-2h12',
   map: 'M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2zM9 4v14M15 6v14',
   lore: 'M20 4C10 4 5 10 4 20M20 4c0 8-5 12-12 12',
@@ -49,7 +51,7 @@ function NavLink({ to, icon, current, children }: { to: string; icon: string; cu
 /** The parchment sidebar on every character page: who you're playing, then where to go. */
 export function Sidebar({ characterId, current }: { characterId: number; current: ShellPage }) {
   const list = useCharacters();
-  const hasMap = useHasMap(characterId);
+  const { hasMap, hasSpells } = useCharacterFacts(characterId);
   const me = list?.find((c) => c.id === characterId);
   const others = list?.filter((c) => c.id !== characterId) ?? [];
   const [open, setOpen] = useState(false); // phone: the sheet is pulled out over the page
@@ -73,7 +75,7 @@ export function Sidebar({ characterId, current }: { characterId: number; current
 
   /** The same page for another character, when they have it; otherwise their sheet. */
   const pageFor = (c: CharacterSummary) => {
-    if (current === 'sheet' || current === 'map' || (current === 'notes' && !c.campaignId)) return `/c/${c.id}`;
+    if (current === 'sheet' || current === 'map' || current === 'spells' || (current === 'notes' && !c.campaignId)) return `/c/${c.id}`;
     return `/c/${c.id}/${current}`;
   };
   const base = `/c/${characterId}`;
@@ -122,6 +124,8 @@ export function Sidebar({ characterId, current }: { characterId: number; current
 
         <div className="k-side-group">At the table</div>
         <NavLink to={base} icon={ICONS.sheet} current={current === 'sheet'}>Character sheet</NavLink>
+        {hasSpells && <NavLink to={`${base}/spells`} icon={ICONS.spells} current={current === 'spells'}>Spells</NavLink>}
+        <NavLink to={`${base}/inventory`} icon={ICONS.inventory} current={current === 'inventory'}>Inventory</NavLink>
 
         <div className="k-side-group">The campaign</div>
         {me?.campaignId != null && <NavLink to={`${base}/notes`} icon={ICONS.notes} current={current === 'notes'}>Notes</NavLink>}

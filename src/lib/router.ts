@@ -32,10 +32,14 @@ export function linkTo(to: string) {
   };
 }
 
+/** The character sheet's ribbon tabs; Stats lives at /c/:id itself. */
+export const SHEET_TABS = ['stats', 'spells', 'inventory', 'features'] as const;
+export type SheetTab = (typeof SHEET_TABS)[number];
+
 export type Route =
   | { name: 'list' }
   | { name: 'create' }
-  | { name: 'sheet'; id: number }
+  | { name: 'sheet'; id: number; tab: SheetTab }
   | { name: 'log'; id: number }
   | { name: 'map'; id: number }
   | { name: 'lore'; id: number }
@@ -53,7 +57,9 @@ export function parseRoute(path: string): Route {
   if (pathname === '/' || pathname === '') return { name: 'list' };
   if (/^\/new\/?$/.test(pathname)) return { name: 'create' };
   let m = /^\/c\/(\d+)\/?$/.exec(pathname);
-  if (m) return { name: 'sheet', id: Number(m[1]) };
+  if (m) return { name: 'sheet', id: Number(m[1]), tab: 'stats' };
+  m = /^\/c\/(\d+)\/(spells|inventory|features)\/?$/.exec(pathname);
+  if (m) return { name: 'sheet', id: Number(m[1]), tab: m[2] as SheetTab };
   m = /^\/c\/(\d+)\/log\/?$/.exec(pathname);
   if (m) return { name: 'log', id: Number(m[1]) };
   m = /^\/c\/(\d+)\/map\/?$/.exec(pathname);

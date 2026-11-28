@@ -1,4 +1,4 @@
-import type { ElementType, HTMLAttributes, ReactNode } from 'react';
+import type { ElementType, HTMLAttributes, ReactNode, Ref } from 'react';
 
 const Corner = ({ at }: { at: 'tl' | 'tr' | 'bl' | 'br' }) => (
   <svg className={`k-corner ${at}`} aria-hidden="true" viewBox="0 0 40 40" fill="none" stroke="currentColor" strokeWidth="1.4">
@@ -15,6 +15,7 @@ type Props = HTMLAttributes<HTMLElement> & {
   /** Gilt filigree in the corners: the top two, or all four. */
   corners?: 'top' | 'all';
   children?: ReactNode;
+  ref?: Ref<HTMLElement>;
 };
 
 /** The surface everything readable sits on: textured paper hung on the stone. */

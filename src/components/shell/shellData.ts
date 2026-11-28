@@ -49,24 +49,28 @@ export function useCharacters(): CharacterSummary[] | null {
   return list;
 }
 
-/** Whether the character has Cartographer's Tools (the Journey map page), the same check the map page makes. */
-export function useHasMap(id: number): boolean {
+/** What decides the sidebar's links for this character: a Journey map (Cartographer's Tools, the map page's own
+ * check) and a Spells tab (any spells at all, the sheet's own check). */
+export function useCharacterFacts(id: number): { hasMap: boolean; hasSpells: boolean } {
   const v = useVersion();
-  const [has, setHas] = useState(false);
+  const [facts, setFacts] = useState({ hasMap: false, hasSpells: false });
   useEffect(() => {
     let live = true;
     get<CharacterDto>(`/characters/${id}`).then((dto) => {
       if (!live || !dto) return;
       try {
         const c = buildCharacter(dto.sheet, dto.extras, dto.levels, dto.homebrew);
-        setHas(hasTool(c.tools, "Cartographer's Tools"));
+        setFacts({
+          hasMap: hasTool(c.tools, "Cartographer's Tools"),
+          hasSpells: c.spellAbility !== null || c.spells.length > 0 || c.bonusSpells.length > 0,
+        });
       } catch {
-        setHas(false);
+        setFacts({ hasMap: false, hasSpells: false });
       }
     });
     return () => {
       live = false;
     };
   }, [id, v]);
-  return has;
+  return facts;
 }

@@ -1,0 +1,140 @@
+/* ---------- Sheet banner: who the character is, and the vitals you reach for mid-fight ----------
+   A parchment panel with the class colour across the top, a swallowtail pennant, the portrait in a gilt laurel.
+   Below a gilt rule: HP vial, AC crest, initiative and speed coins, hit dice, slots, uses, conditions, rests. */
+.k-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.k-vl { font: 400 13px 'IM Fell English SC', serif; letter-spacing: .06em; color: var(--muted); }
+.k-x { min-width: 28px; min-height: 28px; padding: 0; border: 0; border-radius: 50%; background: none; color: var(--muted); font: 600 18px/1 'EB Garamond', serif; }
+.k-x:hover:not(:disabled) { background: var(--bg-2); color: var(--ink); }
+.k-x:disabled { opacity: .35; }
+
+.k-banner { position: relative; z-index: 2; display: grid; gap: 16px; padding: 22px 24px 18px; border-top: 8px solid var(--accent); }
+.k-banner-stitch { position: absolute; left: 0; right: 0; top: 0; height: 3px; background: repeating-linear-gradient(90deg, var(--gilt-hi) 0 10px, transparent 10px 16px); opacity: .8; pointer-events: none; }
+.k-banner-pennant { position: absolute; top: -8px; right: 26px; z-index: 1; }
+.k-banner-pennant .emblem { width: 26px; height: 26px; color: var(--gilt-hi); }
+
+.k-banner-who { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 22px; padding-right: 84px; }
+.k-laurel { position: relative; width: 132px; height: 132px; flex: none; display: grid; place-items: center; }
+.k-laurel-wreath { position: absolute; inset: 0; pointer-events: none; color: var(--gilt); filter: drop-shadow(0 1px 0 var(--gilt-lo)) drop-shadow(0 0 10px color-mix(in srgb, var(--gilt-hi) 45%, transparent)); }
+.k-banner-portrait { width: 96px; height: 96px; border-radius: 50%; object-fit: cover; object-position: 50% 20%; border: 3px solid var(--card); box-shadow: 0 0 0 2px var(--gilt), 0 0 0 5px var(--accent), 0 8px 20px rgb(0 0 0 / 40%); box-sizing: border-box; }
+.k-banner-portrait.initials { display: grid; place-items: center; background: radial-gradient(circle at 35% 30%, var(--accent-2), var(--accent) 70%); color: #f3eee1; font: 400 34px 'IM Fell English SC', serif; }
+.k-banner-name { flex: 1 1 280px; min-width: 0; }
+.k-banner-name h1 { margin: 0; font: 400 clamp(30px, 4vw, 42px)/1.05 'IM Fell English SC', serif; letter-spacing: .03em; color: var(--heading); text-shadow: 0 1px 0 rgb(255 255 255 / 60%), 0 -1px 0 rgb(0 0 0 / 20%); }
+.k-banner-name p { margin: 4px 0 0; font: italic 18px 'EB Garamond', serif; color: var(--muted); }
+.k-banner-tags { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 0; }
+.k-banner-tags div { display: flex; align-items: baseline; gap: 6px; padding: 2px 10px; border: 1px solid var(--line); border-radius: 3px; background: var(--bg-2); }
+.k-banner-tags dt { font: 400 13px 'IM Fell English SC', serif; letter-spacing: .05em; color: var(--muted); }
+.k-banner-tags dd { margin: 0; font: 600 16px 'EB Garamond', serif; }
+.k-banner-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.k-banner-menu { position: relative; }
+.k-banner-menu > .btn { min-width: 44px; min-height: 40px; font-size: 20px; line-height: 1; }
+.k-menu { position: absolute; right: 0; top: calc(100% + 6px); z-index: 20; display: grid; min-width: 200px; padding: 6px; }
+.k-menu button { min-height: 40px; padding: 0 12px; border: 0; border-radius: 3px; background: none; text-align: left; font: 500 16px 'EB Garamond', serif; color: var(--ink); }
+.k-menu button:hover, .k-menu button:focus-visible { background: var(--bg-2); }
+
+.k-banner-alerts { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; }
+.k-conc { display: inline-flex; align-items: center; gap: 10px; padding: 4px 8px 4px 4px; border-radius: 999px; background: rgb(36 80 143 / 12%); border: 1px solid rgb(36 80 143 / 40%); color: #1d3f72; font: 500 16px 'EB Garamond', serif; }
+.k-death { display: inline-flex; align-items: center; gap: 10px; }
+@media (prefers-color-scheme: dark) { .k-conc { color: #a8c6f2; background: rgb(111 160 255 / 12%); border-color: rgb(111 160 255 / 35%); } }
+
+/* The vitals row, below a gilt rule. */
+.k-vitals { display: flex; flex-wrap: wrap; align-items: stretch; gap: 14px 18px; padding-top: 18px; background: var(--rule) center top / 100% 14px no-repeat; }
+.k-hp { flex: 1 1 300px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.k-hp-top { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.k-hp-n { font: 900 38px/1 Cinzel, serif; font-variant-numeric: tabular-nums; }
+.k-hp-max { font: 600 18px Cinzel, serif; color: var(--muted); }
+.k-hp-controls { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.k-hp-controls input { width: 64px; min-height: 34px; box-sizing: border-box; padding: 0 8px; border: 1px solid var(--line); border-radius: 3px; background: var(--bg); color: var(--ink); font: 600 16px 'EB Garamond', serif; }
+.k-hp-controls .btn { min-height: 34px; }
+.k-chip { display: inline-flex; align-items: center; gap: 4px; min-height: 28px; padding: 0 10px; border-radius: 3px; border: 1px solid var(--line); background: var(--bg-2); color: var(--ink); font: 500 15px 'EB Garamond', serif; }
+button.k-chip { cursor: pointer; }
+button.k-chip:hover { border-color: var(--gilt); }
+.k-chip.blue { background: rgb(36 80 143 / 12%); border-color: rgb(36 80 143 / 35%); color: #1d3f72; }
+.k-chip.red { background: rgb(168 50 42 / 12%); border-color: rgb(168 50 42 / 40%); color: #7c231d; }
+.k-chip.add { border-style: dashed; background: none; color: var(--muted); }
+@media (prefers-color-scheme: dark) {
+  .k-chip.blue { color: #a8c6f2; background: rgb(111 160 255 / 12%); border-color: rgb(111 160 255 / 35%); }
+  .k-chip.red { color: #f2a59c; background: rgb(224 103 92 / 14%); border-color: rgb(224 103 92 / 40%); }
+}
+
+/* AC as a gilt crest with an enamelled field in the class colour. */
+.k-crest { flex: none; align-self: center; width: 92px; height: 108px; display: grid; place-items: center; border-radius: 6px 6px 50% 50% / 6px 6px 40% 40%; background: linear-gradient(135deg, var(--gilt-hi), var(--gilt) 45%, var(--gilt-lo)); box-shadow: 0 8px 14px rgb(0 0 0 / 35%), inset 0 2px 0 rgb(255 255 255 / 40%); }
+.k-crest > span { width: 78px; height: 92px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 4px 4px 50% 50% / 4px 4px 40% 40%; background: radial-gradient(circle at 40% 25%, color-mix(in srgb, var(--accent) 80%, white), color-mix(in srgb, var(--accent) 75%, black)); color: #f3eee1; }
+.k-crest .k-vl { color: rgb(243 238 225 / 85%); }
+.k-crest b { font: 900 34px/1 Cinzel, serif; text-shadow: 0 2px 0 rgb(0 0 0 / 40%); }
+@media (prefers-color-scheme: dark) { .k-crest > span { background: radial-gradient(circle at 40% 25%, color-mix(in srgb, var(--accent) 55%, black), color-mix(in srgb, var(--accent) 30%, black)); } }
+.k-vitals .k-coin-wrap { align-self: center; margin: 0 10px; } /* the ribbon reaches past the coin */
+
+.k-box { display: flex; flex-direction: column; justify-content: center; gap: 6px; min-width: 96px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 3px; background: var(--bg-2); }
+.k-box-n { font: 700 26px/1.1 Cinzel, serif; font-variant-numeric: tabular-nums; }
+.k-box-n small { font: 500 15px 'EB Garamond', serif; color: var(--muted); }
+.k-box-row { display: flex; align-items: center; gap: 8px; }
+.k-box-row > small { min-width: 28px; font: 500 14px 'EB Garamond', serif; color: var(--muted); }
+.k-uses > small { min-width: 0; }
+.k-uses .btn { min-height: 30px; padding: 0 10px; }
+.k-conditions { flex: 1 1 220px; }
+.k-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.k-condition-pick { padding-top: 6px; border-top: 1px dashed var(--line); }
+.k-rests { display: flex; flex-direction: column; justify-content: center; gap: 8px; margin-left: auto; }
+.k-variant { margin: 0; font-size: 15px; color: var(--muted); }
+
+/* The one-line copy that pins to the top once the banner has scrolled away. */
+.k-pinbar { position: sticky; top: 0; z-index: 20; height: 0; }
+.k-pinbar-in {
+  display: flex; align-items: center; gap: 14px; flex-wrap: nowrap; overflow: hidden; padding: 6px 14px; border-top: 4px solid var(--accent); border-radius: 0 0 3px 3px;
+  transform: translateY(-110%); opacity: 0; visibility: hidden; transition: transform var(--dur-fast), opacity var(--dur-fast), visibility 0s linear var(--dur-fast);
+  font: 500 15px 'EB Garamond', serif; white-space: nowrap;
+}
+.k-pinbar.show .k-pinbar-in { transform: none; opacity: 1; visibility: visible; transition: transform var(--dur-fast), opacity var(--dur-fast); }
+.k-pinbar-in img, .k-pinbar-dot { width: 30px; height: 30px; flex: none; border-radius: 50%; object-fit: cover; object-position: 50% 20%; box-shadow: 0 0 0 1.5px var(--gilt), 0 0 0 3px var(--accent); }
+.k-pinbar-dot { background: var(--accent); }
+.k-pinbar-name { font: 400 18px 'IM Fell English SC', serif; color: var(--heading); overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.k-pinbar b { font: 700 17px Cinzel, serif; }
+.k-pinbar-vial { flex: 0 1 140px; min-width: 70px; }
+.k-pinbar-vial .k-vial { height: 14px; box-shadow: inset 0 1px 3px rgb(0 0 0 / 40%), 0 0 0 1.5px var(--gilt); }
+.k-pinbar-vial .k-vial::after, .k-pinbar-vial .k-bubble { display: none; }
+.k-pinbar-slots { display: inline-flex; align-items: center; gap: 5px; }
+.k-pinbar-slots small { color: var(--muted); }
+.k-pinbar-slots .k-pip { width: 11px; height: 11px; }
+.k-pinbar .k-chip { min-height: 24px; font-size: 14px; }
+@media (max-width: 599px) {
+  .k-pinbar { top: 51px; } /* under the phone's sidebar bar */
+  .k-pinbar-vial, .k-pinbar-slots, .k-pinbar-name { display: none; }
+}
+
+/* Ribbon tabs hanging from the banner. */
+.k-ribbons { position: relative; z-index: 1; display: flex; flex-wrap: wrap; gap: 6px; padding: 0 18px; margin: 0 0 22px; }
+.k-ribbon-tab {
+  display: inline-flex; align-items: center; min-height: 44px; padding: 10px 18px 8px; box-sizing: border-box;
+  border: 1px solid rgb(90 60 25 / 45%); border-top: 0; border-radius: 0 0 4px 4px; text-decoration: none;
+  background: linear-gradient(var(--card-wash), var(--card-wash)), var(--card-tex) 0 0 / 512px 512px, var(--card);
+  color: var(--muted); font: 400 18px 'IM Fell English SC', serif; letter-spacing: .04em; box-shadow: 0 4px 8px rgb(30 20 5 / 28%);
+  transition: padding var(--dur-fast);
+}
+.k-ribbon-tab:hover { color: var(--ink); padding-bottom: 11px; }
+.k-ribbon-tab.on { padding-bottom: 14px; background: linear-gradient(color-mix(in srgb, var(--accent) 88%, white), var(--accent)); border-color: color-mix(in srgb, var(--accent) 70%, black); color: #f3eee1; }
+.k-ribbon-tab:focus-visible { outline: 2px solid var(--gilt); outline-offset: 2px; }
+@media (prefers-color-scheme: dark) {
+  .k-ribbon-tab { border-color: rgb(236 210 160 / 20%); }
+  .k-ribbon-tab.on { background: linear-gradient(color-mix(in srgb, var(--accent) 50%, black), color-mix(in srgb, var(--accent) 35%, black)); }
+}
+@media (max-width: 599px) {
+  .k-ribbons { flex-wrap: nowrap; overflow-x: auto; padding: 0 8px; scrollbar-width: none; }
+  .k-ribbon-tab { flex: none; font-size: 16px; padding-inline: 14px; }
+}
+
+.k-tab-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(360px, 100%), 1fr)); gap: 18px; align-items: start; }
+.k-tab-single { display: grid; gap: 18px; }
+
+/* Phone: name and portrait stack; vitals fold to the essentials, two to a row. */
+@media (max-width: 599px) {
+  .k-banner { padding: 18px 14px 14px; }
+  .k-banner-who { padding-right: 0; justify-content: center; text-align: center; }
+  .k-banner-pennant { right: 12px; transform: scale(.75); transform-origin: top right; }
+  .k-banner-tags { justify-content: center; }
+  .k-banner-actions { justify-content: center; width: 100%; }
+  .k-vitals { gap: 12px; }
+  .k-hp { flex-basis: 100%; }
+  .k-rests { flex-direction: row; margin-left: 0; width: 100%; }
+  .k-rests .btn { flex: 1; }
+}
+@media (prefers-reduced-motion: reduce) { .k-pinbar-in, .k-ribbon-tab { transition: none !important; } }

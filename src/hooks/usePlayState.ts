@@ -177,6 +177,12 @@ export function usePlayState(c: Character, characterId: number) {
       return { slotsUsed: used };
     }, slotSummary('Restored', level));
 
+  const toggleInspiration = () =>
+    update(
+      (s) => ({ inspiration: !s.inspiration }),
+      (_, b) => ({ type: 'condition', summary: b.inspiration ? 'Gained Heroic Inspiration' : 'Spent Heroic Inspiration' }),
+    );
+
   const toggleCondition = (name: string) =>
     update(
       (s) => ({
@@ -193,6 +199,7 @@ export function usePlayState(c: Character, characterId: number) {
         chosenCantrips: s.chosenCantrips,
         prepared: s.prepared,
         variant: s.variant,
+        inspiration: s.inspiration,
       }),
       (a, b) => ({ type: 'rest', summary: `Long rest (HP ${a.hp} → ${b.hp}, slots restored)` }),
     );
@@ -278,7 +285,7 @@ export function usePlayState(c: Character, characterId: number) {
   };
 
   return {
-    state, ready, update, damage, heal, setTemp, useSlot, restoreSlot, toggleCondition, longRest, reset,
+    state, ready, update, damage, heal, setTemp, useSlot, restoreSlot, toggleCondition, toggleInspiration, longRest, reset,
     toggleCantrip, togglePrepared, useWildShape: () => wildShape(1), restoreWildShape: () => wildShape(-1),
     setVariant, useResource: (key: string) => resource(key, 1), restoreResource: (key: string) => resource(key, -1), shortRest,
     settle, replace,
