@@ -6,12 +6,14 @@ Adventurers Journal is an [Electron](https://www.electronjs.org/) app with a Rea
 
 ## Features
 
-- **Character sheet**: ability scores, saving throws and skills, combat stats, features and traits, equipment and inventory.
-- **Spells**: spell list, plus an SRD spell browser and picker.
-- **Dice tray**: roll dice right from the sheet.
+- **Character sheet**: a banner with the vitals you reach for mid-fight (HP, AC, slots, uses, conditions, rests, concentration, Heroic Inspiration) and tabs for Stats (ability scores, saves, skills, actions), Spells, Inventory and Features.
+- **Spells**: today's spells as a deck of cards, with a casting effect and upcasting, or as a list; plus an SRD spell browser and picker.
+- **Dice**: roll from anywhere on the sheet, with advantage and disadvantage, and see each roll tumble in.
+- **Find & roll**: `Ctrl+K` (`⌘K`) finds pages, heroes, notes, spells and skills, and rolls dice like `2d6+3`.
+- **Day and night**: a Day, Night or Follow-the-system switch.
 - **Level-up wizard**: levels 1 → 20, asking only for the choices each level grants.
 - **Homebrew**: a library and editor for your own subclasses.
-- **Characters and campaigns**: keep several characters and campaigns, each character with a history log. Notes belong to the campaign and every character in it shares them, on the character's Notes tab.
+- **Characters and campaigns**: the Hall of Heroes keeps several characters and campaigns, and shows who's hurt at a glance; each character has a history log. Notes belong to the campaign and every character in it shares them, on the character's Notes tab.
 - **Linked notes**: notes for sessions, the other players and their characters, quests, NPCs, places, factions, items and lore, each with its own fields (quest status, NPC attitude, …) and an optional image or portrait. Write `[[Neverwinter]]` to link a note, or just mention a note's title or alias. Every note lists the notes that mention it. The Notes tab opens on a campaign overview (open quests, a card per kind, recent changes); the index filters by kind and tag.
 - **Import and backup**: import a character from a JSON sheet, and back up the whole database to a file.
 
@@ -119,6 +121,15 @@ Two standalone scripts aren't wired into `package.json`, because you rarely need
 
 - `bun scripts/gen-textures.ts` regenerates the parchment and leather textures in `public/textures/`.
 - `bun scripts/check-levels.ts [class]` compares the class tables in `src/lib/rules.ts` with the SRD API (needs network).
+
+### The look
+
+The castle look (stone wall, parchment, gilt, class colours, IM Fell English SC, Cinzel and EB Garamond) is built
+from a small kit in `src/components/kit/` and `src/styles/kit.css`. In dev builds, open `/kit` to see every piece in
+every state, with a class picker; switch the OS theme or the in-app switch for night. `src/styles.css` imports one
+stylesheet per area from `src/styles/` in cascade order. Night rules are written inside
+`@media (prefers-color-scheme: dark)`; a PostCSS plugin (`scripts/build/themeSwitch.ts`) lets the theme switch force them.
+Nothing is written straight on the wall: text sits on parchment.
 
 ### Project structure
 
