@@ -553,8 +553,8 @@ label.btn { display: inline-block; }
 .note-row > .note-thumb { grid-column: 1; grid-row: 1 / span 3; align-self: start; width: 40px; height: 40px; margin-top: 2px; }
 .note-thumb img { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: 3px; box-shadow: 0 0 0 1px var(--gilt); }
 .note-thumb.is-portrait img { border-radius: 50%; }
-/* A stand-in medallion brings its own rim and transparent corners: no frame of ours around it. */
-.note-thumb.is-fallback img { object-fit: contain; border-radius: 0; box-shadow: none; }
+/* A stand-in is a bare watercolour circle: we draw its frame, gilt then the kind's colour. */
+.note-thumb.is-fallback img { border-radius: 50%; box-shadow: 0 0 0 1px var(--gilt), 0 0 0 2px var(--kind, var(--gilt)); }
 .note-row strong { font-size: 1.02rem; font-weight: 600; }
 .note-row small { color: var(--muted); font-size: .84rem; }
 /* Every title reads at full strength; a finished quest just gets a mark after its name. */
@@ -1496,9 +1496,10 @@ button.linkish.more { color: var(--muted); font-size: .9rem; }
 }
 /* A kind's stand-in is a placeholder, not the note's own picture: smaller and quieter. */
 .note-image.is-fallback.is-picture img {
-  width: 140px; height: 140px; max-width: none; max-height: none; object-fit: contain;
-  /* The painted medallion has its own rim and transparent corners, so it goes unframed. */
-  border: 0; border-radius: 0; box-shadow: none; filter: drop-shadow(0 3px 6px rgb(0 0 0 / 30%));
+  width: 140px; height: 140px; max-width: none; max-height: none; object-fit: cover;
+  /* The watercolour circle has no rim of its own: frame it like a portrait, its outer ring in the kind's colour. */
+  border: 3px solid var(--card); border-radius: 50%;
+  box-shadow: 0 0 0 2px var(--gilt), 0 0 0 4px var(--kind), 0 4px 12px rgb(0 0 0 / 30%);
 }
 .note-image.is-picture img { max-width: min(260px, 40vw); max-height: 220px; border-radius: 3px; border: 1px solid var(--line); box-shadow: 0 0 0 3px var(--card), 0 0 0 4px var(--gilt), 0 4px 12px rgb(0 0 0 / 25%); }
 @media (max-width: 560px) {
